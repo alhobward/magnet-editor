@@ -3,79 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Magnet Editor Prototype</title>
+  <title>Magnet Editor</title>
   <style>
     :root{
       --bg:#0b0c10;
       --panel:#121420;
-      --panel2:#0f1120;
-      --stroke:rgba(255,255,255,.10);
-      --stroke2:rgba(255,255,255,.14);
       --text:#e9eef5;
       --muted:rgba(233,238,245,.75);
       --blue:#2a5cff;
       --yellow:#ffd43b;
-      --yellowSoft:rgba(255,212,59,.38);
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --shadow2: 0 18px 55px rgba(0,0,0,.45);
       --radius:16px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color: var(--text);
     }
-
     *{ box-sizing:border-box; }
     body{
-      margin:0;
-      min-height:100vh;
+      margin:0; min-height:100vh;
       background:
         radial-gradient(1200px 600px at 20% -10%, rgba(42,92,255,.15), transparent 55%),
         radial-gradient(900px 500px at 90% 10%, rgba(255,212,59,.10), transparent 60%),
-        radial-gradient(800px 500px at 60% 110%, rgba(120,255,190,.08), transparent 55%),
         var(--bg);
       color:var(--text);
     }
 
     header{
-      padding: 16px 20px;
+      padding: 14px 16px;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex;
-      gap:16px;
-      align-items:center;
-      justify-content:space-between;
+      display:flex; align-items:center; justify-content:space-between;
       backdrop-filter: blur(8px);
       background: rgba(11,12,16,.55);
-      position: sticky;
-      top: 0;
-      z-index: 5;
+      position: sticky; top: 0; z-index: 5;
+      gap: 10px;
+      flex-wrap: wrap;
     }
+    header h1{ margin:0; font-size: 13px; font-weight:800; opacity:.95; }
 
-    header h1{
-      margin:0;
-      font-size: 14px;
-      font-weight: 750;
-      letter-spacing:.25px;
-      opacity:.95;
+    .pill{
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      font-size:12px;
+      background: rgba(15,17,32,.55);
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      white-space: nowrap;
     }
-
-    /* ✅ Premium header progress */
-    .hdrRight{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      align-items:flex-end;
-      min-width: 320px;
-    }
-    .hdrTop{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:flex-end;
-      flex-wrap:wrap;
-    }
+    .hdrRight{ display:flex; flex-direction:column; gap:8px; min-width: 320px; }
+    .hdrTop{ display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap; }
     .progressWrap{
-      width: 320px;
-      max-width: 70vw;
-      height: 10px;
+      width: 320px; max-width: 92vw; height: 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(15,17,32,.55);
@@ -83,57 +59,45 @@
       box-shadow: 0 10px 25px rgba(0,0,0,.18) inset;
     }
     .progressBar{
-      height:100%;
-      width:0%;
-      border-radius: 999px;
+      height:100%; width:0%;
       background: linear-gradient(90deg, rgba(255,212,59,1), rgba(42,92,255,.95));
-      box-shadow: 0 0 22px rgba(255,212,59,.18);
       transition: width .22s ease;
     }
 
     main{
       display:grid;
       grid-template-columns: 360px 1fr;
-      gap: 14px;
-      padding: 14px;
+      gap: 12px;
+      padding: 12px;
     }
 
     .panel{
       background: linear-gradient(180deg, rgba(18,20,32,.95), rgba(18,20,32,.85));
       border: 1px solid rgba(255,255,255,.08);
       border-radius: var(--radius);
-      padding:14px;
+      padding: 12px;
       box-shadow: var(--shadow);
     }
 
-    .panel h2{
-      margin:0 0 10px;
-      font-size: 12px;
-      opacity:.9;
-      font-weight:800;
-      letter-spacing:.25px;
-      text-transform: none;
+    .right{
+      background: linear-gradient(180deg, rgba(18,20,32,.93), rgba(18,20,32,.84));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding:12px;
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height: 520px;
     }
+
+    h2{ margin:0 0 10px; font-size:12px; font-weight:900; opacity:.9; }
+    .muted{ font-size:12px; color: var(--muted); line-height:1.35; }
+    .k{ font-size:12px; opacity:.82; }
 
     .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .row + .row{ margin-top:10px; }
-
-    label{ font-size: 12px; opacity:.9; }
-    input[type="range"]{ width: 100%; }
-    input[type="text"]{
-      width: 100%;
-      padding:10px 12px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(15,17,32,.9);
-      color: var(--text);
-      outline:none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-    input[type="text"]:focus{
-      border-color: rgba(255,212,59,.55);
-      box-shadow: 0 0 0 4px rgba(255,212,59,.10);
-    }
+    .twoCol{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
     button{
       appearance:none;
@@ -143,112 +107,52 @@
       padding:10px 12px;
       border-radius: 12px;
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
-      letter-spacing:.15px;
-      transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease;
     }
-
-    button:hover{
-      border-color: rgba(255,255,255,.22);
-      filter: brightness(1.03);
-      transform: translateY(-1px);
-    }
-
-    button:active{
-      transform: translateY(0px);
-      filter: brightness(0.98);
-    }
+    button:hover{ border-color: rgba(255,255,255,.22); filter: brightness(1.03); transform: translateY(-1px); }
+    button:active{ transform: translateY(0); filter: brightness(.98); }
+    button:disabled{ opacity:.45; cursor:not-allowed; transform:none; filter:none; box-shadow:none; }
 
     button.primary{
       background: linear-gradient(180deg, rgba(42,92,255,1), rgba(42,92,255,.82));
       border-color: rgba(42,92,255,.85);
       box-shadow: 0 10px 25px rgba(42,92,255,.25);
     }
-    button.primary:hover{
-      filter: brightness(1.06);
-      box-shadow: 0 12px 30px rgba(42,92,255,.30);
-    }
-
-    button.danger{
-      background: linear-gradient(180deg, rgba(64,18,34,.9), rgba(42,20,32,.9));
-      border-color: rgba(255,80,120,.35);
-      box-shadow: 0 12px 28px rgba(255,80,120,.08);
-    }
-
-    button.ghost{ background: transparent; }
-
-    button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none !important;
-      filter:none !important;
-      box-shadow:none !important;
-    }
-
     button.upload{
       background: linear-gradient(180deg, rgba(255,212,59,1), rgba(255,212,59,.88));
       border-color: rgba(255,212,59,.95);
       color:#0b0c10;
       box-shadow: 0 10px 25px rgba(255,212,59,.16);
     }
-    button.upload:hover{
-      filter: brightness(1.03);
-      box-shadow: 0 12px 30px rgba(255,212,59,.20);
+    button.danger{
+      background: linear-gradient(180deg, rgba(64,18,34,.9), rgba(42,20,32,.9));
+      border-color: rgba(255,80,120,.35);
     }
+    button.ghost{ background: transparent; }
 
-    /* ✅ Gentle pulse ONLY when needed */
-    @keyframes softPulse {
-      0%   { box-shadow: 0 10px 25px rgba(0,0,0,.10), 0 0 0 0 rgba(255,212,59,.22); }
-      55%  { box-shadow: 0 12px 30px rgba(0,0,0,.16), 0 0 0 10px rgba(255,212,59,0); }
-      100% { box-shadow: 0 10px 25px rgba(0,0,0,.10), 0 0 0 0 rgba(255,212,59,0); }
-    }
-    .pulse{
-      border-color: rgba(255,212,59,.85) !important;
-      animation: softPulse 1.8s ease-in-out infinite;
-    }
+    hr{ border:0; border-top:1px solid rgba(255,255,255,.08); margin:12px 0; }
 
-    .muted{ font-size:12px; color: var(--muted); line-height:1.35; }
-    .k{ font-size:12px; opacity:.82; }
-
-    .pill{
-      padding:6px 10px;
-      border-radius:999px;
+    input[type="text"]{
+      width: 100%;
+      padding:10px 12px;
+      border-radius: 12px;
       border:1px solid rgba(255,255,255,.12);
-      font-size:12px;
-      opacity:.95;
-      background: rgba(15,17,32,.55);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 10px 25px rgba(0,0,0,.20);
+      background: rgba(15,17,32,.9);
+      color: var(--text);
+      outline:none;
     }
+    input[type="range"]{ width: 100%; }
 
     .seg{ display:flex; gap:8px; flex-wrap:wrap; }
-    .seg button{
-      padding:8px 10px;
-      border-radius:999px;
-      font-weight:850;
-      background: rgba(15,17,32,.75);
-    }
+    .seg button{ padding:8px 10px; border-radius:999px; }
     .seg button.active{
       background: rgba(26,34,58,.9);
       border-color: rgba(255,255,255,.24);
-      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
     }
 
-    hr{ border:0; border-top:1px solid rgba(255,255,255,.08); margin:14px 0; }
-
-    .right{
-      background: linear-gradient(180deg, rgba(18,20,32,.93), rgba(18,20,32,.84));
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      padding:14px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      box-shadow: var(--shadow);
-    }
-
-    .nav{ display:flex; justify-content:space-between; gap:10px; align-items:center; }
+    .nav{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
 
     .grid{
       display:grid;
@@ -258,147 +162,71 @@
 
     .tile{
       background: linear-gradient(180deg, rgba(15,17,32,.95), rgba(12,14,24,.95));
-      border: 1.5px solid rgba(255,212,59,.70);
+      border: 1.5px solid rgba(255,212,59,.78);
       border-radius: 16px;
       padding:10px;
       cursor:pointer;
       display:flex;
       flex-direction:column;
       gap:10px;
-      user-select:none;
-      box-shadow:
-        0 10px 24px rgba(0,0,0,.22),
-        0 0 0 1px rgba(255,212,59,.06) inset;
-      transition:
-        transform .14s ease,
-        box-shadow .14s ease,
-        border-color .14s ease,
-        filter .14s ease;
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
     }
-
-    .tile::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background: radial-gradient(600px 120px at 50% 0%, rgba(255,212,59,.10), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
-    }
-
-    .tile:hover{
-      transform: translateY(-2px);
-      border-color: rgba(255,212,59,.92);
-      box-shadow:
-        0 18px 38px rgba(0,0,0,.35),
-        0 0 0 1px rgba(255,212,59,.10) inset,
-        0 0 22px rgba(255,212,59,.12);
-      filter: brightness(1.02);
-    }
-
-    .tile.active{
-      border-color: rgba(255,212,59,1);
-      box-shadow:
-        0 18px 42px rgba(0,0,0,.38),
-        0 0 0 2px rgba(255,212,59,.24) inset,
-        0 0 26px rgba(255,212,59,.18);
-    }
+    .tile:hover{ transform: translateY(-2px); border-color: rgba(255,212,59,.98); box-shadow: 0 18px 38px rgba(0,0,0,.35); }
+    .tile.active{ border-color: rgba(255,212,59,1); box-shadow: 0 18px 42px rgba(0,0,0,.38); }
 
     .thumb{
       width:100%;
-      aspect-ratio:1/1;
+      aspect-ratio: 1/1;
       border-radius:14px;
       background: rgba(11,12,16,1);
       border: 1px solid rgba(255,212,59,.50);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       overflow:hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25) inset;
-      position: relative;
     }
     .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-    .tile .meta{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-    }
-
+    .meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .badge{
       font-size: 11px;
       padding: 5px 9px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(15,17,32,.65);
-      backdrop-filter: blur(6px);
-      font-weight: 850;
-      letter-spacing:.15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      font-weight: 900;
       white-space: nowrap;
     }
-    .badge.empty{
-      border-color: rgba(255,255,255,.14);
-      opacity:.82;
-    }
-    .badge.review{
-      border-color: rgba(255,210,138,.55);
-      color: #ffd28a;
-      box-shadow: 0 12px 30px rgba(255,210,138,.08);
-    }
-    .badge.ready{
-      border-color: rgba(120,255,190,.35);
-      color: #a9ffd4;
-      box-shadow: 0 12px 30px rgba(120,255,190,.08);
-    }
+    .badge.empty{ opacity:.82; }
+    .badge.review{ border-color: rgba(255,210,138,.55); color: #ffd28a; }
+    .badge.ready{ border-color: rgba(120,255,190,.35); color: #a9ffd4; }
 
     .canvasWrap{
       background: linear-gradient(180deg, rgba(11,12,16,1), rgba(6,7,10,1));
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
       padding: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       box-shadow: var(--shadow2);
-      position: relative;
-      overflow:hidden;
-    }
-    .canvasWrap::before{
-      content:"";
-      position:absolute;
-      inset:-60px;
-      background:
-        radial-gradient(420px 220px at 30% 10%, rgba(42,92,255,.10), transparent 60%),
-        radial-gradient(420px 220px at 70% 90%, rgba(255,212,59,.08), transparent 60%);
-      pointer-events:none;
     }
     canvas{
-      width:min(560px, 100%);
-      height:auto;
-      border-radius:14px;
-      background:#05060a;
+      width: min(560px, 100%);
+      height: auto;
+      border-radius: 14px;
+      background: #05060a;
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 14px 35px rgba(0,0,0,.38);
-      touch-action:none;
-      position: relative;
-      z-index: 1;
+      touch-action: none; /* ✅ important for mobile gestures */
     }
 
-    .twoCol{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .checkrow{ display:flex; gap:10px; align-items:flex-start; }
+    .checkrow input{ transform: translateY(2px); }
+    .hint{ font-size:12px; opacity:.78; margin-top:6px; }
     .warn{ font-size:12px; color:#ffd28a; opacity:.95; }
     .ok{ font-size:12px; color:#a9ffd4; opacity:.95; }
 
-    .checkrow{ display:flex; gap:10px; align-items:flex-start; }
-    .checkrow input[type="checkbox"]{ transform: translateY(2px); }
-    .hint{ font-size:12px; opacity:.78; margin-top:6px; }
-
     @media (max-width: 980px){
       main{ grid-template-columns: 1fr; }
-      header{ position: relative; }
-      .hdrRight{ align-items:stretch; min-width: unset; width: 100%; }
+      .hdrRight{ min-width: unset; width: 100%; }
       .progressWrap{ width: 100%; max-width: 100%; }
       .hdrTop{ justify-content:space-between; }
     }
@@ -408,26 +236,24 @@
 <header>
   <h1>Magnet Editor (50×50mm required • bleed may be blank)</h1>
 
-  <!-- ✅ Header right block with pills + progress bar -->
   <div class="hdrRight">
     <div class="hdrTop">
       <span class="pill" id="qtyPill">Order Quantity: 6</span>
       <span class="pill" id="progressPill">0/6 complete</span>
       <button class="primary" id="toGridBtn" type="button">Grid</button>
     </div>
-    <div class="progressWrap" aria-label="Order progress">
+    <div class="progressWrap">
       <div class="progressBar" id="progressBar"></div>
     </div>
   </div>
 </header>
 
 <main>
-  <!-- LEFT -->
+  <!-- LEFT PANEL -->
   <section class="panel">
     <h2>Order</h2>
-
     <div class="row">
-      <label>Quantity (multiples of 6, max 72)</label>
+      <div class="k">Quantity (multiples of 6, max 72)</div>
       <div class="seg" id="qtyButtons"></div>
     </div>
 
@@ -436,9 +262,7 @@
       <input id="bulkFileInput" type="file" accept="image/*" multiple style="display:none" />
       <input id="tileFileInput" type="file" accept="image/*" style="display:none" />
     </div>
-    <div class="muted">
-      Tip: You can also upload an individual photo by clicking any blank square in the grid.
-    </div>
+    <div class="muted">Tip: on mobile, you can upload single photos by tapping an empty square.</div>
 
     <hr>
 
@@ -451,7 +275,7 @@
     <div class="checkrow">
       <input id="finalConfirm" type="checkbox" />
       <div>
-        <label for="finalConfirm">I’ve reviewed all magnets and they’re ready to print</label>
+        <label for="finalConfirm" class="k">I’ve reviewed all magnets and they’re ready to print</label>
         <div class="hint" id="confirmHint">Uploads must be complete (no empty magnets) to enable A4/A3.</div>
         <div class="hint" id="confirmStatus"></div>
       </div>
@@ -467,13 +291,11 @@
       <button id="dlA4Btn" type="button">Download A4 sheet (6-up)</button>
       <button id="dlA3Btn" type="button">Download A3 sheet (12-up)</button>
     </div>
-    <div class="muted">
-      A4/A3 downloads require: (1) no empty magnets, and (2) the confirmation box ticked.
-      If some magnets are not yet reviewed, we’ll warn you — but we won’t block you.
-    </div>
+    <div class="muted">A4/A3 downloads require: (1) no empty magnets, (2) the confirmation box ticked.</div>
 
     <hr>
 
+    <!-- EDITOR CONTROLS (shows when editing) -->
     <div id="editorControls" style="display:none">
       <h2>Editor</h2>
 
@@ -492,27 +314,43 @@
       </div>
 
       <div class="row">
-        <label>Zoom (min = “covers 50×50mm”)</label>
+        <label class="k">Zoom (pinch on mobile also works)</label>
         <input type="range" id="zoom" min="1" max="3" value="1" step="0.01" />
       </div>
 
       <div class="row twoCol">
         <button id="bwBtn" type="button">B&W: Off</button>
+        <button id="textColorBtn" type="button">Text: Black</button>
+      </div>
+
+      <div class="row">
+        <label class="k">Text (optional, max 25 chars)</label>
+        <input type="text" id="textInput" maxlength="25" placeholder="e.g., Seoul 2026" />
+        <div class="row" style="width:100%; justify-content:space-between;">
+          <span class="k" id="charCount">0/25</span>
+          <span class="k">Drag text on canvas</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="danger" id="deleteTextBtn" type="button" disabled>Delete text</button>
       </div>
 
       <div class="row">
         <button id="backToGridBtn" class="ghost" type="button">← Back to grid</button>
       </div>
+
+      <div class="muted">
+        Mobile gestures: <b>one-finger drag</b> to move photo, <b>two-finger pinch</b> to zoom.
+      </div>
     </div>
   </section>
 
-  <!-- RIGHT -->
+  <!-- RIGHT PANEL -->
   <section class="right">
     <div class="nav">
       <div class="seg" id="setButtons"></div>
-      <div class="row">
-        <span class="k" id="viewLabel">Grid</span>
-      </div>
+      <span class="k" id="viewLabel">Grid</span>
     </div>
 
     <div id="gridView">
@@ -526,15 +364,13 @@
       <div class="canvasWrap">
         <canvas id="canvas" width="800" height="800"></canvas>
       </div>
-      <div class="muted">
-        Tip: drag photo to reposition. Zoom out is limited so the inner 50×50mm is always covered. Bleed ring may be blank.
-      </div>
     </div>
   </section>
 </main>
 
 <script>
 (() => {
+  // --- geometry
   const CANVAS_SIZE = 800;
   const VISIBLE_MM = 50;
   const BLEED_MM = 5;
@@ -556,6 +392,7 @@
   const A3 = { w: 3508, h: 4961, name: "A3_300dpi" };
   const MAGNET_ON_SHEET_PX = 709;
 
+  // --- DOM
   const qtyButtons = document.getElementById('qtyButtons');
   const setButtons = document.getElementById('setButtons');
   const grid = document.getElementById('grid');
@@ -567,8 +404,12 @@
   const qtyPill = document.getElementById('qtyPill');
   const progressPill = document.getElementById('progressPill');
   const progressBar = document.getElementById('progressBar');
-
   const lowResWarn = document.getElementById('lowResWarn');
+
+  const bulkUploadBtn = document.getElementById('bulkUploadBtn');
+  const bulkFileInput = document.getElementById('bulkFileInput');
+  const tileFileInput = document.getElementById('tileFileInput');
+  const fileInput = document.getElementById('fileInput');
 
   const finalConfirm = document.getElementById('finalConfirm');
   const confirmHint = document.getElementById('confirmHint');
@@ -576,75 +417,74 @@
   const reviewNextBtn = document.getElementById('reviewNextBtn');
   const reviewSummaryBtn = document.getElementById('reviewSummaryBtn');
 
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
+  const dlMagnetBtn = document.getElementById('dlMagnetBtn');
+  const dlA4Btn = document.getElementById('dlA4Btn');
+  const dlA3Btn = document.getElementById('dlA3Btn');
 
-  const fileInput = document.getElementById('fileInput');
-  const bulkUploadBtn = document.getElementById('bulkUploadBtn');
-  const bulkFileInput = document.getElementById('bulkFileInput');
-  const tileFileInput = document.getElementById('tileFileInput');
-  let tileUploadTargetIndex = null;
-
-  const zoomEl = document.getElementById('zoom');
-  const bwBtn = document.getElementById('bwBtn');
   const guidesBtn = document.getElementById('guidesBtn');
   const clearPhotoBtn = document.getElementById('clearPhotoBtn');
-
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
   const backToGridBtn = document.getElementById('backToGridBtn');
   const toGridBtn = document.getElementById('toGridBtn');
 
-  const dlMagnetBtn = document.getElementById('dlMagnetBtn');
-  const dlA4Btn = document.getElementById('dlA4Btn');
-  const dlA3Btn = document.getElementById('dlA3Btn');
+  const zoomEl = document.getElementById('zoom');
+  const bwBtn = document.getElementById('bwBtn');
 
+  const textInput = document.getElementById('textInput');
+  const charCount = document.getElementById('charCount');
+  const textColorBtn = document.getElementById('textColorBtn');
+  const deleteTextBtn = document.getElementById('deleteTextBtn');
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // --- state
   let quantity = 6;
   let setIndex = 0;
   let activeIndex = 0;
   let showGuides = true;
-  let mode = 'grid';
+  let mode = 'grid'; // grid | edit
   let items = [];
+  let tileUploadTargetIndex = null;
 
-  function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
-  function ceilToMultiple(n, m) { return Math.ceil(n / m) * m; }
+  // --- helpers
+  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const ceilToMultiple = (n,m)=>Math.ceil(n/m)*m;
 
-  function newItem() {
+  function newItem(){
     return {
-      img: null, src: null, w: 0, h: 0,
-      x: 0, y: 0, scale: 1,
-      bw: false,
-      reviewed: false,
-      lowRes: false
+      img:null, src:null, w:0, h:0,
+      x:0, y:0, scale:1,
+      bw:false,
+      reviewed:false,
+      lowRes:false,
+      // text
+      hasText:false,
+      text:"",
+      textX: CANVAS_SIZE/2,
+      textY: CANVAS_SIZE*0.84,
+      textColor: "black" // black | whiteShadow
     };
   }
+  function initItems(qty){ items = Array.from({length:qty}, ()=>newItem()); }
 
-  function initItems(qty) { items = Array.from({length: qty}, () => newItem()); }
+  function countComplete(){ return items.filter(it=>!!it.src).length; }
+  function countEmpty(){ return items.filter(it=>!it.src).length; }
+  function countNeedsReview(){ return items.filter(it=>!!it.src && !it.reviewed).length; }
 
-  function countComplete() { return items.filter(it => !!it.src).length; }
-  function countEmpty() { return items.filter(it => !it.src).length; }
-  function countNeedsReview() { return items.filter(it => !!it.src && !it.reviewed).length; }
+  function updateQtyUI(){ qtyPill.textContent = `Order Quantity: ${quantity}`; }
 
-  function updateQtyUI() { qtyPill.textContent = `Order Quantity: ${quantity}`; }
-
-  /* ✅ Update pills + progress bar */
-  function updateProgress() {
+  function updateProgress(){
     const complete = countComplete();
     progressPill.textContent = `${complete}/${quantity} complete`;
-    const pct = quantity === 0 ? 0 : Math.round((complete / quantity) * 100);
-    progressBar.style.width = pct + '%';
+    const pct = quantity ? Math.round((complete/quantity)*100) : 0;
+    progressBar.style.width = pct + "%";
   }
 
-  /* ✅ Pulse review button only when needed */
-  function updateReviewPulse() {
-    const needs = countEmpty() + countNeedsReview();
-    if (needs > 0) reviewNextBtn.classList.add('pulse');
-    else reviewNextBtn.classList.remove('pulse');
-  }
-
-  function updateGatingUI() {
+  function updateGatingUI(){
     const confirmed = !!finalConfirm.checked;
     const empties = countEmpty();
     const needsReview = countNeedsReview();
@@ -659,14 +499,12 @@
       confirmStatus.className = "hint";
       return;
     }
-
     if (empties > 0) {
-      confirmHint.textContent = "Please fill all magnets before downloading A4/A3 (to avoid blank prints).";
+      confirmHint.textContent = "Please fill all magnets before downloading A4/A3.";
       confirmStatus.textContent = `Still empty: ${empties} magnet(s).`;
       confirmStatus.className = "hint warn";
       return;
     }
-
     if (needsReview > 0) {
       confirmHint.textContent = "Downloads enabled. We recommend reviewing all magnets first.";
       confirmStatus.textContent = `Not reviewed yet: ${needsReview} magnet(s).`;
@@ -678,33 +516,12 @@
     }
   }
 
-  function setQuantity(newQty, { preserveExisting = true } = {}) {
-    newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(newQty, 6)));
-    if (newQty === quantity) return;
-
-    const old = items;
-    quantity = newQty;
-    items = Array.from({length: quantity}, (_, i) => (preserveExisting && i < old.length) ? old[i] : newItem());
-
-    if (activeIndex >= quantity) activeIndex = quantity - 1;
-    const setCount = Math.ceil(quantity / 6);
-    if (setIndex >= setCount) setIndex = setCount - 1;
-
-    buildQtyButtons();
-    buildSetButtons();
-    renderGrid();
-    updateQtyUI();
-    updateProgress();
-    updateGatingUI();
-    updateReviewPulse();
-  }
-
-  function baseScaleForVisible(it) {
+  function baseScaleForVisible(it){
     if (!it.img) return 1;
-    return Math.max(VISIBLE_RECT.w / it.w, VISIBLE_RECT.h / it.h);
+    return Math.max(VISIBLE_RECT.w/it.w, VISIBLE_RECT.h/it.h);
   }
 
-  function clampToVisibleCoverage(it) {
+  function clampToVisibleCoverage(it){
     if (!it.img) return;
     const base = baseScaleForVisible(it);
     if (it.scale < base) it.scale = base;
@@ -721,136 +538,150 @@
     it.y = clamp(it.y, minY, maxY);
   }
 
-  function buildQtyButtons() {
+  function buildQtyButtons(){
     qtyButtons.innerHTML = '';
-    for (let q = 6; q <= MAX_QTY; q += 6) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = q;
-      if (q === quantity) b.classList.add('active');
-      b.onclick = () => setQuantity(q, { preserveExisting: true });
+    for (let q=6; q<=MAX_QTY; q+=6){
+      const b=document.createElement('button');
+      b.type='button'; b.textContent=q;
+      if (q===quantity) b.classList.add('active');
+      b.onclick=()=>setQuantity(q,true);
       qtyButtons.appendChild(b);
     }
   }
 
-  function buildSetButtons() {
-    setButtons.innerHTML = '';
-    const setCount = Math.ceil(quantity / 6);
-    for (let s = 0; s < setCount; s++) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = `Set ${s+1}`;
-      if (s === setIndex) b.classList.add('active');
-      b.onclick = () => {
-        setIndex = s;
+  function buildSetButtons(){
+    setButtons.innerHTML='';
+    const setCount = Math.ceil(quantity/6);
+    for (let s=0; s<setCount; s++){
+      const b=document.createElement('button');
+      b.type='button'; b.textContent=`Set ${s+1}`;
+      if (s===setIndex) b.classList.add('active');
+      b.onclick=()=>{
+        setIndex=s;
         buildSetButtons();
         renderGrid();
-        if (mode === 'edit') {
-          const start = setIndex*6;
-          const end = Math.min(start+6, quantity)-1;
-          if (activeIndex < start || activeIndex > end) openEditor(start);
-          else draw();
+        if (mode==='edit'){
+          const start=setIndex*6;
+          openEditor(start);
         }
       };
       setButtons.appendChild(b);
     }
   }
 
-  function setMode(next) {
-    mode = next;
-    if (mode === 'grid') {
-      gridView.style.display = '';
-      editorView.style.display = 'none';
-      editorControls.style.display = 'none';
-      viewLabel.textContent = 'Grid';
+  function setMode(next){
+    mode=next;
+    if (mode==='grid'){
+      gridView.style.display='';
+      editorView.style.display='none';
+      editorControls.style.display='none';
+      viewLabel.textContent='Grid';
     } else {
-      gridView.style.display = 'none';
-      editorView.style.display = '';
-      editorControls.style.display = '';
-      viewLabel.textContent = `Editing #${activeIndex+1}`;
+      gridView.style.display='none';
+      editorView.style.display='';
+      editorControls.style.display='';
+      viewLabel.textContent=`Editing #${activeIndex+1}`;
+      syncControls();
       draw();
     }
   }
 
-  function getBadgeInfo(it) {
-    if (!it.src) return { text: "Empty", cls: "empty" };
-    if (!it.reviewed) return { text: "Review", cls: "review" };
-    return { text: "Ready", cls: "ready" };
+  function setQuantity(newQty, preserveExisting=true){
+    newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(newQty,6)));
+    if (newQty === quantity) return;
+
+    const old = items;
+    quantity = newQty;
+    items = Array.from({length:quantity}, (_,i)=> (preserveExisting && i<old.length) ? old[i] : newItem());
+
+    if (activeIndex >= quantity) activeIndex = quantity-1;
+    const setCount = Math.ceil(quantity/6);
+    if (setIndex >= setCount) setIndex = setCount-1;
+
+    buildQtyButtons();
+    buildSetButtons();
+    renderGrid();
+    updateQtyUI();
+    updateProgress();
+    updateGatingUI();
   }
 
-  function renderPreviewDataURL(index, size=320) {
+  function getBadgeInfo(it){
+    if (!it.src) return {text:"Empty", cls:"empty"};
+    if (!it.reviewed) return {text:"Review", cls:"review"};
+    return {text:"Ready", cls:"ready"};
+  }
+
+  function renderPreviewDataURL(index, size=320){
     const it = items[index];
     if (!it.img) return '';
-    const off = document.createElement('canvas');
-    off.width = size; off.height = size;
-    const o = off.getContext('2d');
-    o.imageSmoothingEnabled = true;
-    o.imageSmoothingQuality = "high";
-    o.fillStyle = '#05060a';
+    const off=document.createElement('canvas');
+    off.width=size; off.height=size;
+    const o=off.getContext('2d');
+    o.imageSmoothingEnabled=true;
+    o.imageSmoothingQuality="high";
+    o.fillStyle='#05060a';
     o.fillRect(0,0,size,size);
     o.save();
     o.filter = it.bw ? 'grayscale(1)' : 'none';
     const sx = it.x / CANVAS_SIZE * size;
     const sy = it.y / CANVAS_SIZE * size;
-    const sw = (it.w * it.scale) / CANVAS_SIZE * size;
-    const sh = (it.h * it.scale) / CANVAS_SIZE * size;
+    const sw = (it.w*it.scale)/CANVAS_SIZE * size;
+    const sh = (it.h*it.scale)/CANVAS_SIZE * size;
     o.drawImage(it.img, sx, sy, sw, sh);
     o.restore();
     return off.toDataURL('image/png');
   }
 
-  function renderGrid() {
-    grid.innerHTML = '';
-    const start = setIndex * 6;
-    const end = Math.min(start + 6, quantity);
-    let anyLowRes = false;
+  function renderGrid(){
+    grid.innerHTML='';
+    const start=setIndex*6;
+    const end=Math.min(start+6, quantity);
+    let anyLowRes=false;
 
-    for (let i = start; i < end; i++) {
-      const it = items[i];
-      const tile = document.createElement('div');
-      tile.className = 'tile' + (i === activeIndex && mode === 'edit' ? ' active' : '');
-
-      tile.onclick = () => {
-        if (!items[i].src) {
-          tileUploadTargetIndex = i;
-          tileFileInput.value = '';
+    for (let i=start; i<end; i++){
+      const it=items[i];
+      const tile=document.createElement('div');
+      tile.className='tile' + ((mode==='edit' && i===activeIndex) ? ' active' : '');
+      tile.onclick=()=>{
+        if (!it.src){
+          tileUploadTargetIndex=i;
+          tileFileInput.value='';
           tileFileInput.click();
-        } else {
-          openEditor(i);
-        }
+        } else openEditor(i);
       };
 
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
+      const thumb=document.createElement('div');
+      thumb.className='thumb';
 
-      if (it.src) {
-        const imgEl = document.createElement('img');
-        imgEl.src = renderPreviewDataURL(i, 320);
+      if (it.src){
+        const imgEl=document.createElement('img');
+        imgEl.src=renderPreviewDataURL(i, 320);
         thumb.appendChild(imgEl);
       } else {
-        const ph = document.createElement('div');
-        ph.className = 'muted';
-        ph.style.textAlign = 'center';
-        ph.innerHTML = "Click to upload<br/>(+ add photo)";
+        const ph=document.createElement('div');
+        ph.className='muted';
+        ph.style.textAlign='center';
+        ph.innerHTML='Tap to upload<br>(+ add photo)';
         thumb.appendChild(ph);
       }
 
-      const meta = document.createElement('div');
-      meta.className = 'meta';
+      const meta=document.createElement('div');
+      meta.className='meta';
 
-      const left = document.createElement('div');
-      left.className = 'k';
-      left.textContent = `#${i+1}`;
+      const left=document.createElement('div');
+      left.className='k';
+      left.textContent=`#${i+1}`;
 
-      const badge = document.createElement('div');
-      const b = getBadgeInfo(it);
-      badge.className = `badge ${b.cls}`;
-      badge.textContent = b.text;
+      const badge=document.createElement('div');
+      const b=getBadgeInfo(it);
+      badge.className=`badge ${b.cls}`;
+      badge.textContent=b.text;
 
       meta.appendChild(left);
       meta.appendChild(badge);
 
-      if (it.lowRes) anyLowRes = true;
+      if (it.lowRes) anyLowRes=true;
 
       tile.appendChild(thumb);
       tile.appendChild(meta);
@@ -860,134 +691,305 @@
     lowResWarn.style.display = anyLowRes ? 'block' : 'none';
   }
 
-  function fileToDataURL(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
+      const r=new FileReader();
+      r.onload=()=>resolve(r.result);
+      r.onerror=reject;
+      r.readAsDataURL(file);
+    });
+  }
+  function loadImageFromURL(url){
+    return new Promise((resolve,reject)=>{
+      const img=new Image();
+      img.onload=()=>resolve(img);
+      img.onerror=reject;
+      img.src=url;
     });
   }
 
-  function loadImageFromURL(url) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = url;
-    });
-  }
+  function setImageForIndex(i, img, src){
+    const it=items[i];
+    it.img=img; it.src=src;
+    it.w=img.naturalWidth; it.h=img.naturalHeight;
 
-  function setImageForIndex(i, img, src) {
-    const it = items[i];
-    it.img = img; it.src = src;
-    it.w = img.naturalWidth; it.h = img.naturalHeight;
-
-    const base = baseScaleForVisible(it);
-    it.scale = base;
+    const base=baseScaleForVisible(it);
+    it.scale=base;
 
     const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
     const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
-    it.x = cx - (it.w * it.scale) / 2;
-    it.y = cy - (it.h * it.scale) / 2;
+    it.x = cx - (it.w*it.scale)/2;
+    it.y = cy - (it.h*it.scale)/2;
 
-    it.reviewed = false;
-    it.bw = false;
+    it.reviewed=false;
+    it.lowRes = (Math.min(it.w, it.h) < 1200);
 
     clampToVisibleCoverage(it);
-    it.lowRes = (Math.min(it.w, it.h) < 1200);
 
     updateProgress();
     updateGatingUI();
-    updateReviewPulse();
     renderGrid();
-    if (mode === 'edit' && activeIndex === i) draw();
+    if (mode==='edit' && activeIndex===i){
+      syncControls();
+      draw();
+    }
   }
 
-  function draw() {
-    const it = items[activeIndex];
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    ctx.fillStyle = '#05060a';
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  function syncControls(){
+    const it=items[activeIndex];
 
-    if (!it.img) {
-      ctx.fillStyle = 'rgba(233,238,245,.85)';
-      ctx.font = '750 16px system-ui';
-      ctx.textAlign = 'center';
+    guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`;
+    bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
+
+    // zoom slider = relative to base scale
+    if (it.img){
+      const base=baseScaleForVisible(it);
+      const ratio=it.scale/base;
+      zoomEl.value=String(clamp(ratio,1,3));
+    } else zoomEl.value='1';
+
+    // text
+    textInput.value = it.hasText ? it.text : '';
+    charCount.textContent = `${(textInput.value||'').length}/25`;
+    textColorBtn.textContent = (it.textColor === 'black') ? 'Text: Black' : 'Text: White + Shadow';
+    deleteTextBtn.disabled = !it.hasText;
+
+    fileInput.value='';
+  }
+
+  function draw(){
+    const it=items[activeIndex];
+    ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+
+    // background
+    ctx.fillStyle='#05060a';
+    ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+
+    if (!it.img){
+      ctx.fillStyle='rgba(233,238,245,.85)';
+      ctx.font='800 16px system-ui';
+      ctx.textAlign='center';
       ctx.fillText('Upload a photo to begin', CANVAS_SIZE/2, CANVAS_SIZE/2);
       return;
     }
 
+    // photo
     ctx.save();
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality="high";
     ctx.filter = it.bw ? 'grayscale(1)' : 'none';
-    ctx.drawImage(it.img, it.x, it.y, it.w * it.scale, it.h * it.scale);
+    ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
     ctx.restore();
 
-    if (showGuides) {
-      ctx.strokeStyle = 'rgba(255,255,255,.35)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(2, 2, CANVAS_SIZE-4, CANVAS_SIZE-4);
+    // text
+    if (it.hasText && it.text){
+      ctx.save();
+      ctx.font = '800 42px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-      ctx.strokeStyle = 'rgba(255,210,138,.9)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8, 6]);
+      if (it.textColor === 'whiteShadow'){
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.fillText(it.text, it.textX+2, it.textY+2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(it.text, it.textX, it.textY);
+      } else {
+        ctx.fillStyle = '#000000';
+        ctx.fillText(it.text, it.textX, it.textY);
+      }
+      ctx.restore();
+    }
+
+    // guides
+    if (showGuides){
+      ctx.strokeStyle='rgba(255,255,255,.35)';
+      ctx.lineWidth=2;
+      ctx.strokeRect(2,2,CANVAS_SIZE-4,CANVAS_SIZE-4);
+
+      ctx.strokeStyle='rgba(255,210,138,.9)';
+      ctx.lineWidth=2;
+      ctx.setLineDash([8,6]);
       ctx.strokeRect(VISIBLE_RECT.x, VISIBLE_RECT.y, VISIBLE_RECT.w, VISIBLE_RECT.h);
       ctx.setLineDash([]);
     }
   }
 
-  function findNextNeededIndex() {
-    const start = setIndex * 6;
-    const end = Math.min(start + 6, quantity);
-    for (let i = start; i < end; i++) if (!items[i].src) return i;
-    for (let i = start; i < end; i++) if (items[i].src && !items[i].reviewed) return i;
-    for (let i = 0; i < quantity; i++) if (!items[i].src) return i;
-    for (let i = 0; i < quantity; i++) if (items[i].src && !items[i].reviewed) return i;
+  function findNextNeededIndex(){
+    const start=setIndex*6;
+    const end=Math.min(start+6, quantity);
+    for (let i=start;i<end;i++) if (!items[i].src) return i;
+    for (let i=start;i<end;i++) if (items[i].src && !items[i].reviewed) return i;
+    for (let i=0;i<quantity;i++) if (!items[i].src) return i;
+    for (let i=0;i<quantity;i++) if (items[i].src && !items[i].reviewed) return i;
     return null;
   }
 
-  function openEditor(i) {
-    activeIndex = i;
-    setIndex = Math.floor(activeIndex / 6);
+  function openEditor(i){
+    activeIndex=i;
+    setIndex=Math.floor(activeIndex/6);
     buildSetButtons();
 
-    if (items[activeIndex].src && !items[activeIndex].reviewed) items[activeIndex].reviewed = true;
+    if (items[activeIndex].src && !items[activeIndex].reviewed){
+      items[activeIndex].reviewed=true;
+    }
 
     setMode('edit');
     renderGrid();
     updateGatingUI();
-    updateReviewPulse();
+    syncControls();
     draw();
   }
 
-  reviewNextBtn.addEventListener('click', () => {
-    const idx = findNextNeededIndex();
-    if (idx === null) return alert("Everything looks good — no empty or unreviewed magnets found.");
-    openEditor(idx);
+  // --- mobile-friendly pointer gestures
+  const pointers = new Map(); // pointerId -> {x,y}
+  let dragMode = null;        // 'photo' | 'text' | null
+  let lastSingle = null;
+
+  let pinchStart = null;      // {dist, scale, centerX, centerY, x, y}
+  function canvasToLocal(e){
+    const rect=canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
+    return {x,y};
+  }
+
+  function hitTestText(it, x, y){
+    if (!it.hasText || !it.text) return false;
+    // rough bounding box
+    const w = Math.max(120, it.text.length * 22);
+    const h = 60;
+    return (x >= it.textX - w/2 && x <= it.textX + w/2 && y >= it.textY - h/2 && y <= it.textY + h/2);
+  }
+
+  function applyScaleAroundPoint(it, newScale, anchorX, anchorY){
+    // Keep anchor point stable during zoom:
+    // (anchor - x) / scale is image-space coordinate; preserve that.
+    const oldScale = it.scale;
+    const ix = (anchorX - it.x) / oldScale;
+    const iy = (anchorY - it.y) / oldScale;
+
+    it.scale = newScale;
+    it.x = anchorX - ix * it.scale;
+    it.y = anchorY - iy * it.scale;
+
+    clampToVisibleCoverage(it);
+  }
+
+  canvas.addEventListener('pointerdown', (e)=>{
+    if (mode !== 'edit') return;
+    canvas.setPointerCapture(e.pointerId);
+    const p=canvasToLocal(e);
+    pointers.set(e.pointerId, p);
+
+    const it=items[activeIndex];
+    if (pointers.size === 1){
+      // decide whether dragging text or photo
+      dragMode = hitTestText(it, p.x, p.y) ? 'text' : 'photo';
+      lastSingle = {x:p.x, y:p.y};
+    }
+    if (pointers.size === 2){
+      const pts=[...pointers.values()];
+      const dx=pts[0].x-pts[1].x, dy=pts[0].y-pts[1].y;
+      const dist=Math.hypot(dx,dy);
+      const cx=(pts[0].x+pts[1].x)/2;
+      const cy=(pts[0].y+pts[1].y)/2;
+      pinchStart = { dist, scale: it.scale, cx, cy };
+      dragMode = null;
+      lastSingle = null;
+    }
   });
 
-  reviewSummaryBtn.addEventListener('click', () => {
-    alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
-  });
+  canvas.addEventListener('pointermove', (e)=>{
+    if (mode !== 'edit') return;
+    if (!pointers.has(e.pointerId)) return;
+    const it=items[activeIndex];
+    if (!it.img) return;
 
-  bulkUploadBtn.addEventListener('click', () => bulkFileInput.click());
+    const p=canvasToLocal(e);
+    pointers.set(e.pointerId, p);
 
-  bulkFileInput.addEventListener('change', async (e) => {
-    const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
-    if (files.length === 0) return;
+    if (pointers.size === 1 && lastSingle){
+      const dx = p.x - lastSingle.x;
+      const dy = p.y - lastSingle.y;
 
-    const start = setIndex * 6;
-    const emptyFromStart = items.slice(start).filter(it => !it.src).length;
-    if (files.length > emptyFromStart) {
-      const used = countComplete();
-      const needed = ceilToMultiple(Math.max(start + files.length, used + files.length), 6);
-      setQuantity(needed, { preserveExisting: true });
+      if (dragMode === 'text'){
+        it.textX += dx;
+        it.textY += dy;
+      } else {
+        it.x += dx;
+        it.y += dy;
+        clampToVisibleCoverage(it);
+      }
+
+      lastSingle = {x:p.x, y:p.y};
+      draw();
+      return;
     }
 
-    let i = setIndex * 6;
-    for (const f of files) {
+    if (pointers.size === 2 && pinchStart){
+      const pts=[...pointers.values()];
+      const dx=pts[0].x-pts[1].x, dy=pts[0].y-pts[1].y;
+      const dist=Math.hypot(dx,dy);
+      const cx=(pts[0].x+pts[1].x)/2;
+      const cy=(pts[0].y+pts[1].y)/2;
+
+      const base = baseScaleForVisible(it);
+      const minScale = base;
+      const maxScale = base * 3;
+
+      const scaleFactor = dist / pinchStart.dist;
+      const newScale = clamp(pinchStart.scale * scaleFactor, minScale, maxScale);
+
+      applyScaleAroundPoint(it, newScale, cx, cy);
+
+      // keep slider in sync
+      const ratio = it.scale / base;
+      zoomEl.value = String(clamp(ratio, 1, 3));
+
+      draw();
+    }
+  });
+
+  canvas.addEventListener('pointerup', (e)=>{
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+    if (pointers.size === 0){
+      dragMode = null;
+      lastSingle = null;
+    } else if (pointers.size === 1){
+      // reset lastSingle to remaining pointer
+      const only=[...pointers.values()][0];
+      lastSingle = {x:only.x, y:only.y};
+      dragMode = 'photo';
+    }
+  });
+
+  canvas.addEventListener('pointercancel', (e)=>{
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+    if (pointers.size === 0){
+      dragMode = null;
+      lastSingle = null;
+    }
+  });
+
+  // --- UI events
+  bulkUploadBtn.addEventListener('click', ()=> bulkFileInput.click());
+
+  bulkFileInput.addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files || []).filter(f=>f.type.startsWith('image/'));
+    if (!files.length) return;
+
+    const start = setIndex*6;
+    const emptyFromStart = items.slice(start).filter(it=>!it.src).length;
+    if (files.length > emptyFromStart){
+      const used = countComplete();
+      const needed = ceilToMultiple(Math.max(start + files.length, used + files.length), 6);
+      setQuantity(needed, true);
+    }
+
+    let i=start;
+    for (const f of files){
       while (i < items.length && items[i].src) i++;
       if (i >= items.length) break;
       const src = await fileToDataURL(f);
@@ -995,16 +997,11 @@
       setImageForIndex(i, img, src);
       i++;
     }
-
-    bulkFileInput.value = '';
-    renderGrid();
-    updateProgress();
-    updateQtyUI();
-    updateGatingUI();
-    updateReviewPulse();
+    bulkFileInput.value='';
+    updateProgress(); updateQtyUI(); updateGatingUI();
   });
 
-  tileFileInput.addEventListener('change', async (e) => {
+  tileFileInput.addEventListener('change', async (e)=>{
     const f = e.target.files && e.target.files[0];
     const target = tileUploadTargetIndex;
     tileUploadTargetIndex = null;
@@ -1015,7 +1012,7 @@
     openEditor(target);
   });
 
-  fileInput.addEventListener('change', async (e) => {
+  fileInput.addEventListener('change', async (e)=>{
     const f = e.target.files && e.target.files[0];
     if (!f) return;
     const src = await fileToDataURL(f);
@@ -1023,61 +1020,168 @@
     setImageForIndex(activeIndex, img, src);
   });
 
-  guidesBtn.addEventListener('click', () => { showGuides = !showGuides; guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`; draw(); });
+  guidesBtn.addEventListener('click', ()=>{
+    showGuides = !showGuides;
+    guidesBtn.textContent = `Guides: ${showGuides?'On':'Off'}`;
+    draw();
+  });
 
-  bwBtn.addEventListener('click', () => {
-    const it = items[activeIndex];
+  bwBtn.addEventListener('click', ()=>{
+    const it=items[activeIndex];
     it.bw = !it.bw;
-    bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
+    bwBtn.textContent = `B&W: ${it.bw?'On':'Off'}`;
     draw();
     renderGrid();
   });
 
-  backToGridBtn.addEventListener('click', () => setMode('grid'));
-  toGridBtn.addEventListener('click', () => setMode('grid'));
+  zoomEl.addEventListener('input', ()=>{
+    const it=items[activeIndex];
+    if (!it.img) return;
+    const base = baseScaleForVisible(it);
+    const ratio = parseFloat(zoomEl.value || '1');
+    const newScale = base * ratio;
+    // zoom around center of visible area (nice default)
+    const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
+    const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
+    applyScaleAroundPoint(it, newScale, cx, cy);
+    draw();
+  });
+
+  clearPhotoBtn.addEventListener('click', ()=>{
+    const it=items[activeIndex];
+    if (!it.src) return;
+    items[activeIndex] = newItem();
+    updateProgress(); updateGatingUI();
+    renderGrid();
+    syncControls();
+    draw();
+    // remain in editor, but empty
+  });
+
+  prevBtn.addEventListener('click', ()=>{
+    const start=setIndex*6;
+    const end=Math.min(start+6, quantity)-1;
+    const next = (activeIndex-1 < start) ? end : activeIndex-1;
+    openEditor(next);
+  });
+  nextBtn.addEventListener('click', ()=>{
+    const start=setIndex*6;
+    const end=Math.min(start+6, quantity)-1;
+    const next = (activeIndex+1 > end) ? start : activeIndex+1;
+    openEditor(next);
+  });
+
+  backToGridBtn.addEventListener('click', ()=> setMode('grid'));
+  toGridBtn.addEventListener('click', ()=> setMode('grid'));
 
   finalConfirm.addEventListener('change', updateGatingUI);
 
-  // --- Downloads ---
-  function renderMagnetToCanvas(index, outSize=1200) {
-    const it = items[index];
-    const off = document.createElement('canvas');
-    off.width = outSize; off.height = outSize;
-    const o = off.getContext('2d');
-    o.imageSmoothingEnabled = true;
-    o.imageSmoothingQuality = "high";
-    o.fillStyle = '#ffffff';
+  reviewNextBtn.addEventListener('click', ()=>{
+    const idx=findNextNeededIndex();
+    if (idx===null) return alert("Everything looks good — no empty or unreviewed magnets found.");
+    openEditor(idx);
+  });
+  reviewSummaryBtn.addEventListener('click', ()=>{
+    alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
+  });
+
+  // text controls
+  textInput.addEventListener('input', ()=>{
+    const it=items[activeIndex];
+    const v=(textInput.value||'').slice(0,25);
+    textInput.value=v;
+    charCount.textContent=`${v.length}/25`;
+    if (v.trim().length){
+      it.hasText=true;
+      it.text=v.trim();
+      deleteTextBtn.disabled=false;
+    } else {
+      it.hasText=false;
+      it.text="";
+      deleteTextBtn.disabled=true;
+    }
+    draw();
+    renderGrid();
+  });
+
+  textColorBtn.addEventListener('click', ()=>{
+    const it=items[activeIndex];
+    it.textColor = (it.textColor === 'black') ? 'whiteShadow' : 'black';
+    textColorBtn.textContent = (it.textColor === 'black') ? 'Text: Black' : 'Text: White + Shadow';
+    draw();
+  });
+
+  deleteTextBtn.addEventListener('click', ()=>{
+    const it=items[activeIndex];
+    it.hasText=false;
+    it.text="";
+    textInput.value="";
+    charCount.textContent="0/25";
+    deleteTextBtn.disabled=true;
+    draw();
+    renderGrid();
+  });
+
+  // --- downloads
+  function renderMagnetToCanvas(index, outSize=1200){
+    const it=items[index];
+    const off=document.createElement('canvas');
+    off.width=outSize; off.height=outSize;
+    const o=off.getContext('2d');
+    o.imageSmoothingEnabled=true; o.imageSmoothingQuality="high";
+    o.fillStyle='#ffffff';
     o.fillRect(0,0,outSize,outSize);
     if (!it.img) return off;
+
     o.save();
     o.filter = it.bw ? 'grayscale(1)' : 'none';
     const sx = it.x / CANVAS_SIZE * outSize;
     const sy = it.y / CANVAS_SIZE * outSize;
-    const sw = (it.w * it.scale) / CANVAS_SIZE * outSize;
-    const sh = (it.h * it.scale) / CANVAS_SIZE * outSize;
+    const sw = (it.w*it.scale)/CANVAS_SIZE * outSize;
+    const sh = (it.h*it.scale)/CANVAS_SIZE * outSize;
     o.drawImage(it.img, sx, sy, sw, sh);
     o.restore();
+
+    // text
+    if (it.hasText && it.text){
+      o.save();
+      o.font='800 64px system-ui';
+      o.textAlign='center';
+      o.textBaseline='middle';
+      const tx = it.textX / CANVAS_SIZE * outSize;
+      const ty = it.textY / CANVAS_SIZE * outSize;
+      if (it.textColor === 'whiteShadow'){
+        o.fillStyle='rgba(0,0,0,.55)';
+        o.fillText(it.text, tx+3, ty+3);
+        o.fillStyle='#ffffff';
+        o.fillText(it.text, tx, ty);
+      } else {
+        o.fillStyle='#000000';
+        o.fillText(it.text, tx, ty);
+      }
+      o.restore();
+    }
+
     return off;
   }
 
-  function downloadCanvasPNG(c, filename) {
-    const a = document.createElement('a');
-    a.href = c.toDataURL('image/png');
-    a.download = filename;
+  function downloadCanvasPNG(c, filename){
+    const a=document.createElement('a');
+    a.href=c.toDataURL('image/png');
+    a.download=filename;
     a.click();
   }
 
-  function makeSheet(page, indices, perPage) {
-    const sheet = document.createElement('canvas');
-    sheet.width = page.w; sheet.height = page.h;
-    const sctx = sheet.getContext('2d');
-    sctx.imageSmoothingEnabled = true;
-    sctx.imageSmoothingQuality = "high";
-    sctx.fillStyle = '#ffffff';
+  function makeSheet(page, indices, perPage){
+    const sheet=document.createElement('canvas');
+    sheet.width=page.w; sheet.height=page.h;
+    const sctx=sheet.getContext('2d');
+    sctx.imageSmoothingEnabled=true; sctx.imageSmoothingQuality="high";
+    sctx.fillStyle='#ffffff';
     sctx.fillRect(0,0,sheet.width,sheet.height);
 
-    const cols = perPage === 6 ? 3 : 4;
-    const rows = perPage === 6 ? 2 : 3;
+    const cols = perPage===6 ? 3 : 4;
+    const rows = perPage===6 ? 2 : 3;
     const margin = Math.floor(page.w * 0.07);
     const gap = Math.floor(page.w * 0.03);
 
@@ -1085,50 +1189,50 @@
     const cellH = Math.floor((page.h - margin*2 - gap*(rows-1)) / rows);
     const drawSize = Math.min(MAGNET_ON_SHEET_PX, cellW, cellH);
 
-    let idx = 0;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (idx >= indices.length) break;
-        const magnetIndex = indices[idx++];
-        const magnetCanvas = renderMagnetToCanvas(magnetIndex, MAGNET_PRINT_PX);
+    let idx=0;
+    for (let r=0;r<rows;r++){
+      for (let c=0;c<cols;c++){
+        if (idx>=indices.length) break;
+        const magnetIndex=indices[idx++];
+        const magnetCanvas=renderMagnetToCanvas(magnetIndex, MAGNET_PRINT_PX);
 
-        const xCell = margin + c*(cellW + gap);
-        const yCell = margin + r*(cellH + gap);
+        const xCell = margin + c*(cellW+gap);
+        const yCell = margin + r*(cellH+gap);
         const x = xCell + Math.floor((cellW - drawSize)/2);
         const y = yCell + Math.floor((cellH - drawSize)/2);
 
-        sctx.drawImage(magnetCanvas, 0, 0, MAGNET_PRINT_PX, MAGNET_PRINT_PX, x, y, drawSize, drawSize);
-        sctx.strokeStyle = 'rgba(0,0,0,.10)';
-        sctx.lineWidth = 2;
-        sctx.strokeRect(x, y, drawSize, drawSize);
+        sctx.drawImage(magnetCanvas, 0,0,MAGNET_PRINT_PX,MAGNET_PRINT_PX, x,y, drawSize,drawSize);
+        sctx.strokeStyle='rgba(0,0,0,.10)';
+        sctx.lineWidth=2;
+        sctx.strokeRect(x,y,drawSize,drawSize);
       }
     }
     return sheet;
   }
 
-  dlMagnetBtn.addEventListener('click', () => {
-    if (!items[activeIndex].img) return alert('Open (click) a magnet with a photo first to download that specific magnet.');
+  dlMagnetBtn.addEventListener('click', ()=>{
+    if (!items[activeIndex].img) return alert('Open a magnet with a photo first.');
     downloadCanvasPNG(renderMagnetToCanvas(activeIndex, MAGNET_PRINT_PX), `magnet_${activeIndex+1}_1200.png`);
   });
 
-  dlA4Btn.addEventListener('click', () => {
+  dlA4Btn.addEventListener('click', ()=>{
     if (dlA4Btn.disabled) return;
-    const start = setIndex * 6;
-    const end = Math.min(start + 6, quantity);
-    const indices = Array.from({length: end-start}, (_, k) => start + k);
+    const start=setIndex*6;
+    const end=Math.min(start+6, quantity);
+    const indices=Array.from({length:end-start}, (_,k)=>start+k);
     downloadCanvasPNG(makeSheet(A4, indices, 6), `print_sheet_set${setIndex+1}_A4_6up.png`);
   });
 
-  dlA3Btn.addEventListener('click', () => {
+  dlA3Btn.addEventListener('click', ()=>{
     if (dlA3Btn.disabled) return;
-    const start = setIndex * 6;
-    const end = Math.min(start + 12, quantity);
-    if (end - start < 12) return alert('Need 12 magnets available for A3 (two full sets).');
-    const indices = Array.from({length: 12}, (_, k) => start + k);
+    const start=setIndex*6;
+    const end=Math.min(start+12, quantity);
+    if (end-start<12) return alert('Need 12 magnets available for A3 (two full sets).');
+    const indices=Array.from({length:12}, (_,k)=>start+k);
     downloadCanvasPNG(makeSheet(A3, indices, 12), `print_sheet_set${setIndex+1}_A3_12up.png`);
   });
 
-  // --- Init ---
+  // --- init
   initItems(quantity);
   buildQtyButtons();
   buildSetButtons();
@@ -1136,7 +1240,6 @@
   updateQtyUI();
   updateProgress();
   updateGatingUI();
-  updateReviewPulse();
   setMode('grid');
 })();
 </script>
