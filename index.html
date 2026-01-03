@@ -7,7 +7,6 @@
   <style>
     :root{
       --bg:#0b0c10;
-      --panel:#121420;
       --text:#e9eef5;
       --muted:rgba(233,238,245,.75);
       --blue:#2a5cff;
@@ -38,7 +37,7 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-    header h1{ margin:0; font-size: 13px; font-weight:800; opacity:.95; }
+    header h1{ margin:0; font-size: 13px; font-weight:900; opacity:.95; }
 
     .pill{
       padding:6px 10px; border-radius:999px;
@@ -91,7 +90,7 @@
       min-height: 520px;
     }
 
-    h2{ margin:0 0 10px; font-size:12px; font-weight:900; opacity:.9; }
+    h2{ margin:0 0 10px; font-size:12px; font-weight:950; opacity:.9; }
     .muted{ font-size:12px; color: var(--muted); line-height:1.35; }
     .k{ font-size:12px; opacity:.82; }
 
@@ -107,7 +106,7 @@
       padding:10px 12px;
       border-radius: 12px;
       cursor:pointer;
-      font-weight:900;
+      font-weight:950;
       font-size:12px;
       transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease;
     }
@@ -193,7 +192,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(15,17,32,.65);
-      font-weight: 900;
+      font-weight: 950;
       white-space: nowrap;
     }
     .badge.empty{ opacity:.82; }
@@ -215,7 +214,7 @@
       background: #05060a;
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 14px 35px rgba(0,0,0,.38);
-      touch-action: none; /* ✅ important for mobile gestures */
+      touch-action: none;
     }
 
     .checkrow{ display:flex; gap:10px; align-items:flex-start; }
@@ -249,7 +248,6 @@
 </header>
 
 <main>
-  <!-- LEFT PANEL -->
   <section class="panel">
     <h2>Order</h2>
     <div class="row">
@@ -295,7 +293,6 @@
 
     <hr>
 
-    <!-- EDITOR CONTROLS (shows when editing) -->
     <div id="editorControls" style="display:none">
       <h2>Editor</h2>
 
@@ -346,7 +343,6 @@
     </div>
   </section>
 
-  <!-- RIGHT PANEL -->
   <section class="right">
     <div class="nav">
       <div class="seg" id="setButtons"></div>
@@ -370,7 +366,7 @@
 
 <script>
 (() => {
-  // --- geometry
+  // Geometry
   const CANVAS_SIZE = 800;
   const VISIBLE_MM = 50;
   const BLEED_MM = 5;
@@ -388,11 +384,11 @@
   const MAGNET_PRINT_PX = 1200;
   const MAX_QTY = 72;
 
-  const A4 = { w: 2480, h: 3508, name: "A4_300dpi" };
-  const A3 = { w: 3508, h: 4961, name: "A3_300dpi" };
+  const A4 = { w: 2480, h: 3508 };
+  const A3 = { w: 3508, h: 4961 };
   const MAGNET_ON_SHEET_PX = 709;
 
-  // --- DOM
+  // DOM
   const qtyButtons = document.getElementById('qtyButtons');
   const setButtons = document.getElementById('setButtons');
   const grid = document.getElementById('grid');
@@ -441,7 +437,7 @@
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  // --- state
+  // State
   let quantity = 6;
   let setIndex = 0;
   let activeIndex = 0;
@@ -450,13 +446,15 @@
   let items = [];
   let tileUploadTargetIndex = null;
 
-  // --- helpers
+  // Helpers
   const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
   const ceilToMultiple = (n,m)=>Math.ceil(n/m)*m;
 
   function newItem(){
     return {
-      img:null, src:null, w:0, h:0,
+      img:null,
+      grayCanvas:null, // ✅ precomputed grayscale for mobile reliability
+      src:null, w:0, h:0,
       x:0, y:0, scale:1,
       bw:false,
       reviewed:false,
@@ -469,6 +467,7 @@
       textColor: "black" // black | whiteShadow
     };
   }
+
   function initItems(qty){ items = Array.from({length:qty}, ()=>newItem()); }
 
   function countComplete(){ return items.filter(it=>!!it.src).length; }
@@ -622,14 +621,20 @@
     o.imageSmoothingQuality="high";
     o.fillStyle='#05060a';
     o.fillRect(0,0,size,size);
-    o.save();
-    o.filter = it.bw ? 'grayscale(1)' : 'none';
+
+    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
+
     const sx = it.x / CANVAS_SIZE * size;
     const sy = it.y / CANVAS_SIZE * size;
     const sw = (it.w*it.scale)/CANVAS_SIZE * size;
     const sh = (it.h*it.scale)/CANVAS_SIZE * size;
-    o.drawImage(it.img, sx, sy, sw, sh);
-    o.restore();
+
+    if (srcCanvas) {
+      o.drawImage(srcCanvas, sx, sy, sw, sh);
+    } else {
+      o.drawImage(it.img, sx, sy, sw, sh);
+    }
+
     return off.toDataURL('image/png');
   }
 
@@ -699,6 +704,7 @@
       r.readAsDataURL(file);
     });
   }
+
   function loadImageFromURL(url){
     return new Promise((resolve,reject)=>{
       const img=new Image();
@@ -708,9 +714,29 @@
     });
   }
 
+  // ✅ Precompute grayscale once per uploaded image (reliable on iOS)
+  function buildGrayscaleCanvas(img){
+    const c = document.createElement('canvas');
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(img, 0, 0, w, h);
+    const data = g.getImageData(0, 0, w, h);
+    const d = data.data;
+    for (let i=0; i<d.length; i+=4){
+      const r=d[i], gg=d[i+1], b=d[i+2];
+      const y = (0.2126*r + 0.7152*gg + 0.0722*b) | 0;
+      d[i]=d[i+1]=d[i+2]=y;
+    }
+    g.putImageData(data, 0, 0);
+    return c;
+  }
+
   function setImageForIndex(i, img, src){
     const it=items[i];
     it.img=img; it.src=src;
+    it.grayCanvas = buildGrayscaleCanvas(img); // ✅
     it.w=img.naturalWidth; it.h=img.naturalHeight;
 
     const base=baseScaleForVisible(it);
@@ -741,14 +767,12 @@
     guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`;
     bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
 
-    // zoom slider = relative to base scale
     if (it.img){
       const base=baseScaleForVisible(it);
       const ratio=it.scale/base;
       zoomEl.value=String(clamp(ratio,1,3));
     } else zoomEl.value='1';
 
-    // text
     textInput.value = it.hasText ? it.text : '';
     charCount.textContent = `${(textInput.value||'').length}/25`;
     textColorBtn.textContent = (it.textColor === 'black') ? 'Text: Black' : 'Text: White + Shadow';
@@ -761,30 +785,28 @@
     const it=items[activeIndex];
     ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
 
-    // background
     ctx.fillStyle='#05060a';
     ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
 
     if (!it.img){
       ctx.fillStyle='rgba(233,238,245,.85)';
-      ctx.font='800 16px system-ui';
+      ctx.font='900 16px system-ui';
       ctx.textAlign='center';
       ctx.fillText('Upload a photo to begin', CANVAS_SIZE/2, CANVAS_SIZE/2);
       return;
     }
 
-    // photo
-    ctx.save();
-    ctx.imageSmoothingEnabled=true;
-    ctx.imageSmoothingQuality="high";
-    ctx.filter = it.bw ? 'grayscale(1)' : 'none';
-    ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
-    ctx.restore();
+    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
 
-    // text
+    if (srcCanvas){
+      ctx.drawImage(srcCanvas, it.x, it.y, it.w*it.scale, it.h*it.scale);
+    } else {
+      ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
+    }
+
     if (it.hasText && it.text){
       ctx.save();
-      ctx.font = '800 42px system-ui';
+      ctx.font = '900 42px system-ui';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -800,7 +822,6 @@
       ctx.restore();
     }
 
-    // guides
     if (showGuides){
       ctx.strokeStyle='rgba(255,255,255,.35)';
       ctx.lineWidth=2;
@@ -840,12 +861,48 @@
     draw();
   }
 
-  // --- mobile-friendly pointer gestures
-  const pointers = new Map(); // pointerId -> {x,y}
+  // ✅ Auto-compact + auto-shrink sets
+  function compactAndResizeAfterRemoval(keepEditingIndex=null){
+    // gather filled items (preserve per-item settings)
+    const filled = items.filter(it => !!it.src);
+    const filledCount = filled.length;
+    const newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount, 6)));
+
+    const newItems = [];
+    for (let i=0; i<newQty; i++){
+      newItems.push(i < filledCount ? filled[i] : newItem());
+    }
+    items = newItems;
+    quantity = newQty;
+
+    // keep selection sensible
+    if (keepEditingIndex !== null) {
+      activeIndex = clamp(keepEditingIndex, 0, quantity-1);
+    } else {
+      activeIndex = clamp(activeIndex, 0, quantity-1);
+    }
+    setIndex = Math.floor(activeIndex / 6);
+
+    buildQtyButtons();
+    buildSetButtons();
+    renderGrid();
+    updateQtyUI();
+    updateProgress();
+    updateGatingUI();
+
+    if (mode === 'edit') {
+      // if we removed current, try to edit the same index if it exists, else fallback to last filled
+      const idx = clamp(activeIndex, 0, quantity-1);
+      openEditor(idx);
+    }
+  }
+
+  // Mobile pointer gestures
+  const pointers = new Map();
   let dragMode = null;        // 'photo' | 'text' | null
   let lastSingle = null;
+  let pinchStart = null;
 
-  let pinchStart = null;      // {dist, scale, centerX, centerY, x, y}
   function canvasToLocal(e){
     const rect=canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -855,15 +912,12 @@
 
   function hitTestText(it, x, y){
     if (!it.hasText || !it.text) return false;
-    // rough bounding box
     const w = Math.max(120, it.text.length * 22);
     const h = 60;
     return (x >= it.textX - w/2 && x <= it.textX + w/2 && y >= it.textY - h/2 && y <= it.textY + h/2);
   }
 
   function applyScaleAroundPoint(it, newScale, anchorX, anchorY){
-    // Keep anchor point stable during zoom:
-    // (anchor - x) / scale is image-space coordinate; preserve that.
     const oldScale = it.scale;
     const ix = (anchorX - it.x) / oldScale;
     const iy = (anchorY - it.y) / oldScale;
@@ -883,7 +937,6 @@
 
     const it=items[activeIndex];
     if (pointers.size === 1){
-      // decide whether dragging text or photo
       dragMode = hitTestText(it, p.x, p.y) ? 'text' : 'photo';
       lastSingle = {x:p.x, y:p.y};
     }
@@ -891,9 +944,7 @@
       const pts=[...pointers.values()];
       const dx=pts[0].x-pts[1].x, dy=pts[0].y-pts[1].y;
       const dist=Math.hypot(dx,dy);
-      const cx=(pts[0].x+pts[1].x)/2;
-      const cy=(pts[0].y+pts[1].y)/2;
-      pinchStart = { dist, scale: it.scale, cx, cy };
+      pinchStart = { dist, scale: it.scale };
       dragMode = null;
       lastSingle = null;
     }
@@ -913,14 +964,11 @@
       const dy = p.y - lastSingle.y;
 
       if (dragMode === 'text'){
-        it.textX += dx;
-        it.textY += dy;
+        it.textX += dx; it.textY += dy;
       } else {
-        it.x += dx;
-        it.y += dy;
+        it.x += dx; it.y += dy;
         clampToVisibleCoverage(it);
       }
-
       lastSingle = {x:p.x, y:p.y};
       draw();
       return;
@@ -942,10 +990,8 @@
 
       applyScaleAroundPoint(it, newScale, cx, cy);
 
-      // keep slider in sync
       const ratio = it.scale / base;
       zoomEl.value = String(clamp(ratio, 1, 3));
-
       draw();
     }
   });
@@ -957,38 +1003,31 @@
       dragMode = null;
       lastSingle = null;
     } else if (pointers.size === 1){
-      // reset lastSingle to remaining pointer
       const only=[...pointers.values()][0];
       lastSingle = {x:only.x, y:only.y};
       dragMode = 'photo';
     }
   });
-
   canvas.addEventListener('pointercancel', (e)=>{
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinchStart = null;
-    if (pointers.size === 0){
-      dragMode = null;
-      lastSingle = null;
-    }
+    if (pointers.size === 0){ dragMode=null; lastSingle=null; }
   });
 
-  // --- UI events
+  // UI events
   bulkUploadBtn.addEventListener('click', ()=> bulkFileInput.click());
 
   bulkFileInput.addEventListener('change', async (e)=>{
     const files = Array.from(e.target.files || []).filter(f=>f.type.startsWith('image/'));
     if (!files.length) return;
 
-    const start = setIndex*6;
-    const emptyFromStart = items.slice(start).filter(it=>!it.src).length;
-    if (files.length > emptyFromStart){
-      const used = countComplete();
-      const needed = ceilToMultiple(Math.max(start + files.length, used + files.length), 6);
-      setQuantity(needed, true);
-    }
+    // ensure capacity
+    const filledCount = items.filter(it=>!!it.src).length;
+    const neededQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount + files.length, 6)));
+    if (neededQty !== quantity) setQuantity(neededQty, true);
 
-    let i=start;
+    // append to first available empties
+    let i=0;
     for (const f of files){
       while (i < items.length && items[i].src) i++;
       if (i >= items.length) break;
@@ -997,6 +1036,7 @@
       setImageForIndex(i, img, src);
       i++;
     }
+
     bulkFileInput.value='';
     updateProgress(); updateQtyUI(); updateGatingUI();
   });
@@ -1040,7 +1080,6 @@
     const base = baseScaleForVisible(it);
     const ratio = parseFloat(zoomEl.value || '1');
     const newScale = base * ratio;
-    // zoom around center of visible area (nice default)
     const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
     const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
     applyScaleAroundPoint(it, newScale, cx, cy);
@@ -1048,14 +1087,11 @@
   });
 
   clearPhotoBtn.addEventListener('click', ()=>{
-    const it=items[activeIndex];
-    if (!it.src) return;
+    if (!items[activeIndex].src) return;
+    // remove current photo item
     items[activeIndex] = newItem();
-    updateProgress(); updateGatingUI();
-    renderGrid();
-    syncControls();
-    draw();
-    // remain in editor, but empty
+    // ✅ compact forward + shrink quantity to the right multiple of 6
+    compactAndResizeAfterRemoval(activeIndex);
   });
 
   prevBtn.addEventListener('click', ()=>{
@@ -1085,7 +1121,7 @@
     alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
   });
 
-  // text controls
+  // Text
   textInput.addEventListener('input', ()=>{
     const it=items[activeIndex];
     const v=(textInput.value||'').slice(0,25);
@@ -1122,30 +1158,30 @@
     renderGrid();
   });
 
-  // --- downloads
+  // Downloads
   function renderMagnetToCanvas(index, outSize=1200){
     const it=items[index];
     const off=document.createElement('canvas');
     off.width=outSize; off.height=outSize;
-    const o=off.getContext('2d');
+    const o=off.getContext('2d', { willReadFrequently: false });
     o.imageSmoothingEnabled=true; o.imageSmoothingQuality="high";
     o.fillStyle='#ffffff';
     o.fillRect(0,0,outSize,outSize);
     if (!it.img) return off;
 
-    o.save();
-    o.filter = it.bw ? 'grayscale(1)' : 'none';
+    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
+
     const sx = it.x / CANVAS_SIZE * outSize;
     const sy = it.y / CANVAS_SIZE * outSize;
     const sw = (it.w*it.scale)/CANVAS_SIZE * outSize;
     const sh = (it.h*it.scale)/CANVAS_SIZE * outSize;
-    o.drawImage(it.img, sx, sy, sw, sh);
-    o.restore();
 
-    // text
+    if (srcCanvas) o.drawImage(srcCanvas, sx, sy, sw, sh);
+    else o.drawImage(it.img, sx, sy, sw, sh);
+
     if (it.hasText && it.text){
       o.save();
-      o.font='800 64px system-ui';
+      o.font='900 64px system-ui';
       o.textAlign='center';
       o.textBaseline='middle';
       const tx = it.textX / CANVAS_SIZE * outSize;
@@ -1232,7 +1268,21 @@
     downloadCanvasPNG(makeSheet(A3, indices, 12), `print_sheet_set${setIndex+1}_A3_12up.png`);
   });
 
-  // --- init
+  // Wire remaining buttons
+  bulkUploadBtn.addEventListener('click', ()=> bulkFileInput.click());
+
+  tileFileInput.addEventListener('change', async (e)=>{
+    const f = e.target.files && e.target.files[0];
+    const target = tileUploadTargetIndex;
+    tileUploadTargetIndex = null;
+    if (!f || target == null) return;
+    const src = await fileToDataURL(f);
+    const img = await loadImageFromURL(src);
+    setImageForIndex(target, img, src);
+    openEditor(target);
+  });
+
+  // Init
   initItems(quantity);
   buildQtyButtons();
   buildSetButtons();
