@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Magnet Editor Prototype</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#121420;
+      --panel2:#0f1120;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e9eef5;
+      --muted:rgba(233,238,245,.75);
+      --blue:#2a5cff;
+      --yellow:#ffd43b;
+      --yellowSoft:rgba(255,212,59,.38);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --shadow2: 0 18px 55px rgba(0,0,0,.45);
+      --radius:16px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(42,92,255,.15), transparent 55%),
+        radial-gradient(900px 500px at 90% 10%, rgba(255,212,59,.10), transparent 60%),
+        radial-gradient(800px 500px at 60% 110%, rgba(120,255,190,.08), transparent 55%),
+        var(--bg);
+      color:var(--text);
+    }
+
+    header{
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      backdrop-filter: blur(8px);
+      background: rgba(11,12,16,.55);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    header h1{
+      margin:0;
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing:.25px;
+      opacity:.95;
+    }
+
+    /* ✅ Premium header progress */
+    .hdrRight{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+      min-width: 320px;
+    }
+    .hdrTop{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .progressWrap{
+      width: 320px;
+      max-width: 70vw;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(15,17,32,.55);
+      overflow:hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18) inset;
+    }
+    .progressBar{
+      height:100%;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,212,59,1), rgba(42,92,255,.95));
+      box-shadow: 0 0 22px rgba(255,212,59,.18);
+      transition: width .22s ease;
+    }
+
+    main{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(18,20,32,.95), rgba(18,20,32,.85));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2{
+      margin:0 0 10px;
+      font-size: 12px;
+      opacity:.9;
+      font-weight:800;
+      letter-spacing:.25px;
+      text-transform: none;
+    }
+
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .row + .row{ margin-top:10px; }
+
+    label{ font-size: 12px; opacity:.9; }
+    input[type="range"]{ width: 100%; }
+    input[type="text"]{
+      width: 100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,17,32,.9);
+      color: var(--text);
+      outline:none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    input[type="text"]:focus{
+      border-color: rgba(255,212,59,.55);
+      box-shadow: 0 0 0 4px rgba(255,212,59,.10);
+    }
+
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,17,32,.9);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.15px;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    button:hover{
+      border-color: rgba(255,255,255,.22);
+      filter: brightness(1.03);
+      transform: translateY(-1px);
+    }
+
+    button:active{
+      transform: translateY(0px);
+      filter: brightness(0.98);
+    }
+
+    button.primary{
+      background: linear-gradient(180deg, rgba(42,92,255,1), rgba(42,92,255,.82));
+      border-color: rgba(42,92,255,.85);
+      box-shadow: 0 10px 25px rgba(42,92,255,.25);
+    }
+    button.primary:hover{
+      filter: brightness(1.06);
+      box-shadow: 0 12px 30px rgba(42,92,255,.30);
+    }
+
+    button.danger{
+      background: linear-gradient(180deg, rgba(64,18,34,.9), rgba(42,20,32,.9));
+      border-color: rgba(255,80,120,.35);
+      box-shadow: 0 12px 28px rgba(255,80,120,.08);
+    }
+
+    button.ghost{ background: transparent; }
+
+    button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none !important;
+      filter:none !important;
+      box-shadow:none !important;
+    }
+
+    button.upload{
+      background: linear-gradient(180deg, rgba(255,212,59,1), rgba(255,212,59,.88));
+      border-color: rgba(255,212,59,.95);
+      color:#0b0c10;
+      box-shadow: 0 10px 25px rgba(255,212,59,.16);
+    }
+    button.upload:hover{
+      filter: brightness(1.03);
+      box-shadow: 0 12px 30px rgba(255,212,59,.20);
+    }
+
+    /* ✅ Gentle pulse ONLY when needed */
+    @keyframes softPulse {
+      0%   { box-shadow: 0 10px 25px rgba(0,0,0,.10), 0 0 0 0 rgba(255,212,59,.22); }
+      55%  { box-shadow: 0 12px 30px rgba(0,0,0,.16), 0 0 0 10px rgba(255,212,59,0); }
+      100% { box-shadow: 0 10px 25px rgba(0,0,0,.10), 0 0 0 0 rgba(255,212,59,0); }
+    }
+    .pulse{
+      border-color: rgba(255,212,59,.85) !important;
+      animation: softPulse 1.8s ease-in-out infinite;
+    }
+
+    .muted{ font-size:12px; color: var(--muted); line-height:1.35; }
+    .k{ font-size:12px; opacity:.82; }
+
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      font-size:12px;
+      opacity:.95;
+      background: rgba(15,17,32,.55);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 25px rgba(0,0,0,.20);
+    }
+
+    .seg{ display:flex; gap:8px; flex-wrap:wrap; }
+    .seg button{
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:850;
+      background: rgba(15,17,32,.75);
+    }
+    .seg button.active{
+      background: rgba(26,34,58,.9);
+      border-color: rgba(255,255,255,.24);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.04);
+    }
+
+    hr{ border:0; border-top:1px solid rgba(255,255,255,.08); margin:14px 0; }
+
+    .right{
+      background: linear-gradient(180deg, rgba(18,20,32,.93), rgba(18,20,32,.84));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      box-shadow: var(--shadow);
+    }
+
+    .nav{ display:flex; justify-content:space-between; gap:10px; align-items:center; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .tile{
+      background: linear-gradient(180deg, rgba(15,17,32,.95), rgba(12,14,24,.95));
+      border: 1.5px solid rgba(255,212,59,.70);
+      border-radius: 16px;
+      padding:10px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      user-select:none;
+      box-shadow:
+        0 10px 24px rgba(0,0,0,.22),
+        0 0 0 1px rgba(255,212,59,.06) inset;
+      transition:
+        transform .14s ease,
+        box-shadow .14s ease,
+        border-color .14s ease,
+        filter .14s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 120px at 50% 0%, rgba(255,212,59,.10), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .tile:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,212,59,.92);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,.35),
+        0 0 0 1px rgba(255,212,59,.10) inset,
+        0 0 22px rgba(255,212,59,.12);
+      filter: brightness(1.02);
+    }
+
+    .tile.active{
+      border-color: rgba(255,212,59,1);
+      box-shadow:
+        0 18px 42px rgba(0,0,0,.38),
+        0 0 0 2px rgba(255,212,59,.24) inset,
+        0 0 26px rgba(255,212,59,.18);
+    }
+
+    .thumb{
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:14px;
+      background: rgba(11,12,16,1);
+      border: 1px solid rgba(255,212,59,.50);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25) inset;
+      position: relative;
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .tile .meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+
+    .badge{
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,17,32,.65);
+      backdrop-filter: blur(6px);
+      font-weight: 850;
+      letter-spacing:.15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      white-space: nowrap;
+    }
+    .badge.empty{
+      border-color: rgba(255,255,255,.14);
+      opacity:.82;
+    }
+    .badge.review{
+      border-color: rgba(255,210,138,.55);
+      color: #ffd28a;
+      box-shadow: 0 12px 30px rgba(255,210,138,.08);
+    }
+    .badge.ready{
+      border-color: rgba(120,255,190,.35);
+      color: #a9ffd4;
+      box-shadow: 0 12px 30px rgba(120,255,190,.08);
+    }
+
+    .canvasWrap{
+      background: linear-gradient(180deg, rgba(11,12,16,1), rgba(6,7,10,1));
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow2);
+      position: relative;
+      overflow:hidden;
+    }
+    .canvasWrap::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background:
+        radial-gradient(420px 220px at 30% 10%, rgba(42,92,255,.10), transparent 60%),
+        radial-gradient(420px 220px at 70% 90%, rgba(255,212,59,.08), transparent 60%);
+      pointer-events:none;
+    }
+    canvas{
+      width:min(560px, 100%);
+      height:auto;
+      border-radius:14px;
+      background:#05060a;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 35px rgba(0,0,0,.38);
+      touch-action:none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .twoCol{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .warn{ font-size:12px; color:#ffd28a; opacity:.95; }
+    .ok{ font-size:12px; color:#a9ffd4; opacity:.95; }
+
+    .checkrow{ display:flex; gap:10px; align-items:flex-start; }
+    .checkrow input[type="checkbox"]{ transform: translateY(2px); }
+    .hint{ font-size:12px; opacity:.78; margin-top:6px; }
+
+    @media (max-width: 980px){
+      main{ grid-template-columns: 1fr; }
+      header{ position: relative; }
+      .hdrRight{ align-items:stretch; min-width: unset; width: 100%; }
+      .progressWrap{ width: 100%; max-width: 100%; }
+      .hdrTop{ justify-content:space-between; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Magnet Editor (50×50mm required • bleed may be blank)</h1>
+
+  <!-- ✅ Header right block with pills + progress bar -->
+  <div class="hdrRight">
+    <div class="hdrTop">
+      <span class="pill" id="qtyPill">Order Quantity: 6</span>
+      <span class="pill" id="progressPill">0/6 complete</span>
+      <button class="primary" id="toGridBtn" type="button">Grid</button>
+    </div>
+    <div class="progressWrap" aria-label="Order progress">
+      <div class="progressBar" id="progressBar"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <section class="panel">
+    <h2>Order</h2>
+
+    <div class="row">
+      <label>Quantity (multiples of 6, max 72)</label>
+      <div class="seg" id="qtyButtons"></div>
+    </div>
+
+    <div class="row">
+      <button id="bulkUploadBtn" class="upload" type="button">Upload photos (bulk)</button>
+      <input id="bulkFileInput" type="file" accept="image/*" multiple style="display:none" />
+      <input id="tileFileInput" type="file" accept="image/*" style="display:none" />
+    </div>
+    <div class="muted">
+      Tip: You can also upload an individual photo by clicking any blank square in the grid.
+    </div>
+
+    <hr>
+
+    <h2>Review & print readiness</h2>
+    <div class="row twoCol">
+      <button id="reviewNextBtn" type="button">Review next needed</button>
+      <button id="reviewSummaryBtn" type="button">Show summary</button>
+    </div>
+
+    <div class="checkrow">
+      <input id="finalConfirm" type="checkbox" />
+      <div>
+        <label for="finalConfirm">I’ve reviewed all magnets and they’re ready to print</label>
+        <div class="hint" id="confirmHint">Uploads must be complete (no empty magnets) to enable A4/A3.</div>
+        <div class="hint" id="confirmStatus"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h2>Downloads</h2>
+    <div class="row">
+      <button id="dlMagnetBtn" type="button">Download current magnet (1200×1200 PNG)</button>
+    </div>
+    <div class="row twoCol">
+      <button id="dlA4Btn" type="button">Download A4 sheet (6-up)</button>
+      <button id="dlA3Btn" type="button">Download A3 sheet (12-up)</button>
+    </div>
+    <div class="muted">
+      A4/A3 downloads require: (1) no empty magnets, and (2) the confirmation box ticked.
+      If some magnets are not yet reviewed, we’ll warn you — but we won’t block you.
+    </div>
+
+    <hr>
+
+    <div id="editorControls" style="display:none">
+      <h2>Editor</h2>
+
+      <div class="row">
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+
+      <div class="row twoCol">
+        <button id="clearPhotoBtn" class="danger" type="button">Clear photo</button>
+        <button id="guidesBtn" type="button">Guides: On</button>
+      </div>
+
+      <div class="row twoCol">
+        <button id="prevBtn" type="button">◀ Prev</button>
+        <button id="nextBtn" type="button">Next ▶</button>
+      </div>
+
+      <div class="row">
+        <label>Zoom (min = “covers 50×50mm”)</label>
+        <input type="range" id="zoom" min="1" max="3" value="1" step="0.01" />
+      </div>
+
+      <div class="row twoCol">
+        <button id="bwBtn" type="button">B&W: Off</button>
+      </div>
+
+      <div class="row">
+        <button id="backToGridBtn" class="ghost" type="button">← Back to grid</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT -->
+  <section class="right">
+    <div class="nav">
+      <div class="seg" id="setButtons"></div>
+      <div class="row">
+        <span class="k" id="viewLabel">Grid</span>
+      </div>
+    </div>
+
+    <div id="gridView">
+      <div class="grid" id="grid"></div>
+      <div class="row" style="margin-top:12px;">
+        <span class="warn" id="lowResWarn" style="display:none;">One or more photos may be low resolution for printing.</span>
+      </div>
+    </div>
+
+    <div id="editorView" style="display:none">
+      <div class="canvasWrap">
+        <canvas id="canvas" width="800" height="800"></canvas>
+      </div>
+      <div class="muted">
+        Tip: drag photo to reposition. Zoom out is limited so the inner 50×50mm is always covered. Bleed ring may be blank.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const CANVAS_SIZE = 800;
+  const VISIBLE_MM = 50;
+  const BLEED_MM = 5;
+  const TOTAL_MM = VISIBLE_MM + BLEED_MM*2; // 60
+  const VISIBLE_RATIO = VISIBLE_MM / TOTAL_MM; // 50/60
+  const VISIBLE_MARGIN_RATIO = (1 - VISIBLE_RATIO) / 2;
+
+  const VISIBLE_RECT = {
+    x: CANVAS_SIZE * VISIBLE_MARGIN_RATIO,
+    y: CANVAS_SIZE * VISIBLE_MARGIN_RATIO,
+    w: CANVAS_SIZE * VISIBLE_RATIO,
+    h: CANVAS_SIZE * VISIBLE_RATIO
+  };
+
+  const MAGNET_PRINT_PX = 1200;
+  const MAX_QTY = 72;
+
+  const A4 = { w: 2480, h: 3508, name: "A4_300dpi" };
+  const A3 = { w: 3508, h: 4961, name: "A3_300dpi" };
+  const MAGNET_ON_SHEET_PX = 709;
+
+  const qtyButtons = document.getElementById('qtyButtons');
+  const setButtons = document.getElementById('setButtons');
+  const grid = document.getElementById('grid');
+  const gridView = document.getElementById('gridView');
+  const editorView = document.getElementById('editorView');
+  const editorControls = document.getElementById('editorControls');
+  const viewLabel = document.getElementById('viewLabel');
+
+  const qtyPill = document.getElementById('qtyPill');
+  const progressPill = document.getElementById('progressPill');
+  const progressBar = document.getElementById('progressBar');
+
+  const lowResWarn = document.getElementById('lowResWarn');
+
+  const finalConfirm = document.getElementById('finalConfirm');
+  const confirmHint = document.getElementById('confirmHint');
+  const confirmStatus = document.getElementById('confirmStatus');
+  const reviewNextBtn = document.getElementById('reviewNextBtn');
+  const reviewSummaryBtn = document.getElementById('reviewSummaryBtn');
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const fileInput = document.getElementById('fileInput');
+  const bulkUploadBtn = document.getElementById('bulkUploadBtn');
+  const bulkFileInput = document.getElementById('bulkFileInput');
+  const tileFileInput = document.getElementById('tileFileInput');
+  let tileUploadTargetIndex = null;
+
+  const zoomEl = document.getElementById('zoom');
+  const bwBtn = document.getElementById('bwBtn');
+  const guidesBtn = document.getElementById('guidesBtn');
+  const clearPhotoBtn = document.getElementById('clearPhotoBtn');
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const backToGridBtn = document.getElementById('backToGridBtn');
+  const toGridBtn = document.getElementById('toGridBtn');
+
+  const dlMagnetBtn = document.getElementById('dlMagnetBtn');
+  const dlA4Btn = document.getElementById('dlA4Btn');
+  const dlA3Btn = document.getElementById('dlA3Btn');
+
+  let quantity = 6;
+  let setIndex = 0;
+  let activeIndex = 0;
+  let showGuides = true;
+  let mode = 'grid';
+  let items = [];
+
+  function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+  function ceilToMultiple(n, m) { return Math.ceil(n / m) * m; }
+
+  function newItem() {
+    return {
+      img: null, src: null, w: 0, h: 0,
+      x: 0, y: 0, scale: 1,
+      bw: false,
+      reviewed: false,
+      lowRes: false
+    };
+  }
+
+  function initItems(qty) { items = Array.from({length: qty}, () => newItem()); }
+
+  function countComplete() { return items.filter(it => !!it.src).length; }
+  function countEmpty() { return items.filter(it => !it.src).length; }
+  function countNeedsReview() { return items.filter(it => !!it.src && !it.reviewed).length; }
+
+  function updateQtyUI() { qtyPill.textContent = `Order Quantity: ${quantity}`; }
+
+  /* ✅ Update pills + progress bar */
+  function updateProgress() {
+    const complete = countComplete();
+    progressPill.textContent = `${complete}/${quantity} complete`;
+    const pct = quantity === 0 ? 0 : Math.round((complete / quantity) * 100);
+    progressBar.style.width = pct + '%';
+  }
+
+  /* ✅ Pulse review button only when needed */
+  function updateReviewPulse() {
+    const needs = countEmpty() + countNeedsReview();
+    if (needs > 0) reviewNextBtn.classList.add('pulse');
+    else reviewNextBtn.classList.remove('pulse');
+  }
+
+  function updateGatingUI() {
+    const confirmed = !!finalConfirm.checked;
+    const empties = countEmpty();
+    const needsReview = countNeedsReview();
+
+    const canPrintSheets = confirmed && empties === 0;
+    dlA4Btn.disabled = !canPrintSheets;
+    dlA3Btn.disabled = !canPrintSheets;
+
+    if (!confirmed) {
+      confirmHint.textContent = "Ticking this enables A4/A3 downloads (once all magnets have photos).";
+      confirmStatus.textContent = "";
+      confirmStatus.className = "hint";
+      return;
+    }
+
+    if (empties > 0) {
+      confirmHint.textContent = "Please fill all magnets before downloading A4/A3 (to avoid blank prints).";
+      confirmStatus.textContent = `Still empty: ${empties} magnet(s).`;
+      confirmStatus.className = "hint warn";
+      return;
+    }
+
+    if (needsReview > 0) {
+      confirmHint.textContent = "Downloads enabled. We recommend reviewing all magnets first.";
+      confirmStatus.textContent = `Not reviewed yet: ${needsReview} magnet(s).`;
+      confirmStatus.className = "hint warn";
+    } else {
+      confirmHint.textContent = "Downloads enabled. Everything looks ready.";
+      confirmStatus.textContent = "All magnets reviewed ✅";
+      confirmStatus.className = "hint ok";
+    }
+  }
+
+  function setQuantity(newQty, { preserveExisting = true } = {}) {
+    newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(newQty, 6)));
+    if (newQty === quantity) return;
+
+    const old = items;
+    quantity = newQty;
+    items = Array.from({length: quantity}, (_, i) => (preserveExisting && i < old.length) ? old[i] : newItem());
+
+    if (activeIndex >= quantity) activeIndex = quantity - 1;
+    const setCount = Math.ceil(quantity / 6);
+    if (setIndex >= setCount) setIndex = setCount - 1;
+
+    buildQtyButtons();
+    buildSetButtons();
+    renderGrid();
+    updateQtyUI();
+    updateProgress();
+    updateGatingUI();
+    updateReviewPulse();
+  }
+
+  function baseScaleForVisible(it) {
+    if (!it.img) return 1;
+    return Math.max(VISIBLE_RECT.w / it.w, VISIBLE_RECT.h / it.h);
+  }
+
+  function clampToVisibleCoverage(it) {
+    if (!it.img) return;
+    const base = baseScaleForVisible(it);
+    if (it.scale < base) it.scale = base;
+
+    const imgW = it.w * it.scale;
+    const imgH = it.h * it.scale;
+
+    const minX = VISIBLE_RECT.x + VISIBLE_RECT.w - imgW;
+    const maxX = VISIBLE_RECT.x;
+    const minY = VISIBLE_RECT.y + VISIBLE_RECT.h - imgH;
+    const maxY = VISIBLE_RECT.y;
+
+    it.x = clamp(it.x, minX, maxX);
+    it.y = clamp(it.y, minY, maxY);
+  }
+
+  function buildQtyButtons() {
+    qtyButtons.innerHTML = '';
+    for (let q = 6; q <= MAX_QTY; q += 6) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = q;
+      if (q === quantity) b.classList.add('active');
+      b.onclick = () => setQuantity(q, { preserveExisting: true });
+      qtyButtons.appendChild(b);
+    }
+  }
+
+  function buildSetButtons() {
+    setButtons.innerHTML = '';
+    const setCount = Math.ceil(quantity / 6);
+    for (let s = 0; s < setCount; s++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = `Set ${s+1}`;
+      if (s === setIndex) b.classList.add('active');
+      b.onclick = () => {
+        setIndex = s;
+        buildSetButtons();
+        renderGrid();
+        if (mode === 'edit') {
+          const start = setIndex*6;
+          const end = Math.min(start+6, quantity)-1;
+          if (activeIndex < start || activeIndex > end) openEditor(start);
+          else draw();
+        }
+      };
+      setButtons.appendChild(b);
+    }
+  }
+
+  function setMode(next) {
+    mode = next;
+    if (mode === 'grid') {
+      gridView.style.display = '';
+      editorView.style.display = 'none';
+      editorControls.style.display = 'none';
+      viewLabel.textContent = 'Grid';
+    } else {
+      gridView.style.display = 'none';
+      editorView.style.display = '';
+      editorControls.style.display = '';
+      viewLabel.textContent = `Editing #${activeIndex+1}`;
+      draw();
+    }
+  }
+
+  function getBadgeInfo(it) {
+    if (!it.src) return { text: "Empty", cls: "empty" };
+    if (!it.reviewed) return { text: "Review", cls: "review" };
+    return { text: "Ready", cls: "ready" };
+  }
+
+  function renderPreviewDataURL(index, size=320) {
+    const it = items[index];
+    if (!it.img) return '';
+    const off = document.createElement('canvas');
+    off.width = size; off.height = size;
+    const o = off.getContext('2d');
+    o.imageSmoothingEnabled = true;
+    o.imageSmoothingQuality = "high";
+    o.fillStyle = '#05060a';
+    o.fillRect(0,0,size,size);
+    o.save();
+    o.filter = it.bw ? 'grayscale(1)' : 'none';
+    const sx = it.x / CANVAS_SIZE * size;
+    const sy = it.y / CANVAS_SIZE * size;
+    const sw = (it.w * it.scale) / CANVAS_SIZE * size;
+    const sh = (it.h * it.scale) / CANVAS_SIZE * size;
+    o.drawImage(it.img, sx, sy, sw, sh);
+    o.restore();
+    return off.toDataURL('image/png');
+  }
+
+  function renderGrid() {
+    grid.innerHTML = '';
+    const start = setIndex * 6;
+    const end = Math.min(start + 6, quantity);
+    let anyLowRes = false;
+
+    for (let i = start; i < end; i++) {
+      const it = items[i];
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (i === activeIndex && mode === 'edit' ? ' active' : '');
+
+      tile.onclick = () => {
+        if (!items[i].src) {
+          tileUploadTargetIndex = i;
+          tileFileInput.value = '';
+          tileFileInput.click();
+        } else {
+          openEditor(i);
+        }
+      };
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+
+      if (it.src) {
+        const imgEl = document.createElement('img');
+        imgEl.src = renderPreviewDataURL(i, 320);
+        thumb.appendChild(imgEl);
+      } else {
+        const ph = document.createElement('div');
+        ph.className = 'muted';
+        ph.style.textAlign = 'center';
+        ph.innerHTML = "Click to upload<br/>(+ add photo)";
+        thumb.appendChild(ph);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const left = document.createElement('div');
+      left.className = 'k';
+      left.textContent = `#${i+1}`;
+
+      const badge = document.createElement('div');
+      const b = getBadgeInfo(it);
+      badge.className = `badge ${b.cls}`;
+      badge.textContent = b.text;
+
+      meta.appendChild(left);
+      meta.appendChild(badge);
+
+      if (it.lowRes) anyLowRes = true;
+
+      tile.appendChild(thumb);
+      tile.appendChild(meta);
+      grid.appendChild(tile);
+    }
+
+    lowResWarn.style.display = anyLowRes ? 'block' : 'none';
+  }
+
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadImageFromURL(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
+
+  function setImageForIndex(i, img, src) {
+    const it = items[i];
+    it.img = img; it.src = src;
+    it.w = img.naturalWidth; it.h = img.naturalHeight;
+
+    const base = baseScaleForVisible(it);
+    it.scale = base;
+
+    const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
+    const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
+    it.x = cx - (it.w * it.scale) / 2;
+    it.y = cy - (it.h * it.scale) / 2;
+
+    it.reviewed = false;
+    it.bw = false;
+
+    clampToVisibleCoverage(it);
+    it.lowRes = (Math.min(it.w, it.h) < 1200);
+
+    updateProgress();
+    updateGatingUI();
+    updateReviewPulse();
+    renderGrid();
+    if (mode === 'edit' && activeIndex === i) draw();
+  }
+
+  function draw() {
+    const it = items[activeIndex];
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.fillStyle = '#05060a';
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+    if (!it.img) {
+      ctx.fillStyle = 'rgba(233,238,245,.85)';
+      ctx.font = '750 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Upload a photo to begin', CANVAS_SIZE/2, CANVAS_SIZE/2);
+      return;
+    }
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.filter = it.bw ? 'grayscale(1)' : 'none';
+    ctx.drawImage(it.img, it.x, it.y, it.w * it.scale, it.h * it.scale);
+    ctx.restore();
+
+    if (showGuides) {
+      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(2, 2, CANVAS_SIZE-4, CANVAS_SIZE-4);
+
+      ctx.strokeStyle = 'rgba(255,210,138,.9)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 6]);
+      ctx.strokeRect(VISIBLE_RECT.x, VISIBLE_RECT.y, VISIBLE_RECT.w, VISIBLE_RECT.h);
+      ctx.setLineDash([]);
+    }
+  }
+
+  function findNextNeededIndex() {
+    const start = setIndex * 6;
+    const end = Math.min(start + 6, quantity);
+    for (let i = start; i < end; i++) if (!items[i].src) return i;
+    for (let i = start; i < end; i++) if (items[i].src && !items[i].reviewed) return i;
+    for (let i = 0; i < quantity; i++) if (!items[i].src) return i;
+    for (let i = 0; i < quantity; i++) if (items[i].src && !items[i].reviewed) return i;
+    return null;
+  }
+
+  function openEditor(i) {
+    activeIndex = i;
+    setIndex = Math.floor(activeIndex / 6);
+    buildSetButtons();
+
+    if (items[activeIndex].src && !items[activeIndex].reviewed) items[activeIndex].reviewed = true;
+
+    setMode('edit');
+    renderGrid();
+    updateGatingUI();
+    updateReviewPulse();
+    draw();
+  }
+
+  reviewNextBtn.addEventListener('click', () => {
+    const idx = findNextNeededIndex();
+    if (idx === null) return alert("Everything looks good — no empty or unreviewed magnets found.");
+    openEditor(idx);
+  });
+
+  reviewSummaryBtn.addEventListener('click', () => {
+    alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
+  });
+
+  bulkUploadBtn.addEventListener('click', () => bulkFileInput.click());
+
+  bulkFileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
+    if (files.length === 0) return;
+
+    const start = setIndex * 6;
+    const emptyFromStart = items.slice(start).filter(it => !it.src).length;
+    if (files.length > emptyFromStart) {
+      const used = countComplete();
+      const needed = ceilToMultiple(Math.max(start + files.length, used + files.length), 6);
+      setQuantity(needed, { preserveExisting: true });
+    }
+
+    let i = setIndex * 6;
+    for (const f of files) {
+      while (i < items.length && items[i].src) i++;
+      if (i >= items.length) break;
+      const src = await fileToDataURL(f);
+      const img = await loadImageFromURL(src);
+      setImageForIndex(i, img, src);
+      i++;
+    }
+
+    bulkFileInput.value = '';
+    renderGrid();
+    updateProgress();
+    updateQtyUI();
+    updateGatingUI();
+    updateReviewPulse();
+  });
+
+  tileFileInput.addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    const target = tileUploadTargetIndex;
+    tileUploadTargetIndex = null;
+    if (!f || target == null) return;
+    const src = await fileToDataURL(f);
+    const img = await loadImageFromURL(src);
+    setImageForIndex(target, img, src);
+    openEditor(target);
+  });
+
+  fileInput.addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const src = await fileToDataURL(f);
+    const img = await loadImageFromURL(src);
+    setImageForIndex(activeIndex, img, src);
+  });
+
+  guidesBtn.addEventListener('click', () => { showGuides = !showGuides; guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`; draw(); });
+
+  bwBtn.addEventListener('click', () => {
+    const it = items[activeIndex];
+    it.bw = !it.bw;
+    bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
+    draw();
+    renderGrid();
+  });
+
+  backToGridBtn.addEventListener('click', () => setMode('grid'));
+  toGridBtn.addEventListener('click', () => setMode('grid'));
+
+  finalConfirm.addEventListener('change', updateGatingUI);
+
+  // --- Downloads ---
+  function renderMagnetToCanvas(index, outSize=1200) {
+    const it = items[index];
+    const off = document.createElement('canvas');
+    off.width = outSize; off.height = outSize;
+    const o = off.getContext('2d');
+    o.imageSmoothingEnabled = true;
+    o.imageSmoothingQuality = "high";
+    o.fillStyle = '#ffffff';
+    o.fillRect(0,0,outSize,outSize);
+    if (!it.img) return off;
+    o.save();
+    o.filter = it.bw ? 'grayscale(1)' : 'none';
+    const sx = it.x / CANVAS_SIZE * outSize;
+    const sy = it.y / CANVAS_SIZE * outSize;
+    const sw = (it.w * it.scale) / CANVAS_SIZE * outSize;
+    const sh = (it.h * it.scale) / CANVAS_SIZE * outSize;
+    o.drawImage(it.img, sx, sy, sw, sh);
+    o.restore();
+    return off;
+  }
+
+  function downloadCanvasPNG(c, filename) {
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = filename;
+    a.click();
+  }
+
+  function makeSheet(page, indices, perPage) {
+    const sheet = document.createElement('canvas');
+    sheet.width = page.w; sheet.height = page.h;
+    const sctx = sheet.getContext('2d');
+    sctx.imageSmoothingEnabled = true;
+    sctx.imageSmoothingQuality = "high";
+    sctx.fillStyle = '#ffffff';
+    sctx.fillRect(0,0,sheet.width,sheet.height);
+
+    const cols = perPage === 6 ? 3 : 4;
+    const rows = perPage === 6 ? 2 : 3;
+    const margin = Math.floor(page.w * 0.07);
+    const gap = Math.floor(page.w * 0.03);
+
+    const cellW = Math.floor((page.w - margin*2 - gap*(cols-1)) / cols);
+    const cellH = Math.floor((page.h - margin*2 - gap*(rows-1)) / rows);
+    const drawSize = Math.min(MAGNET_ON_SHEET_PX, cellW, cellH);
+
+    let idx = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (idx >= indices.length) break;
+        const magnetIndex = indices[idx++];
+        const magnetCanvas = renderMagnetToCanvas(magnetIndex, MAGNET_PRINT_PX);
+
+        const xCell = margin + c*(cellW + gap);
+        const yCell = margin + r*(cellH + gap);
+        const x = xCell + Math.floor((cellW - drawSize)/2);
+        const y = yCell + Math.floor((cellH - drawSize)/2);
+
+        sctx.drawImage(magnetCanvas, 0, 0, MAGNET_PRINT_PX, MAGNET_PRINT_PX, x, y, drawSize, drawSize);
+        sctx.strokeStyle = 'rgba(0,0,0,.10)';
+        sctx.lineWidth = 2;
+        sctx.strokeRect(x, y, drawSize, drawSize);
+      }
+    }
+    return sheet;
+  }
+
+  dlMagnetBtn.addEventListener('click', () => {
+    if (!items[activeIndex].img) return alert('Open (click) a magnet with a photo first to download that specific magnet.');
+    downloadCanvasPNG(renderMagnetToCanvas(activeIndex, MAGNET_PRINT_PX), `magnet_${activeIndex+1}_1200.png`);
+  });
+
+  dlA4Btn.addEventListener('click', () => {
+    if (dlA4Btn.disabled) return;
+    const start = setIndex * 6;
+    const end = Math.min(start + 6, quantity);
+    const indices = Array.from({length: end-start}, (_, k) => start + k);
+    downloadCanvasPNG(makeSheet(A4, indices, 6), `print_sheet_set${setIndex+1}_A4_6up.png`);
+  });
+
+  dlA3Btn.addEventListener('click', () => {
+    if (dlA3Btn.disabled) return;
+    const start = setIndex * 6;
+    const end = Math.min(start + 12, quantity);
+    if (end - start < 12) return alert('Need 12 magnets available for A3 (two full sets).');
+    const indices = Array.from({length: 12}, (_, k) => start + k);
+    downloadCanvasPNG(makeSheet(A3, indices, 12), `print_sheet_set${setIndex+1}_A3_12up.png`);
+  });
+
+  // --- Init ---
+  initItems(quantity);
+  buildQtyButtons();
+  buildSetButtons();
+  renderGrid();
+  updateQtyUI();
+  updateProgress();
+  updateGatingUI();
+  updateReviewPulse();
+  setMode('grid');
+})();
+</script>
+</body>
+</html>
