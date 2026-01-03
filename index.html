@@ -98,7 +98,7 @@
     .row + .row{ margin-top:10px; }
     .twoCol{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-    button{
+    button, .btnLike{
       appearance:none;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(15,17,32,.9);
@@ -109,9 +109,15 @@
       font-weight:950;
       font-size:12px;
       transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
-    button:hover{ border-color: rgba(255,255,255,.22); filter: brightness(1.03); transform: translateY(-1px); }
-    button:active{ transform: translateY(0); filter: brightness(.98); }
+    button:hover, .btnLike:hover{ border-color: rgba(255,255,255,.22); filter: brightness(1.03); transform: translateY(-1px); }
+    button:active, .btnLike:active{ transform: translateY(0); filter: brightness(.98); }
     button:disabled{ opacity:.45; cursor:not-allowed; transform:none; filter:none; box-shadow:none; }
 
     button.primary{
@@ -119,7 +125,7 @@
       border-color: rgba(42,92,255,.85);
       box-shadow: 0 10px 25px rgba(42,92,255,.25);
     }
-    button.upload{
+    .upload{
       background: linear-gradient(180deg, rgba(255,212,59,1), rgba(255,212,59,.88));
       border-color: rgba(255,212,59,.95);
       color:#0b0c10;
@@ -223,6 +229,16 @@
     .warn{ font-size:12px; color:#ffd28a; opacity:.95; }
     .ok{ font-size:12px; color:#a9ffd4; opacity:.95; }
 
+    /* ✅ Hide file inputs WITHOUT display:none (better on mobile) */
+    .fileHidden{
+      position:absolute;
+      left:-9999px;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+
     @media (max-width: 980px){
       main{ grid-template-columns: 1fr; }
       .hdrRight{ min-width: unset; width: 100%; }
@@ -256,9 +272,11 @@
     </div>
 
     <div class="row">
-      <button id="bulkUploadBtn" class="upload" type="button">Upload photos (bulk)</button>
-      <input id="bulkFileInput" type="file" accept="image/*" multiple style="display:none" />
-      <input id="tileFileInput" type="file" accept="image/*" style="display:none" />
+      <!-- ✅ Label triggers bulk input directly (most reliable on mobile) -->
+      <label for="bulkFileInput" class="btnLike upload">Upload photos (bulk)</label>
+
+      <input id="bulkFileInput" class="fileHidden" type="file" accept="image/*" multiple />
+      <input id="tileFileInput" class="fileHidden" type="file" accept="image/*" />
     </div>
     <div class="muted">Tip: on mobile, you can upload single photos by tapping an empty square.</div>
 
@@ -402,7 +420,6 @@
   const progressBar = document.getElementById('progressBar');
   const lowResWarn = document.getElementById('lowResWarn');
 
-  const bulkUploadBtn = document.getElementById('bulkUploadBtn');
   const bulkFileInput = document.getElementById('bulkFileInput');
   const tileFileInput = document.getElementById('tileFileInput');
   const fileInput = document.getElementById('fileInput');
@@ -442,7 +459,7 @@
   let setIndex = 0;
   let activeIndex = 0;
   let showGuides = true;
-  let mode = 'grid'; // grid | edit
+  let mode = 'grid';
   let items = [];
   let tileUploadTargetIndex = null;
 
@@ -453,18 +470,17 @@
   function newItem(){
     return {
       img:null,
-      grayCanvas:null, // ✅ precomputed grayscale for mobile reliability
+      grayCanvas:null,
       src:null, w:0, h:0,
       x:0, y:0, scale:1,
       bw:false,
       reviewed:false,
       lowRes:false,
-      // text
       hasText:false,
       text:"",
       textX: CANVAS_SIZE/2,
       textY: CANVAS_SIZE*0.84,
-      textColor: "black" // black | whiteShadow
+      textColor: "black"
     };
   }
 
@@ -487,8 +503,8 @@
     const confirmed = !!finalConfirm.checked;
     const empties = countEmpty();
     const needsReview = countNeedsReview();
-
     const canPrintSheets = confirmed && empties === 0;
+
     dlA4Btn.disabled = !canPrintSheets;
     dlA3Btn.disabled = !canPrintSheets;
 
@@ -629,11 +645,8 @@
     const sw = (it.w*it.scale)/CANVAS_SIZE * size;
     const sh = (it.h*it.scale)/CANVAS_SIZE * size;
 
-    if (srcCanvas) {
-      o.drawImage(srcCanvas, sx, sy, sw, sh);
-    } else {
-      o.drawImage(it.img, sx, sy, sw, sh);
-    }
+    if (srcCanvas) o.drawImage(srcCanvas, sx, sy, sw, sh);
+    else o.drawImage(it.img, sx, sy, sw, sh);
 
     return off.toDataURL('image/png');
   }
@@ -652,7 +665,7 @@
         if (!it.src){
           tileUploadTargetIndex=i;
           tileFileInput.value='';
-          tileFileInput.click();
+          tileFileInput.click(); // works because input is not display:none
         } else openEditor(i);
       };
 
@@ -714,7 +727,6 @@
     });
   }
 
-  // ✅ Precompute grayscale once per uploaded image (reliable on iOS)
   function buildGrayscaleCanvas(img){
     const c = document.createElement('canvas');
     const w = img.naturalWidth;
@@ -736,7 +748,7 @@
   function setImageForIndex(i, img, src){
     const it=items[i];
     it.img=img; it.src=src;
-    it.grayCanvas = buildGrayscaleCanvas(img); // ✅
+    it.grayCanvas = buildGrayscaleCanvas(img);
     it.w=img.naturalWidth; it.h=img.naturalHeight;
 
     const base=baseScaleForVisible(it);
@@ -763,7 +775,6 @@
 
   function syncControls(){
     const it=items[activeIndex];
-
     guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`;
     bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
 
@@ -797,12 +808,8 @@
     }
 
     const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
-
-    if (srcCanvas){
-      ctx.drawImage(srcCanvas, it.x, it.y, it.w*it.scale, it.h*it.scale);
-    } else {
-      ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
-    }
+    if (srcCanvas) ctx.drawImage(srcCanvas, it.x, it.y, it.w*it.scale, it.h*it.scale);
+    else ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
 
     if (it.hasText && it.text){
       ctx.save();
@@ -861,9 +868,8 @@
     draw();
   }
 
-  // ✅ Auto-compact + auto-shrink sets
+  // Auto-compact + auto-shrink sets
   function compactAndResizeAfterRemoval(keepEditingIndex=null){
-    // gather filled items (preserve per-item settings)
     const filled = items.filter(it => !!it.src);
     const filledCount = filled.length;
     const newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount, 6)));
@@ -875,12 +881,9 @@
     items = newItems;
     quantity = newQty;
 
-    // keep selection sensible
-    if (keepEditingIndex !== null) {
-      activeIndex = clamp(keepEditingIndex, 0, quantity-1);
-    } else {
-      activeIndex = clamp(activeIndex, 0, quantity-1);
-    }
+    if (keepEditingIndex !== null) activeIndex = clamp(keepEditingIndex, 0, quantity-1);
+    else activeIndex = clamp(activeIndex, 0, quantity-1);
+
     setIndex = Math.floor(activeIndex / 6);
 
     buildQtyButtons();
@@ -890,16 +893,12 @@
     updateProgress();
     updateGatingUI();
 
-    if (mode === 'edit') {
-      // if we removed current, try to edit the same index if it exists, else fallback to last filled
-      const idx = clamp(activeIndex, 0, quantity-1);
-      openEditor(idx);
-    }
+    if (mode === 'edit') openEditor(activeIndex);
   }
 
-  // Mobile pointer gestures
+  // Touch/pointer gestures
   const pointers = new Map();
-  let dragMode = null;        // 'photo' | 'text' | null
+  let dragMode = null;
   let lastSingle = null;
   let pinchStart = null;
 
@@ -963,12 +962,9 @@
       const dx = p.x - lastSingle.x;
       const dy = p.y - lastSingle.y;
 
-      if (dragMode === 'text'){
-        it.textX += dx; it.textY += dy;
-      } else {
-        it.x += dx; it.y += dy;
-        clampToVisibleCoverage(it);
-      }
+      if (dragMode === 'text'){ it.textX += dx; it.textY += dy; }
+      else { it.x += dx; it.y += dy; clampToVisibleCoverage(it); }
+
       lastSingle = {x:p.x, y:p.y};
       draw();
       return;
@@ -999,34 +995,29 @@
   canvas.addEventListener('pointerup', (e)=>{
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinchStart = null;
-    if (pointers.size === 0){
-      dragMode = null;
-      lastSingle = null;
-    } else if (pointers.size === 1){
+    if (pointers.size === 0){ dragMode = null; lastSingle = null; }
+    else if (pointers.size === 1){
       const only=[...pointers.values()][0];
       lastSingle = {x:only.x, y:only.y};
       dragMode = 'photo';
     }
   });
+
   canvas.addEventListener('pointercancel', (e)=>{
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinchStart = null;
     if (pointers.size === 0){ dragMode=null; lastSingle=null; }
   });
 
-  // UI events
-  bulkUploadBtn.addEventListener('click', ()=> bulkFileInput.click());
-
+  // Bulk upload (multiple files)
   bulkFileInput.addEventListener('change', async (e)=>{
     const files = Array.from(e.target.files || []).filter(f=>f.type.startsWith('image/'));
     if (!files.length) return;
 
-    // ensure capacity
     const filledCount = items.filter(it=>!!it.src).length;
     const neededQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount + files.length, 6)));
     if (neededQty !== quantity) setQuantity(neededQty, true);
 
-    // append to first available empties
     let i=0;
     for (const f of files){
       while (i < items.length && items[i].src) i++;
@@ -1036,11 +1027,11 @@
       setImageForIndex(i, img, src);
       i++;
     }
-
     bulkFileInput.value='';
     updateProgress(); updateQtyUI(); updateGatingUI();
   });
 
+  // Single upload by tapping an empty tile
   tileFileInput.addEventListener('change', async (e)=>{
     const f = e.target.files && e.target.files[0];
     const target = tileUploadTargetIndex;
@@ -1052,6 +1043,7 @@
     openEditor(target);
   });
 
+  // Single upload inside editor
   fileInput.addEventListener('change', async (e)=>{
     const f = e.target.files && e.target.files[0];
     if (!f) return;
@@ -1060,6 +1052,7 @@
     setImageForIndex(activeIndex, img, src);
   });
 
+  // Buttons
   guidesBtn.addEventListener('click', ()=>{
     showGuides = !showGuides;
     guidesBtn.textContent = `Guides: ${showGuides?'On':'Off'}`;
@@ -1088,9 +1081,7 @@
 
   clearPhotoBtn.addEventListener('click', ()=>{
     if (!items[activeIndex].src) return;
-    // remove current photo item
     items[activeIndex] = newItem();
-    // ✅ compact forward + shrink quantity to the right multiple of 6
     compactAndResizeAfterRemoval(activeIndex);
   });
 
@@ -1100,6 +1091,7 @@
     const next = (activeIndex-1 < start) ? end : activeIndex-1;
     openEditor(next);
   });
+
   nextBtn.addEventListener('click', ()=>{
     const start=setIndex*6;
     const end=Math.min(start+6, quantity)-1;
@@ -1117,11 +1109,11 @@
     if (idx===null) return alert("Everything looks good — no empty or unreviewed magnets found.");
     openEditor(idx);
   });
+
   reviewSummaryBtn.addEventListener('click', ()=>{
     alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
   });
 
-  // Text
   textInput.addEventListener('input', ()=>{
     const it=items[activeIndex];
     const v=(textInput.value||'').slice(0,25);
@@ -1158,7 +1150,7 @@
     renderGrid();
   });
 
-  // Downloads
+  // Downloads (unchanged from your working version)
   function renderMagnetToCanvas(index, outSize=1200){
     const it=items[index];
     const off=document.createElement('canvas');
@@ -1266,20 +1258,6 @@
     if (end-start<12) return alert('Need 12 magnets available for A3 (two full sets).');
     const indices=Array.from({length:12}, (_,k)=>start+k);
     downloadCanvasPNG(makeSheet(A3, indices, 12), `print_sheet_set${setIndex+1}_A3_12up.png`);
-  });
-
-  // Wire remaining buttons
-  bulkUploadBtn.addEventListener('click', ()=> bulkFileInput.click());
-
-  tileFileInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    const target = tileUploadTargetIndex;
-    tileUploadTargetIndex = null;
-    if (!f || target == null) return;
-    const src = await fileToDataURL(f);
-    const img = await loadImageFromURL(src);
-    setImageForIndex(target, img, src);
-    openEditor(target);
   });
 
   // Init
