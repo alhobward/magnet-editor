@@ -19,10 +19,9 @@
       --warn:#fbbf24;
       --bad:#fb7185;
 
-      /* Drawing space (px) */
-      --full: 600;    /* includes bleed */
-      --safe: 500;    /* 5cm print area */
-      --bleed: 50;    /* 5mm each side */
+      --full: 600;
+      --safe: 500;
+      --bleed: 50;
     }
 
     *{ box-sizing:border-box; }
@@ -53,25 +52,10 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
-    h1{
-      font-size:16px;
-      margin:0;
-      letter-spacing:0.2px;
-    }
-    .sub{
-      margin-top:2px;
-      font-size:12px;
-      color:var(--muted);
-    }
+    h1{ font-size:16px; margin:0; letter-spacing:0.2px; }
+    .sub{ margin-top:2px; font-size:12px; color:var(--muted); }
 
-    .pillrow{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    button, input, select{ font: inherit; }
+    button, input{ font: inherit; }
 
     .btn{
       border:1px solid var(--line);
@@ -84,18 +68,24 @@
       letter-spacing:0.2px;
     }
     .btn:active{ transform: translateY(1px); }
+    .btn.ghost{ background: transparent; }
+    .btn:disabled{ opacity:0.45; cursor:not-allowed; }
+
     .btn.primary{
       border-color: rgba(251,191,36,0.65);
       color: #0b0d12;
       background: linear-gradient(180deg, rgba(251,191,36,1), rgba(245,158,11,1));
       box-shadow: 0 10px 30px rgba(251,191,36,0.18);
     }
-    .btn.ghost{ background: transparent; }
-    .btn:disabled{ opacity:0.45; cursor:not-allowed; }
+
+    /* yellow bordered utility button */
+    .btn.yellow{
+      border-color: rgba(251,191,36,0.95);
+      box-shadow: 0 0 0 1px rgba(251,191,36,0.12) inset, 0 0 18px rgba(251,191,36,0.12);
+    }
 
     main .wrap{ padding-top: 12px; }
 
-    /* GRID + TABS */
     .gridCard{
       border:1px solid var(--line);
       border-radius: 18px;
@@ -121,10 +111,7 @@
       flex-wrap:wrap;
     }
     .count b{ color:var(--text); font-weight:900; }
-    .hint{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .hint{ font-size:12px; color:var(--muted); }
 
     .tabs{
       display:flex;
@@ -186,11 +173,8 @@
         0 0 0 1px rgba(251,191,36,0.22) inset,
         0 0 24px rgba(251,191,36,0.28);
     }
-    .slot canvas{
-      width:100%;
-      height:100%;
-      display:block;
-    }
+    .slot canvas{ width:100%; height:100%; display:block; }
+
     .slot .empty{
       position:absolute;
       inset:0;
@@ -240,7 +224,6 @@
       box-shadow: 0 0 0 3px rgba(52,211,153,0.15);
     }
 
-    /* BULK UPLOAD UNDER GRID */
     .bulkRow{
       padding: 12px;
       border-top:1px solid var(--line);
@@ -257,11 +240,8 @@
       flex-wrap:wrap;
     }
     .bulkRow input[type="file"]{ display:none; }
-    .note{
-      color: var(--muted);
-      font-size:12px;
-      max-width: 520px;
-    }
+    .note{ color: var(--muted); font-size:12px; max-width: 520px; }
+
     .toast{
       width:100%;
       padding: 10px 12px;
@@ -273,7 +253,6 @@
     }
     .toast strong{ color: var(--text); }
 
-    /* CONTROLS BELOW GRID */
     .controls{
       margin-top: 12px;
       display:grid;
@@ -314,7 +293,7 @@
       width:100%;
       height:auto;
       display:block;
-      touch-action:none; /* pinch+drag */
+      touch-action:none;
     }
     .previewHelp{
       position:absolute;
@@ -332,10 +311,7 @@
     }
     .previewHelp span{ color: rgba(233,236,243,0.92); }
 
-    .row{
-      display:grid;
-      gap:8px;
-    }
+    .row{ display:grid; gap:8px; }
     .row label{
       font-size:12px;
       color: var(--muted);
@@ -344,11 +320,7 @@
       gap:10px;
       align-items:center;
     }
-    .row label b{
-      color: var(--text);
-      font-weight:900;
-      font-size:12px;
-    }
+    .row label b{ color: var(--text); font-weight:900; font-size:12px; }
     .range{ width:100%; }
 
     .toggleRow{
@@ -481,7 +453,9 @@
             <input id="bulkInput" type="file" accept="image/*" multiple />
             <button class="btn primary" id="bulkBtn">Bulk upload photos</button>
 
-            <button class="btn" id="replaceBtn" disabled>Replace selected</button>
+            <button class="btn yellow" id="replaceBtn" disabled>Replace selected</button>
+            <button class="btn yellow" id="deleteSelectedTop" disabled>Delete selected</button>
+
             <input id="replaceInput" type="file" accept="image/*" />
           </div>
           <div class="note">
@@ -505,6 +479,11 @@
               </div>
             </div>
 
+            <div class="actions" style="justify-content:space-between;">
+              <div style="font-size:12px;color:var(--muted);">Switch tiles while preview stays visible.</div>
+              <button class="btn" id="nextTile">Next tile</button>
+            </div>
+
             <div class="toggleRow">
               <button class="btn" id="rot90" disabled>Rotate 90°</button>
               <button class="btn ghost" id="centerImg" disabled>Center</button>
@@ -515,8 +494,7 @@
                 <span>Zoom</span>
                 <b id="zoomVal">100%</b>
               </label>
-              <!-- min/max updated dynamically -->
-              <input class="range" id="zoom" type="range" min="0.5" max="3" step="0.01" value="1" disabled />
+              <input class="range" id="zoom" type="range" min="1" max="3" step="0.01" value="1" disabled />
             </div>
 
             <div class="toggleRow">
@@ -596,11 +574,6 @@
               </div>
             </div>
 
-            <div class="actions">
-              <button class="btn" id="deleteTile" disabled>Delete selected</button>
-              <button class="btn ghost" id="nextTile">Next tile</button>
-            </div>
-
           </div>
         </div>
 
@@ -615,7 +588,6 @@
   <script>
     const MAX_TILES = 72;
     const SET_SIZE = 6;
-
     const MAG = { full: 600, safe: 500, bleed: 50 };
 
     const TEXT_COLORS = [
@@ -636,8 +608,8 @@
         id: (crypto.randomUUID?.() || String(Math.random()).slice(2)),
         img: null,
         src: null,
-        zoom: 1,              // multiplier on top of "cover safe"
-        rot: 0,               // 0/90/180/270
+        zoom: 1,
+        rot: 0,
         offsetX: 0,
         offsetY: 0,
         bw: false,
@@ -646,15 +618,14 @@
         textColor: TEXT_COLORS[0].value,
         textColorName: TEXT_COLORS[0].name,
         textSize: 28,
-        // NEW: text draggable in safe area
-        textX: 50,            // percent across safe area
-        textY: 82,            // percent down safe area
+        textX: 50,
+        textY: 82,
         ready: false,
       };
     }
 
-    let tiles = [];         // dense list
-    let shownCount = 6;     // multiple of 6
+    let tiles = [];
+    let shownCount = 6;
     let activeSet = 0;
     let selectedIndex = 0;
 
@@ -670,6 +641,7 @@
     const replaceBtn = document.getElementById('replaceBtn');
     const replaceInput = document.getElementById('replaceInput');
     const clearAllBtn = document.getElementById('clearAll');
+    const deleteTopBtn = document.getElementById('deleteSelectedTop');
 
     const toast = document.getElementById('toast');
 
@@ -699,7 +671,6 @@
     const orderStatus = document.getElementById('orderStatus');
     const orderDetail = document.getElementById('orderDetail');
 
-    const deleteBtn = document.getElementById('deleteTile');
     const nextBtn = document.getElementById('nextTile');
 
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
@@ -772,19 +743,8 @@
       if(tile) tile.ready = true;
     }
 
-    // ---------------------------
-    // Core geometry: SAFE must never be empty.
-    // Zoom "1" means "cover SAFE". We allow zoom < 1 only down to SAFE coverage (so we use minZoom=1 always),
-    // BUT we now define zoom slider in terms of multiplier on cover-safe; to "zoom out of bleed", user uses zoom=1 (min).
-    // To allow *some* additional zoom-out feel while still covering safe, we allow zoom down to 1 (not below),
-    // and when whiteBleed is off, bleed can still become white because we are NOT requiring full coverage.
-    // ---------------------------
+    function safeRect(){ return { x: MAG.bleed, y: MAG.bleed, w: MAG.safe, h: MAG.safe }; }
 
-    function safeRect(){
-      return { x: MAG.bleed, y: MAG.bleed, w: MAG.safe, h: MAG.safe };
-    }
-
-    // cover scale uses SAFE always (so safe never empties)
     function coverSafeScale(tile){
       if(!tile?.img) return 1;
       const rect = safeRect();
@@ -825,7 +785,6 @@
       tile.offsetY = clamp(tile.offsetY, -maxY, maxY);
     }
 
-    // Reliable grayscale for canvas (fixes B&W on all browsers)
     function drawImageGrayscale(ctx, img, dx, dy, dw, dh){
       const tmp = document.createElement('canvas');
       tmp.width = Math.max(1, Math.round(dw));
@@ -837,7 +796,6 @@
       const d = data.data;
       for(let i=0;i<d.length;i+=4){
         const r=d[i], g=d[i+1], b=d[i+2];
-        // luminance
         const y = (0.2126*r + 0.7152*g + 0.0722*b) | 0;
         d[i]=d[i+1]=d[i+2]=y;
       }
@@ -882,9 +840,8 @@
       }
 
       const sf = W / MAG.full;
-
-      // Determine clip: if whiteBleed -> clip to SAFE. else -> allow drawing full but only enforce safe coverage
       const safe = safeRect();
+
       const clipX = tile.whiteBleed ? safe.x*sf : 0;
       const clipY = tile.whiteBleed ? safe.y*sf : 0;
       const clipW = tile.whiteBleed ? safe.w*sf : W;
@@ -895,7 +852,6 @@
       ctx.rect(clipX, clipY, clipW, clipH);
       ctx.clip();
 
-      // Compute transform centered on SAFE area (so offsets behave consistently)
       const cover = coverSafeScale(tile) * sf;
       const scale = cover * tile.zoom;
 
@@ -913,9 +869,7 @@
       const drawW = iw * scale;
       const drawH = ih * scale;
 
-      // draw with or without grayscale
       if(tile.bw){
-        // grayscale in a temp buffer
         drawImageGrayscale(ctx, tile.img, -drawW/2, -drawH/2, drawW, drawH);
       } else {
         ctx.drawImage(tile.img, -drawW/2, -drawH/2, drawW, drawH);
@@ -923,7 +877,6 @@
 
       ctx.restore();
 
-      // text (draggable) anchored within SAFE area (not affected by photo rotation)
       if(tile.text && tile.text.trim()){
         const t = tile.text.trim();
         const safeX = safe.x*sf;
@@ -939,7 +892,6 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        // Always black shadow
         ctx.shadowColor = "rgba(0,0,0,0.85)";
         ctx.shadowBlur = Math.max(2, 8 * sf);
         ctx.shadowOffsetX = 0;
@@ -953,353 +905,28 @@
       if(withGuides) drawGuides(ctx, W);
     }
 
-    // ---------------------------
-    // UI building
-    // ---------------------------
-    function buildPalette(){
-      paletteEl.innerHTML = "";
-      TEXT_COLORS.forEach((c) => {
-        const b = document.createElement('button');
-        b.type = "button";
-        b.className = "swatch";
-        b.style.setProperty("--c", c.value);
-        b.title = c.name;
-        b.setAttribute("aria-label", c.name);
-        b.setAttribute("aria-selected", "false");
-        b.addEventListener('click', ()=>{
-          const tile = getSlotTile(selectedIndex);
-          if(!tile) return;
-          tile.textColor = c.value;
-          tile.textColorName = c.name;
-          markReady(tile);
-          colorNameEl.textContent = c.name;
-          updatePaletteSelection();
-          renderAll();
-        });
-        paletteEl.appendChild(b);
-      });
-      updatePaletteSelection();
+    // --- Tiny polish helpers: only scroll if preview isn't mostly visible ---
+    function isMostlyInView(el, threshold = 0.6){
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const vw = window.innerWidth || document.documentElement.clientWidth;
+      if (r.width <= 0 || r.height <= 0) return false;
+
+      const visibleY = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      const ratioY = visibleY / r.height;
+      const inX = r.left < vw && r.right > 0;
+
+      return inX && ratioY >= threshold;
     }
 
-    function updatePaletteSelection(){
-      const tile = getSlotTile(selectedIndex);
-      const selectedColor = tile?.textColor || TEXT_COLORS[0].value;
-      [...paletteEl.children].forEach((el, i)=>{
-        el.setAttribute("aria-selected", TEXT_COLORS[i].value === selectedColor ? "true" : "false");
-      });
-    }
-
-    function buildTabs(){
-      tabsEl.innerHTML = "";
-      const sets = totalSets();
-
-      for(let s=0; s<sets; s++){
-        const start = s*SET_SIZE;
-        const end = start + SET_SIZE;
-        const filled = tiles.slice(start, end).filter(Boolean).length;
-        const readyN = tiles.slice(start, end).filter(t => t && t.ready).length;
-
-        const tab = document.createElement('button');
-        tab.type = "button";
-        tab.className = "tab";
-        tab.setAttribute("aria-selected", s===activeSet ? "true":"false");
-
-        const label = document.createElement('span');
-        label.textContent = `Set ${s+1}`;
-        tab.appendChild(label);
-
-        const meta = document.createElement('span');
-        meta.className = "mini " + ((filled>0 && readyN===filled) ? "ok" : "warn");
-        meta.textContent = filled===0 ? "0/6" : `${readyN}/${filled}`;
-        tab.appendChild(meta);
-
-        tab.addEventListener('click', ()=>{
-          activeSet = s;
-          const base = activeSet*SET_SIZE;
-          selectedIndex = clamp(selectedIndex, base, base+SET_SIZE-1);
-          renderAll();
-        });
-
-        tabsEl.appendChild(tab);
+    function scrollPreviewIntoView(){
+      const wrap = document.querySelector('.previewWrap');
+      if(!wrap) return;
+      if(!isMostlyInView(wrap, 0.6)){
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
-    function buildGrid(){
-      gridEl.innerHTML = "";
-      const base = activeSet * SET_SIZE;
-
-      for(let i=0;i<SET_SIZE;i++){
-        const globalIndex = base + i;
-        const tile = getSlotTile(globalIndex);
-
-        const btn = document.createElement('button');
-        btn.type = "button";
-        btn.className = "slot";
-        btn.dataset.index = String(globalIndex);
-        btn.setAttribute("aria-selected", globalIndex===selectedIndex ? "true":"false");
-
-        const canvas = document.createElement('canvas');
-        canvas.width = 220;
-        canvas.height = 220;
-
-        const empty = document.createElement('div');
-        empty.className = "empty";
-        empty.innerHTML = `<div class="plus">+</div><div>Add photo</div>`;
-
-        const badge = document.createElement('div');
-        badge.className = "badge";
-        badge.innerHTML = `<span class="dot"></span><span>Review</span>`;
-
-        btn.appendChild(canvas);
-        btn.appendChild(empty);
-        btn.appendChild(badge);
-
-        btn.addEventListener('click', ()=>{
-          selectedIndex = globalIndex;
-          setActiveSetBySelected();
-          renderAll();
-          if(!getSlotTile(selectedIndex)) replaceInput.click();
-        });
-
-        gridEl.appendChild(btn);
-
-        const ctx = canvas.getContext('2d');
-        renderTileToContext(tile, ctx, canvas.width, false);
-
-        if(tile && tile.img){
-          empty.style.display = "none";
-          badge.style.display = "flex";
-          badge.classList.toggle("ready", !!tile.ready);
-          badge.querySelector('span:last-child').textContent = tile.ready ? "Ready" : "Review";
-        } else {
-          empty.style.display = "flex";
-          badge.style.display = "none";
-        }
-      }
-    }
-
-    function refreshControls(){
-      const tile = getSlotTile(selectedIndex);
-      const has = !!tile;
-
-      selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
-
-      replaceBtn.disabled = false;
-
-      deleteBtn.disabled = !has;
-      rot90Btn.disabled = !has;
-      centerBtn.disabled = !has;
-
-      zoom.disabled = !has;
-      bw.disabled = !has;
-      whiteBleed.disabled = !has;
-
-      overlayText.disabled = !has;
-      textSize.disabled = !has;
-
-      if(!has){
-        zoom.value = "1";
-        zoomVal.textContent = "100%";
-        bw.checked = false;
-        whiteBleed.checked = false;
-        overlayText.value = "";
-        textLen.textContent = "0";
-        textSize.value = "28";
-        textSizeVal.textContent = "28px";
-        colorNameEl.textContent = "White";
-        updatePaletteSelection();
-        return;
-      }
-
-      // Enforce min zoom = 1 (cover SAFE)
-      tile.zoom = clamp(tile.zoom || 1, 1, 3);
-      clampOffsetsToKeepSafeCovered(tile);
-
-      // slider reflects tile.zoom
-      zoom.min = "1";
-      zoom.max = "3";
-      zoom.value = String(tile.zoom);
-      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
-
-      bw.checked = !!tile.bw;
-      whiteBleed.checked = !!tile.whiteBleed;
-
-      overlayText.value = tile.text || "";
-      textLen.textContent = String((tile.text || "").length);
-
-      textSize.value = String(tile.textSize ?? 28);
-      textSizeVal.textContent = `${tile.textSize ?? 28}px`;
-
-      colorNameEl.textContent = tile.textColorName || "White";
-      updatePaletteSelection();
-    }
-
-    function renderPreview(){
-      const tile = getSlotTile(selectedIndex);
-      renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
-    }
-
-    function updateCounts(){
-      photoCountEl.textContent = String(tiles.length);
-      tileCountEl.textContent = String(shownCount);
-      readyCountEl.textContent = String(photosReadyCount());
-
-      // Ack enabled only when full sets (multiple of 6) AND no partial set exists.
-      // In this UX, partial set means tiles.length % 6 != 0.
-      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
-      ack.disabled = !fullSets;
-      if(!fullSets) ack.checked = false;
-
-      const canProceed = allPhotosReady() && ack.checked && fullSets;
-      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
-      orderStatus.className = canProceed ? "ok" : "warn";
-
-      if(tiles.length === 0){
-        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
-      } else if(!fullSets){
-        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
-      } else if(!allPhotosReady()){
-        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
-      } else if(!ack.checked){
-        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
-      } else {
-        orderDetail.textContent = "All tiles are ready and acknowledged.";
-      }
-    }
-
-    function renderAll(){
-      shownCount = computeShownCount(tiles.length);
-      activeSet = clamp(activeSet, 0, totalSets()-1);
-      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
-      setActiveSetBySelected();
-
-      buildTabs();
-      buildGrid();
-      refreshControls();
-      renderPreview();
-      updateCounts();
-    }
-
-    // ---------------------------
-    // Upload / Replace / Delete
-    // ---------------------------
-    async function addFiles(fileList){
-      const files = Array.from(fileList || []).filter(f => f && f.type && f.type.startsWith("image/"));
-      if(!files.length) return;
-
-      const available = MAX_TILES - tiles.length;
-      const willAdd = Math.min(available, files.length);
-      const skipped = files.length - willAdd;
-
-      for(let i=0;i<willAdd;i++){
-        const {img, url} = await loadImageFromFile(files[i]);
-        const t = newTile();
-        t.img = img;
-        t.src = url;
-        t.ready = false;
-        // initial clamp
-        t.zoom = 1;
-        clampOffsetsToKeepSafeCovered(t);
-        tiles.push(t);
-      }
-
-      if(skipped > 0){
-        showToast(`<strong>${skipped}</strong> photo(s) were not added (max <strong>${MAX_TILES}</strong>). Create a second order for more magnets.`);
-      } else {
-        showToast(`Added <strong>${willAdd}</strong> photo(s).`);
-      }
-
-      shownCount = computeShownCount(tiles.length);
-
-      if(willAdd > 0){
-        selectedIndex = tiles.length - 1;
-        setActiveSetBySelected();
-      }
-
-      renderAll();
-    }
-
-    async function replaceSelectedWithFile(file){
-      if(!file || !file.type || !file.type.startsWith("image/")) return;
-
-      if(tiles.length >= MAX_TILES && selectedIndex >= tiles.length){
-        showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
-        return;
-      }
-
-      const {img, url} = await loadImageFromFile(file);
-
-      const target = selectedIndex <= tiles.length ? selectedIndex : tiles.length;
-
-      if(target === tiles.length){
-        if(tiles.length >= MAX_TILES){
-          showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
-          return;
-        }
-        const t = newTile();
-        t.img = img;
-        t.src = url;
-        t.ready = false;
-        tiles.push(t);
-        selectedIndex = tiles.length - 1;
-      } else {
-        const t = tiles[target];
-        revokeURL(t);
-        t.img = img;
-        t.src = url;
-
-        // reset edits
-        t.zoom = 1;
-        t.rot = 0;
-        t.offsetX = 0;
-        t.offsetY = 0;
-        t.bw = false;
-        t.whiteBleed = false;
-        t.text = "";
-        t.textColor = TEXT_COLORS[0].value;
-        t.textColorName = TEXT_COLORS[0].name;
-        t.textSize = 28;
-        t.textX = 50;
-        t.textY = 82;
-        t.ready = false;
-
-        clampOffsetsToKeepSafeCovered(t);
-        selectedIndex = target;
-      }
-
-      shownCount = computeShownCount(tiles.length);
-      setActiveSetBySelected();
-      renderAll();
-    }
-
-    function deleteSelected(){
-      if(selectedIndex < 0 || selectedIndex >= tiles.length) return;
-
-      const t = tiles[selectedIndex];
-      revokeURL(t);
-      tiles.splice(selectedIndex, 1);
-
-      shownCount = computeShownCount(tiles.length);
-      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
-      setActiveSetBySelected();
-
-      renderAll();
-    }
-
-    function clearAll(){
-      for(const t of tiles) revokeURL(t);
-      tiles = [];
-      shownCount = SET_SIZE;
-      activeSet = 0;
-      selectedIndex = 0;
-      ack.checked = false;
-      toast.style.display = "none";
-      renderAll();
-    }
-
-    // ---------------------------
-    // Text hit test & dragging
-    // ---------------------------
     function getTextMetrics(tile){
       if(!tile?.text || !tile.text.trim()) return null;
       const sf = preview.width / MAG.full;
@@ -1312,7 +939,6 @@
       const x = safeX + safeS * (clamp(tile.textX ?? 50, 0, 100)/100);
       const y = safeY + safeS * (clamp(tile.textY ?? 82, 0, 100)/100);
 
-      // measure
       pctx.save();
       pctx.font = `900 ${Math.round(sizePx)}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
       const w = pctx.measureText(tile.text.trim()).width;
@@ -1321,235 +947,10 @@
       const pad = Math.max(10, sizePx*0.35);
       return { x, y, w: w + pad*2, h: sizePx + pad*1.2 };
     }
-
     function pointInRect(px, py, r){
       return (px >= r.x - r.w/2 && px <= r.x + r.w/2 && py >= r.y - r.h/2 && py <= r.y + r.h/2);
     }
 
-    // ---------------------------
-    // Pinch + Drag (photo) + Drag (text)
-    // ---------------------------
-    const pointers = new Map();
-    let pinchStartDist = 0;
-    let pinchStartZoom = 1;
-
-    let draggingText = false;
-    let textDragStart = null;
-
-    function canvasPointFromEvent(e, canvas){
-      const r = canvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - r.left) * (canvas.width / r.width),
-        y: (e.clientY - r.top) * (canvas.height / r.height)
-      };
-    }
-
-    function distance(a,b){
-      const dx=a.x-b.x, dy=a.y-b.y;
-      return Math.hypot(dx,dy);
-    }
-
-    preview.addEventListener('pointerdown', (e)=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-
-      preview.setPointerCapture(e.pointerId);
-      const pt = canvasPointFromEvent(e, preview);
-      pointers.set(e.pointerId, pt);
-
-      // If single pointer and user touched the text box, drag text instead of photo
-      if(pointers.size === 1){
-        const m = getTextMetrics(tile);
-        if(m && pointInRect(pt.x, pt.y, m)){
-          draggingText = true;
-          textDragStart = { pt, tileTextX: tile.textX ?? 50, tileTextY: tile.textY ?? 82 };
-        } else {
-          draggingText = false;
-          textDragStart = null;
-        }
-      }
-
-      if(pointers.size === 2){
-        draggingText = false;
-        textDragStart = null;
-        const pts = [...pointers.values()];
-        pinchStartDist = distance(pts[0], pts[1]);
-        pinchStartZoom = tile.zoom || 1;
-      }
-    });
-
-    preview.addEventListener('pointermove', (e)=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      if(!pointers.has(e.pointerId)) return;
-
-      const prev = pointers.get(e.pointerId);
-      const now = canvasPointFromEvent(e, preview);
-      pointers.set(e.pointerId, now);
-
-      if(pointers.size === 1){
-        const sf = preview.width / MAG.full;
-        const safe = safeRect();
-        const safeX = safe.x*sf;
-        const safeY = safe.y*sf;
-        const safeS = safe.w*sf;
-
-        const dx = now.x - prev.x;
-        const dy = now.y - prev.y;
-
-        if(draggingText && tile.text && tile.text.trim()){
-          // move text within safe area
-          const xPx = (safeX + safeS * ((tile.textX ?? 50)/100)) + dx;
-          const yPx = (safeY + safeS * ((tile.textY ?? 82)/100)) + dy;
-
-          const xPct = ((xPx - safeX) / safeS) * 100;
-          const yPct = ((yPx - safeY) / safeS) * 100;
-
-          // clamp with small padding
-          tile.textX = clamp(xPct, 5, 95);
-          tile.textY = clamp(yPct, 5, 95);
-
-          markReady(tile);
-          renderAll();
-          return;
-        }
-
-        // drag photo
-        tile.offsetX += (dx / sf);
-        tile.offsetY += (dy / sf);
-        clampOffsetsToKeepSafeCovered(tile);
-
-        markReady(tile);
-        renderAll();
-        return;
-      }
-
-      if(pointers.size === 2){
-        const pts = [...pointers.values()];
-        const d = distance(pts[0], pts[1]);
-        if(pinchStartDist > 0){
-          const raw = pinchStartZoom * (d / pinchStartDist);
-          tile.zoom = clamp(raw, 1, 3); // allow zooming out to cover safe (min 1)
-          clampOffsetsToKeepSafeCovered(tile);
-          markReady(tile);
-          renderAll();
-        }
-      }
-    });
-
-    function endPointer(e){
-      if(pointers.has(e.pointerId)) pointers.delete(e.pointerId);
-      if(pointers.size < 2) pinchStartDist = 0;
-      if(pointers.size === 0){
-        draggingText = false;
-        textDragStart = null;
-      }
-    }
-    preview.addEventListener('pointerup', endPointer);
-    preview.addEventListener('pointercancel', endPointer);
-    preview.addEventListener('lostpointercapture', endPointer);
-
-    // ---------------------------
-    // Events
-    // ---------------------------
-    bulkBtn.addEventListener('click', ()=> bulkInput.click());
-    bulkInput.addEventListener('change', async ()=>{
-      await addFiles(bulkInput.files);
-      bulkInput.value = "";
-    });
-
-    replaceBtn.addEventListener('click', ()=> replaceInput.click());
-    replaceInput.addEventListener('change', async ()=>{
-      const file = replaceInput.files && replaceInput.files[0];
-      if(file) await replaceSelectedWithFile(file);
-      replaceInput.value = "";
-    });
-
-    clearAllBtn.addEventListener('click', clearAll);
-
-    showGuides.addEventListener('change', ()=> renderPreview());
-
-    zoom.addEventListener('input', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.zoom = clamp(parseFloat(zoom.value), 1, 3);
-      clampOffsetsToKeepSafeCovered(tile);
-      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
-      markReady(tile);
-      renderAll();
-    });
-
-    bw.addEventListener('change', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.bw = bw.checked;
-      markReady(tile);
-      renderAll();
-    });
-
-    whiteBleed.addEventListener('change', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.whiteBleed = whiteBleed.checked;
-      clampOffsetsToKeepSafeCovered(tile);
-      markReady(tile);
-      renderAll();
-    });
-
-    overlayText.addEventListener('input', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.text = overlayText.value;
-      textLen.textContent = String(overlayText.value.length);
-      markReady(tile);
-      renderAll();
-    });
-
-    textSize.addEventListener('input', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.textSize = parseInt(textSize.value,10);
-      textSizeVal.textContent = `${tile.textSize}px`;
-      markReady(tile);
-      renderAll();
-    });
-
-    ack.addEventListener('change', updateCounts);
-
-    deleteBtn.addEventListener('click', deleteSelected);
-
-    nextBtn.addEventListener('click', ()=>{
-      selectedIndex = (selectedIndex + 1) % shownCount;
-      setActiveSetBySelected();
-      renderAll();
-    });
-
-    rot90Btn.addEventListener('click', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.rot = ((tile.rot || 0) + 90) % 360;
-      clampOffsetsToKeepSafeCovered(tile);
-      markReady(tile);
-      renderAll();
-    });
-
-    centerBtn.addEventListener('click', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.offsetX = 0;
-      tile.offsetY = 0;
-      clampOffsetsToKeepSafeCovered(tile);
-      markReady(tile);
-      renderAll();
-    });
-
-    window.addEventListener('beforeunload', ()=>{
-      for(const t of tiles) revokeURL(t);
-    });
-
-    // ---------------------------
-    // Render helpers
-    // ---------------------------
     function buildPaletteUI(){
       paletteEl.innerHTML = "";
       TEXT_COLORS.forEach((c) => {
@@ -1672,13 +1073,44 @@
       }
     }
 
+    function updateCounts(){
+      photoCountEl.textContent = String(tiles.length);
+      tileCountEl.textContent = String(shownCount);
+      readyCountEl.textContent = String(photosReadyCount());
+
+      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
+      ack.disabled = !fullSets;
+      if(!fullSets) ack.checked = false;
+
+      const canProceed = fullSets && allPhotosReady() && ack.checked;
+      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
+      orderStatus.className = canProceed ? "ok" : "warn";
+
+      const has = !!getSlotTile(selectedIndex);
+      deleteTopBtn.disabled = !has;
+
+      if(tiles.length === 0){
+        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
+      } else if(!fullSets){
+        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
+      } else if(!allPhotosReady()){
+        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
+      } else if(!ack.checked){
+        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
+      } else {
+        orderDetail.textContent = "All tiles are ready and acknowledged.";
+      }
+    }
+
     function refreshControls(){
       const tile = getSlotTile(selectedIndex);
       const has = !!tile;
 
       selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
 
-      deleteBtn.disabled = !has;
+      replaceBtn.disabled = false;
+      deleteTopBtn.disabled = !has;
+
       rot90Btn.disabled = !has;
       centerBtn.disabled = !has;
 
@@ -1729,32 +1161,6 @@
       renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
     }
 
-    function updateCounts(){
-      photoCountEl.textContent = String(tiles.length);
-      tileCountEl.textContent = String(shownCount);
-      readyCountEl.textContent = String(photosReadyCount());
-
-      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
-      ack.disabled = !fullSets;
-      if(!fullSets) ack.checked = false;
-
-      const canProceed = fullSets && allPhotosReady() && ack.checked;
-      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
-      orderStatus.className = canProceed ? "ok" : "warn";
-
-      if(tiles.length === 0){
-        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
-      } else if(!fullSets){
-        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
-      } else if(!allPhotosReady()){
-        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
-      } else if(!ack.checked){
-        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
-      } else {
-        orderDetail.textContent = "All tiles are ready and acknowledged.";
-      }
-    }
-
     function renderAll(){
       shownCount = computeShownCount(tiles.length);
       activeSet = clamp(activeSet, 0, totalSets()-1);
@@ -1768,7 +1174,312 @@
       updateCounts();
     }
 
-    // Init UI
+    async function addFiles(fileList){
+      const files = Array.from(fileList || []).filter(f => f && f.type && f.type.startsWith("image/"));
+      if(!files.length) return;
+
+      const available = MAX_TILES - tiles.length;
+      const willAdd = Math.min(available, files.length);
+      const skipped = files.length - willAdd;
+
+      for(let i=0;i<willAdd;i++){
+        const {img, url} = await loadImageFromFile(files[i]);
+        const t = newTile();
+        t.img = img;
+        t.src = url;
+        t.ready = false;
+        t.zoom = 1;
+        clampOffsetsToKeepSafeCovered(t);
+        tiles.push(t);
+      }
+
+      if(skipped > 0){
+        showToast(`<strong>${skipped}</strong> photo(s) were not added (max <strong>${MAX_TILES}</strong>). Create a second order for more magnets.`);
+      } else {
+        showToast(`Added <strong>${willAdd}</strong> photo(s).`);
+      }
+
+      shownCount = computeShownCount(tiles.length);
+
+      if(willAdd > 0){
+        selectedIndex = tiles.length - 1;
+        setActiveSetBySelected();
+      }
+
+      renderAll();
+    }
+
+    async function replaceSelectedWithFile(file){
+      if(!file || !file.type || !file.type.startsWith("image/")) return;
+
+      if(tiles.length >= MAX_TILES && selectedIndex >= tiles.length){
+        showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
+        return;
+      }
+
+      const {img, url} = await loadImageFromFile(file);
+      const target = selectedIndex <= tiles.length ? selectedIndex : tiles.length;
+
+      if(target === tiles.length){
+        if(tiles.length >= MAX_TILES){
+          showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
+          return;
+        }
+        const t = newTile();
+        t.img = img;
+        t.src = url;
+        t.ready = false;
+        tiles.push(t);
+        selectedIndex = tiles.length - 1;
+      } else {
+        const t = tiles[target];
+        revokeURL(t);
+        t.img = img;
+        t.src = url;
+
+        t.zoom = 1;
+        t.rot = 0;
+        t.offsetX = 0;
+        t.offsetY = 0;
+        t.bw = false;
+        t.whiteBleed = false;
+        t.text = "";
+        t.textColor = TEXT_COLORS[0].value;
+        t.textColorName = TEXT_COLORS[0].name;
+        t.textSize = 28;
+        t.textX = 50;
+        t.textY = 82;
+        t.ready = false;
+
+        clampOffsetsToKeepSafeCovered(t);
+        selectedIndex = target;
+      }
+
+      shownCount = computeShownCount(tiles.length);
+      setActiveSetBySelected();
+      renderAll();
+    }
+
+    function deleteSelected(){
+      if(selectedIndex < 0 || selectedIndex >= tiles.length) return;
+      const t = tiles[selectedIndex];
+      revokeURL(t);
+      tiles.splice(selectedIndex, 1);
+
+      shownCount = computeShownCount(tiles.length);
+      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
+      setActiveSetBySelected();
+      renderAll();
+    }
+
+    function clearAll(){
+      for(const t of tiles) revokeURL(t);
+      tiles = [];
+      shownCount = SET_SIZE;
+      activeSet = 0;
+      selectedIndex = 0;
+      ack.checked = false;
+      toast.style.display = "none";
+      renderAll();
+    }
+
+    // Pointer events (pinch/drag photo, drag text)
+    const pointers = new Map();
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1;
+    let draggingText = false;
+
+    function canvasPointFromEvent(e, canvas){
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * (canvas.width / r.width),
+        y: (e.clientY - r.top) * (canvas.height / r.height)
+      };
+    }
+    function distance(a,b){
+      const dx=a.x-b.x, dy=a.y-b.y;
+      return Math.hypot(dx,dy);
+    }
+
+    preview.addEventListener('pointerdown', (e)=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      preview.setPointerCapture(e.pointerId);
+      const pt = canvasPointFromEvent(e, preview);
+      pointers.set(e.pointerId, pt);
+
+      if(pointers.size === 1){
+        const m = getTextMetrics(tile);
+        draggingText = !!(m && pointInRect(pt.x, pt.y, m));
+      }
+      if(pointers.size === 2){
+        draggingText = false;
+        const pts = [...pointers.values()];
+        pinchStartDist = distance(pts[0], pts[1]);
+        pinchStartZoom = tile.zoom || 1;
+      }
+    });
+
+    preview.addEventListener('pointermove', (e)=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      if(!pointers.has(e.pointerId)) return;
+
+      const prev = pointers.get(e.pointerId);
+      const now = canvasPointFromEvent(e, preview);
+      pointers.set(e.pointerId, now);
+
+      if(pointers.size === 1){
+        const sf = preview.width / MAG.full;
+        const safe = safeRect();
+        const safeX = safe.x*sf;
+        const safeY = safe.y*sf;
+        const safeS = safe.w*sf;
+
+        const dx = now.x - prev.x;
+        const dy = now.y - prev.y;
+
+        if(draggingText && tile.text && tile.text.trim()){
+          const xPx = (safeX + safeS * ((tile.textX ?? 50)/100)) + dx;
+          const yPx = (safeY + safeS * ((tile.textY ?? 82)/100)) + dy;
+
+          tile.textX = clamp(((xPx - safeX) / safeS) * 100, 5, 95);
+          tile.textY = clamp(((yPx - safeY) / safeS) * 100, 5, 95);
+
+          markReady(tile);
+          renderAll();
+          return;
+        }
+
+        tile.offsetX += (dx / sf);
+        tile.offsetY += (dy / sf);
+        clampOffsetsToKeepSafeCovered(tile);
+
+        markReady(tile);
+        renderAll();
+        return;
+      }
+
+      if(pointers.size === 2){
+        const pts = [...pointers.values()];
+        const d = distance(pts[0], pts[1]);
+        if(pinchStartDist > 0){
+          tile.zoom = clamp(pinchStartZoom * (d / pinchStartDist), 1, 3);
+          clampOffsetsToKeepSafeCovered(tile);
+          markReady(tile);
+          renderAll();
+        }
+      }
+    });
+
+    function endPointer(e){
+      if(pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+      if(pointers.size < 2) pinchStartDist = 0;
+      if(pointers.size === 0) draggingText = false;
+    }
+    preview.addEventListener('pointerup', endPointer);
+    preview.addEventListener('pointercancel', endPointer);
+    preview.addEventListener('lostpointercapture', endPointer);
+
+    // UI events
+    bulkBtn.addEventListener('click', ()=> bulkInput.click());
+    bulkInput.addEventListener('change', async ()=>{
+      await addFiles(bulkInput.files);
+      bulkInput.value = "";
+    });
+
+    replaceBtn.addEventListener('click', ()=> replaceInput.click());
+    replaceInput.addEventListener('change', async ()=>{
+      const file = replaceInput.files && replaceInput.files[0];
+      if(file) await replaceSelectedWithFile(file);
+      replaceInput.value = "";
+    });
+
+    deleteTopBtn.addEventListener('click', deleteSelected);
+
+    clearAllBtn.addEventListener('click', clearAll);
+
+    showGuides.addEventListener('change', renderPreview);
+
+    zoom.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.zoom = clamp(parseFloat(zoom.value), 1, 3);
+      clampOffsetsToKeepSafeCovered(tile);
+      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
+      markReady(tile);
+      renderAll();
+    });
+
+    bw.addEventListener('change', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.bw = bw.checked;
+      markReady(tile);
+      renderAll();
+    });
+
+    whiteBleed.addEventListener('change', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.whiteBleed = whiteBleed.checked;
+      clampOffsetsToKeepSafeCovered(tile);
+      markReady(tile);
+      renderAll();
+    });
+
+    overlayText.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.text = overlayText.value;
+      textLen.textContent = String(overlayText.value.length);
+      markReady(tile);
+      renderAll();
+    });
+
+    textSize.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.textSize = parseInt(textSize.value,10);
+      textSizeVal.textContent = `${tile.textSize}px`;
+      markReady(tile);
+      renderAll();
+    });
+
+    ack.addEventListener('change', updateCounts);
+
+    rot90Btn.addEventListener('click', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.rot = ((tile.rot || 0) + 90) % 360;
+      clampOffsetsToKeepSafeCovered(tile);
+      markReady(tile);
+      renderAll();
+    });
+
+    centerBtn.addEventListener('click', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.offsetX = 0;
+      tile.offsetY = 0;
+      clampOffsetsToKeepSafeCovered(tile);
+      markReady(tile);
+      renderAll();
+    });
+
+    // Next tile + tiny polish scroll (option 1)
+    nextBtn.addEventListener('click', ()=>{
+      selectedIndex = (selectedIndex + 1) % shownCount;
+      setActiveSetBySelected();
+      renderAll();
+      scrollPreviewIntoView();
+    });
+
+    window.addEventListener('beforeunload', ()=>{
+      for(const t of tiles) revokeURL(t);
+    });
+
+    // Init
     buildPaletteUI();
     renderAll();
   </script>
