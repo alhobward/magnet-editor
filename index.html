@@ -78,7 +78,6 @@
       box-shadow: 0 10px 30px rgba(251,191,36,0.18);
     }
 
-    /* yellow bordered utility button */
     .btn.yellow{
       border-color: rgba(251,191,36,0.95);
       box-shadow: 0 0 0 1px rgba(251,191,36,0.12) inset, 0 0 18px rgba(251,191,36,0.12);
@@ -424,9 +423,7 @@
           <h1>Magnet Editor</h1>
           <div class="sub">5cm × 5cm • 5mm bleed (can be blank/white) • orders in sets of 6 (max 72)</div>
         </div>
-        <div class="pillrow">
-          <button class="btn ghost" id="clearAll">Clear all</button>
-        </div>
+        <div></div>
       </div>
     </div>
   </header>
@@ -455,6 +452,7 @@
 
             <button class="btn yellow" id="replaceBtn" disabled>Replace selected</button>
             <button class="btn yellow" id="deleteSelectedTop" disabled>Delete selected</button>
+            <button class="btn yellow" id="deleteAll" disabled>Delete all</button>
 
             <input id="replaceInput" type="file" accept="image/*" />
           </div>
@@ -511,14 +509,6 @@
                 <div class="tmeta">
                   <div class="t1">White/blank bleed</div>
                   <div class="t2">Bleed stays white</div>
-                </div>
-              </div>
-
-              <div class="toggle">
-                <input id="showGuides" type="checkbox" checked />
-                <div class="tmeta">
-                  <div class="t1">Show guides</div>
-                  <div class="t2">Safe area + bleed</div>
                 </div>
               </div>
             </div>
@@ -640,8 +630,9 @@
     const bulkInput = document.getElementById('bulkInput');
     const replaceBtn = document.getElementById('replaceBtn');
     const replaceInput = document.getElementById('replaceInput');
-    const clearAllBtn = document.getElementById('clearAll');
-    const deleteTopBtn = document.getElementById('deleteSelectedTop');
+
+    const deleteSelectedTopBtn = document.getElementById('deleteSelectedTop');
+    const deleteAllBtn = document.getElementById('deleteAll');
 
     const toast = document.getElementById('toast');
 
@@ -657,7 +648,6 @@
 
     const bw = document.getElementById('bw');
     const whiteBleed = document.getElementById('whiteBleed');
-    const showGuides = document.getElementById('showGuides');
 
     const overlayText = document.getElementById('overlayText');
     const textLen = document.getElementById('textLen');
@@ -803,24 +793,26 @@
       ctx.drawImage(tmp, dx, dy, dw, dh);
     }
 
+    // Guides are always on now, and black.
     function drawGuides(ctx, W){
       const s = W / MAG.full;
       const bleed = MAG.bleed * s;
       const safe = MAG.safe * s;
 
       ctx.save();
-      ctx.strokeStyle = "rgba(251,191,36,0.35)";
+
+      ctx.strokeStyle = "rgba(0,0,0,0.78)";
       ctx.lineWidth = Math.max(1, 2*s);
       roundRect(ctx, 0.5, 0.5, W-1, W-1, 18*s);
       ctx.stroke();
 
-      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.strokeStyle = "rgba(0,0,0,0.65)";
       ctx.setLineDash([6*s, 6*s]);
       roundRect(ctx, bleed, bleed, safe, safe, 14*s);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillStyle = "rgba(0,0,0,0.45)";
       ctx.font = `${Math.round(12*s)}px ui-sans-serif, system-ui`;
       ctx.textAlign = "left";
       ctx.fillText("bleed", 8*s, 16*s);
@@ -1078,20 +1070,25 @@
       tileCountEl.textContent = String(shownCount);
       readyCountEl.textContent = String(photosReadyCount());
 
-      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
-      ack.disabled = !fullSets;
-      if(!fullSets) ack.checked = false;
+      // Full order must be multiple of 6
+      const fullOrder = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
 
-      const canProceed = fullSets && allPhotosReady() && ack.checked;
+      // Ack can only be checked when the order is full
+      ack.disabled = !fullOrder;
+      if(!fullOrder) ack.checked = false;
+
+      const canProceed = fullOrder && allPhotosReady() && ack.checked;
       orderStatus.textContent = canProceed ? "Ready" : "Not ready";
       orderStatus.className = canProceed ? "ok" : "warn";
 
       const has = !!getSlotTile(selectedIndex);
-      deleteTopBtn.disabled = !has;
+      deleteSelectedTopBtn.disabled = !has;
+
+      deleteAllBtn.disabled = tiles.length === 0;
 
       if(tiles.length === 0){
         orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
-      } else if(!fullSets){
+      } else if(!fullOrder){
         orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
       } else if(!allPhotosReady()){
         orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
@@ -1109,7 +1106,6 @@
       selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
 
       replaceBtn.disabled = false;
-      deleteTopBtn.disabled = !has;
 
       rot90Btn.disabled = !has;
       centerBtn.disabled = !has;
@@ -1158,7 +1154,7 @@
 
     function renderPreview(){
       const tile = getSlotTile(selectedIndex);
-      renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
+      renderTileToContext(tile, pctx, MAG.full, true); // guides always on
     }
 
     function renderAll(){
@@ -1272,7 +1268,7 @@
       renderAll();
     }
 
-    function clearAll(){
+    function deleteAll(){
       for(const t of tiles) revokeURL(t);
       tiles = [];
       shownCount = SET_SIZE;
@@ -1395,11 +1391,8 @@
       replaceInput.value = "";
     });
 
-    deleteTopBtn.addEventListener('click', deleteSelected);
-
-    clearAllBtn.addEventListener('click', clearAll);
-
-    showGuides.addEventListener('change', renderPreview);
+    deleteSelectedTopBtn.addEventListener('click', deleteSelected);
+    deleteAllBtn.addEventListener('click', deleteAll);
 
     zoom.addEventListener('input', ()=>{
       const tile = getSlotTile(selectedIndex);
@@ -1446,7 +1439,15 @@
       renderAll();
     });
 
-    ack.addEventListener('change', updateCounts);
+    // If customer acknowledges (only enabled when multiple of 6), mark ALL uploaded magnets as ready.
+    ack.addEventListener('change', ()=>{
+      if(ack.checked){
+        for(const t of tiles){
+          t.ready = true;
+        }
+      }
+      renderAll();
+    });
 
     rot90Btn.addEventListener('click', ()=>{
       const tile = getSlotTile(selectedIndex);
@@ -1467,7 +1468,7 @@
       renderAll();
     });
 
-    // Next tile + tiny polish scroll (option 1)
+    // Next tile + tiny polish scroll
     nextBtn.addEventListener('click', ()=>{
       selectedIndex = (selectedIndex + 1) % shownCount;
       setActiveSetBySelected();
