@@ -12,7 +12,9 @@
       --text:#e9ecf3;
       --muted:#aab2c5;
       --line:#232a43;
-      --accent:#6ea8ff;
+
+      --yellow:#fbbf24;
+      --yellow2:#f59e0b;
       --good:#34d399;
       --warn:#fbbf24;
       --bad:#fb7185;
@@ -69,18 +71,6 @@
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-    .pill{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background: rgba(18,22,37,0.7);
-      color:var(--text);
-      font-size:12px;
-      line-height:1;
-    }
     button, input, select{ font: inherit; }
 
     .btn{
@@ -90,21 +80,18 @@
       padding:10px 12px;
       border-radius: 12px;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:0.2px;
     }
     .btn:active{ transform: translateY(1px); }
     .btn.primary{
-      border-color: rgba(110,168,255,0.35);
-      background: linear-gradient(180deg, rgba(110,168,255,0.28), rgba(18,22,37,0.7));
+      border-color: rgba(251,191,36,0.65);
+      color: #0b0d12;
+      background: linear-gradient(180deg, rgba(251,191,36,1), rgba(245,158,11,1));
+      box-shadow: 0 10px 30px rgba(251,191,36,0.18);
     }
-    .btn.ghost{
-      background: transparent;
-    }
-    .btn:disabled{
-      opacity:0.45;
-      cursor:not-allowed;
-    }
+    .btn.ghost{ background: transparent; }
+    .btn:disabled{ opacity:0.45; cursor:not-allowed; }
 
     main .wrap{ padding-top: 12px; }
 
@@ -112,7 +99,7 @@
     .gridCard{
       border:1px solid var(--line);
       border-radius: 18px;
-      background: radial-gradient(1200px 500px at 10% 0%, rgba(110,168,255,0.12), transparent 60%),
+      background: radial-gradient(1200px 500px at 10% 0%, rgba(251,191,36,0.10), transparent 60%),
                   linear-gradient(180deg, rgba(18,22,37,0.88), rgba(15,19,32,0.88));
       overflow:hidden;
     }
@@ -133,7 +120,7 @@
       align-items:center;
       flex-wrap:wrap;
     }
-    .count b{ color:var(--text); font-weight:800; }
+    .count b{ color:var(--text); font-weight:900; }
     .hint{
       font-size:12px;
       color:var(--muted);
@@ -155,19 +142,16 @@
       border-radius:999px;
       cursor:pointer;
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
       display:flex;
       align-items:center;
       gap:8px;
     }
     .tab[aria-selected="true"]{
-      border-color: rgba(110,168,255,0.9);
-      box-shadow: 0 0 0 3px rgba(110,168,255,0.12) inset;
+      border-color: rgba(251,191,36,0.9);
+      box-shadow: 0 0 0 3px rgba(251,191,36,0.12) inset;
     }
-    .tab .mini{
-      font-weight:900;
-      color: rgba(233,236,243,0.92);
-    }
+    .tab .mini{ font-weight:900; color: rgba(233,236,243,0.92); }
     .tab .mini.ok{ color: rgba(52,211,153,0.95); }
     .tab .mini.warn{ color: rgba(251,191,36,0.95); }
 
@@ -180,7 +164,7 @@
 
     .slot{
       position:relative;
-      border:1px solid var(--line);
+      border:1px solid rgba(251,191,36,0.75);
       border-radius: 16px;
       background: rgba(7,9,17,0.55);
       overflow:hidden;
@@ -191,10 +175,16 @@
       justify-content:center;
       user-select:none;
       padding:0;
+      box-shadow:
+        0 0 0 1px rgba(251,191,36,0.15) inset,
+        0 0 18px rgba(251,191,36,0.18);
     }
     .slot[aria-selected="true"]{
-      outline: 2px solid rgba(110,168,255,0.9);
+      outline: 2px solid rgba(251,191,36,0.95);
       outline-offset: 2px;
+      box-shadow:
+        0 0 0 1px rgba(251,191,36,0.22) inset,
+        0 0 24px rgba(251,191,36,0.28);
     }
     .slot canvas{
       width:100%;
@@ -218,11 +208,13 @@
     .slot .empty .plus{
       width:36px; height:36px;
       border-radius: 12px;
-      border:1px dashed rgba(170,178,197,0.45);
+      border:1px dashed rgba(251,191,36,0.65);
       display:grid; place-items:center;
       font-size:20px;
-      color: rgba(170,178,197,0.75);
+      color: rgba(251,191,36,0.95);
+      box-shadow: 0 0 18px rgba(251,191,36,0.18);
     }
+
     .badge{
       position:absolute;
       left:8px; top:8px;
@@ -322,7 +314,7 @@
       width:100%;
       height:auto;
       display:block;
-      touch-action:none; /* required for pinch/drag */
+      touch-action:none; /* pinch+drag */
     }
     .previewHelp{
       position:absolute;
@@ -354,7 +346,7 @@
     }
     .row label b{
       color: var(--text);
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
     }
     .range{ width:100%; }
@@ -377,10 +369,7 @@
       min-width: 220px;
     }
     .toggle input{ transform: scale(1.2); }
-    .toggle .tmeta{
-      display:grid;
-      gap:2px;
-    }
+    .toggle .tmeta{ display:grid; gap:2px; }
     .toggle .tmeta .t1{ font-size:12px; font-weight:900; }
     .toggle .tmeta .t2{ font-size:12px; color:var(--muted); }
 
@@ -409,7 +398,7 @@
       background: var(--c);
     }
     .swatch[aria-selected="true"]{
-      outline: 2px solid rgba(110,168,255,0.95);
+      outline: 2px solid rgba(251,191,36,0.95);
       outline-offset: 2px;
     }
     .swatch::after{
@@ -437,7 +426,6 @@
     .statusLine strong{ color:var(--text); }
     .ok{ color: rgba(52,211,153,0.95); font-weight:900; }
     .warn{ color: rgba(251,191,36,0.95); font-weight:900; }
-    .bad{ color: rgba(251,113,133,0.95); font-weight:900; }
 
     .actions{
       display:flex;
@@ -454,7 +442,6 @@
       font-size:12px;
       text-align:center;
     }
-    code{ color: rgba(233,236,243,0.92); }
   </style>
 </head>
 <body>
@@ -475,7 +462,6 @@
   <main>
     <div class="wrap">
 
-      <!-- GRID TOP -->
       <section class="gridCard" aria-label="Magnet grid">
         <div class="gridHeader">
           <div class="count">
@@ -483,14 +469,13 @@
             <span>Tiles shown: <b id="tileCount">6</b></span>
             <span>Ready: <b id="readyCount">0</b></span>
           </div>
-          <div class="hint">Tap a tile to edit. Pinch to zoom. Drag to position.</div>
+          <div class="hint">Tap a tile to edit. Pinch to zoom. Drag photo or drag text.</div>
         </div>
 
         <div class="tabs" id="tabs" aria-label="Sets (6 per tab)"></div>
 
         <div class="thumbGrid" id="thumbGrid"></div>
 
-        <!-- BULK UPLOAD directly under grid -->
         <div class="bulkRow">
           <div class="left">
             <input id="bulkInput" type="file" accept="image/*" multiple />
@@ -507,7 +492,6 @@
         </div>
       </section>
 
-      <!-- CONTROLS BELOW GRID -->
       <section class="controls" aria-label="Editing controls">
 
         <div class="panel">
@@ -517,7 +501,7 @@
               <canvas id="preview" width="600" height="600" aria-label="Magnet preview"></canvas>
               <div class="previewHelp">
                 <div>Selected: <span id="selectedLabel">Tile 1</span></div>
-                <div style="opacity:0.9">Pinch = zoom • Drag = move • Rotate 90° if needed</div>
+                <div style="opacity:0.9">Pinch = zoom • Drag = move • Drag text when visible</div>
               </div>
             </div>
 
@@ -531,7 +515,8 @@
                 <span>Zoom</span>
                 <b id="zoomVal">100%</b>
               </label>
-              <input class="range" id="zoom" type="range" min="1" max="3" step="0.01" value="1" disabled />
+              <!-- min/max updated dynamically -->
+              <input class="range" id="zoom" type="range" min="0.5" max="3" step="0.01" value="1" disabled />
             </div>
 
             <div class="toggleRow">
@@ -547,7 +532,7 @@
                 <input id="whiteBleed" type="checkbox" disabled />
                 <div class="tmeta">
                   <div class="t1">White/blank bleed</div>
-                  <div class="t2">Image only in 5×5 area</div>
+                  <div class="t2">Bleed stays white</div>
                 </div>
               </div>
 
@@ -591,15 +576,7 @@
               <input class="range" id="textSize" type="range" min="16" max="56" step="1" value="28" disabled />
             </div>
 
-            <div class="row">
-              <label>
-                <span>Text vertical position</span>
-                <b id="textYVal">82%</b>
-              </label>
-              <input class="range" id="textY" type="range" min="55" max="95" step="1" value="82" disabled />
-            </div>
-
-            <div class="statusLine" id="statusLine">
+            <div class="statusLine">
               <div>
                 <strong>Order status:</strong>
                 <span id="orderStatus" class="warn">Not ready</span>
@@ -611,17 +588,17 @@
 
             <div class="toggleRow">
               <div class="toggle" style="min-width:100%;">
-                <input id="ack" type="checkbox" />
+                <input id="ack" type="checkbox" disabled />
                 <div class="tmeta">
                   <div class="t1">I acknowledge I have reviewed and edited all magnets</div>
-                  <div class="t2">Required before order can proceed</div>
+                  <div class="t2">Enabled only when your order is a full set of 6 (or 12/18/...)</div>
                 </div>
               </div>
             </div>
 
             <div class="actions">
               <button class="btn" id="deleteTile" disabled>Delete selected</button>
-              <button class="btn ghost" id="nextTile">Next</button>
+              <button class="btn ghost" id="nextTile">Next tile</button>
             </div>
 
           </div>
@@ -630,25 +607,17 @@
       </section>
 
       <footer>
-        This editor is customer-facing only. No download/print buttons are shown.
+        Customer-facing editor only. Shopify checkout navigation will be wired separately later.
       </footer>
     </div>
   </main>
 
   <script>
-    // ---------------------------
-    // Config
-    // ---------------------------
     const MAX_TILES = 72;
     const SET_SIZE = 6;
 
-    const MAG = {
-      full: 600,
-      safe: 500,
-      bleed: 50
-    };
+    const MAG = { full: 600, safe: 500, bleed: 50 };
 
-    // Text palette (fixed presets)
     const TEXT_COLORS = [
       { name: "White",  value: "#FFFFFF" },
       { name: "Black",  value: "#111827" },
@@ -662,43 +631,33 @@
       { name: "Teal",   value: "#14B8A6" },
     ];
 
-    // ---------------------------
-    // State
-    // ---------------------------
-    // We store tiles densely: no holes in the middle. Deleting shifts everything left.
-    // "Tiles shown" expands/shrinks to smallest multiple of 6 needed, min 6, max 72.
     function newTile(){
       return {
         id: (crypto.randomUUID?.() || String(Math.random()).slice(2)),
         img: null,
-        src: null,          // object URL
-        // transform
-        zoom: 1,
-        rot: 0,             // 0,90,180,270
-        offsetX: 0,         // px in MAG.full coordinate space
+        src: null,
+        zoom: 1,              // multiplier on top of "cover safe"
+        rot: 0,               // 0/90/180/270
+        offsetX: 0,
         offsetY: 0,
-        // options
         bw: false,
         whiteBleed: false,
-        // text
         text: "",
         textColor: TEXT_COLORS[0].value,
         textColorName: TEXT_COLORS[0].name,
         textSize: 28,
-        textY: 82,
-        // review
-        ready: false
+        // NEW: text draggable in safe area
+        textX: 50,            // percent across safe area
+        textY: 82,            // percent down safe area
+        ready: false,
       };
     }
 
-    let tiles = [];         // dense list of tiles with photos (and their edits)
-    let shownCount = 6;     // total tile slots currently displayed (multiple of 6)
-    let activeSet = 0;      // tab index (0-based)
-    let selectedIndex = 0;  // global index in the displayed slots [0..shownCount-1]
+    let tiles = [];         // dense list
+    let shownCount = 6;     // multiple of 6
+    let activeSet = 0;
+    let selectedIndex = 0;
 
-    // ---------------------------
-    // DOM
-    // ---------------------------
     const tabsEl = document.getElementById('tabs');
     const gridEl = document.getElementById('thumbGrid');
 
@@ -732,8 +691,6 @@
     const textLen = document.getElementById('textLen');
     const textSize = document.getElementById('textSize');
     const textSizeVal = document.getElementById('textSizeVal');
-    const textY = document.getElementById('textY');
-    const textYVal = document.getElementById('textYVal');
 
     const paletteEl = document.getElementById('palette');
     const colorNameEl = document.getElementById('colorName');
@@ -745,9 +702,6 @@
     const deleteBtn = document.getElementById('deleteTile');
     const nextBtn = document.getElementById('nextTile');
 
-    // ---------------------------
-    // Utilities
-    // ---------------------------
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
     function revokeURL(tile){
@@ -784,7 +738,6 @@
     }
 
     function getSlotTile(globalIndex){
-      // If this slot has a photo (tile exists), return it; else return null (empty slot)
       return tiles[globalIndex] || null;
     }
 
@@ -815,50 +768,48 @@
       }, 4500);
     }
 
-    // ---------------------------
-    // Rendering (canvas)
-    // ---------------------------
-    function requiredRectFor(tile){
-      // If whiteBleed: safe area must be covered; bleed may be blank
-      // Else: full area must be covered
-      if(tile?.whiteBleed){
-        return { x: MAG.bleed, y: MAG.bleed, w: MAG.safe, h: MAG.safe };
-      }
-      return { x: 0, y: 0, w: MAG.full, h: MAG.full };
+    function markReady(tile){
+      if(tile) tile.ready = true;
     }
 
-    function minZoomToCover(tile){
+    // ---------------------------
+    // Core geometry: SAFE must never be empty.
+    // Zoom "1" means "cover SAFE". We allow zoom < 1 only down to SAFE coverage (so we use minZoom=1 always),
+    // BUT we now define zoom slider in terms of multiplier on cover-safe; to "zoom out of bleed", user uses zoom=1 (min).
+    // To allow *some* additional zoom-out feel while still covering safe, we allow zoom down to 1 (not below),
+    // and when whiteBleed is off, bleed can still become white because we are NOT requiring full coverage.
+    // ---------------------------
+
+    function safeRect(){
+      return { x: MAG.bleed, y: MAG.bleed, w: MAG.safe, h: MAG.safe };
+    }
+
+    // cover scale uses SAFE always (so safe never empties)
+    function coverSafeScale(tile){
       if(!tile?.img) return 1;
-
-      const rect = requiredRectFor(tile);
-      const iw = tile.img.naturalWidth;
-      const ih = tile.img.naturalHeight;
-
-      // Rotation is only multiples of 90 -> swap dims if 90/270
-      const r = ((tile.rot % 360) + 360) % 360;
-      const swapped = (r === 90 || r === 270);
-      const rw = swapped ? ih : iw;
-      const rh = swapped ? iw : ih;
-
-      // Need cover (cover scale)
-      const cover = Math.max(rect.w / rw, rect.h / rh);
-      // Our renderer draws using cover * zoom, where zoom>=1 means "extra beyond cover"
-      return 1; // base zoom of 1 already equals cover. But we clamp zoom >=1 always.
+      const rect = safeRect();
+      const iw0 = tile.img.naturalWidth;
+      const ih0 = tile.img.naturalHeight;
+      const rot = ((tile.rot % 360) + 360) % 360;
+      const swapped = (rot === 90 || rot === 270);
+      const rw = swapped ? ih0 : iw0;
+      const rh = swapped ? iw0 : ih0;
+      return Math.max(rect.w / rw, rect.h / rh);
     }
 
-    function clampOffsetsToCover(tile){
+    function clampOffsetsToKeepSafeCovered(tile){
       if(!tile?.img) return;
 
-      const rect = requiredRectFor(tile);
+      const rect = safeRect();
       const iw0 = tile.img.naturalWidth;
       const ih0 = tile.img.naturalHeight;
 
-      const r = ((tile.rot % 360) + 360) % 360;
-      const swapped = (r === 90 || r === 270);
+      const rot = ((tile.rot % 360) + 360) % 360;
+      const swapped = (rot === 90 || rot === 270);
       const iw = swapped ? ih0 : iw0;
       const ih = swapped ? iw0 : ih0;
 
-      const cover = Math.max(rect.w / iw, rect.h / ih);
+      const cover = coverSafeScale(tile);
       const scale = cover * tile.zoom;
 
       const halfW = (iw * scale) / 2;
@@ -867,8 +818,6 @@
       const reqHalfW = rect.w / 2;
       const reqHalfH = rect.h / 2;
 
-      // Ensure scale covers required rect (should, because cover computed)
-      // Clamp offsets so required rect stays within image bounds
       const maxX = Math.max(0, halfW - reqHalfW);
       const maxY = Math.max(0, halfH - reqHalfH);
 
@@ -876,98 +825,24 @@
       tile.offsetY = clamp(tile.offsetY, -maxY, maxY);
     }
 
-    function renderTileToContext(tile, ctx, size, withGuides){
-      const W = size, H = size;
-      ctx.clearRect(0,0,W,H);
+    // Reliable grayscale for canvas (fixes B&W on all browsers)
+    function drawImageGrayscale(ctx, img, dx, dy, dw, dh){
+      const tmp = document.createElement('canvas');
+      tmp.width = Math.max(1, Math.round(dw));
+      tmp.height = Math.max(1, Math.round(dh));
+      const tctx = tmp.getContext('2d', { willReadFrequently: true });
+      tctx.drawImage(img, 0, 0, tmp.width, tmp.height);
 
-      // white background always (bleed can be blank/white)
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fillRect(0,0,W,H);
-
-      if(!tile || !tile.img){
-        if(withGuides) drawGuides(ctx, W);
-        return;
+      const data = tctx.getImageData(0,0,tmp.width,tmp.height);
+      const d = data.data;
+      for(let i=0;i<d.length;i+=4){
+        const r=d[i], g=d[i+1], b=d[i+2];
+        // luminance
+        const y = (0.2126*r + 0.7152*g + 0.0722*b) | 0;
+        d[i]=d[i+1]=d[i+2]=y;
       }
-
-      const scaleFactor = W / MAG.full;
-      const rect = requiredRectFor(tile);
-
-      const rectX = rect.x * scaleFactor;
-      const rectY = rect.y * scaleFactor;
-      const rectW = rect.w * scaleFactor;
-      const rectH = rect.h * scaleFactor;
-
-      // Clip: either required rect (if whiteBleed) or full
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(rectX, rectY, rectW, rectH);
-      ctx.clip();
-
-      // Compute cover scale (rotation multiples of 90)
-      const iw0 = tile.img.naturalWidth;
-      const ih0 = tile.img.naturalHeight;
-      const rot = ((tile.rot % 360) + 360) % 360;
-      const swapped = (rot === 90 || rot === 270);
-      const rw = swapped ? ih0 : iw0;
-      const rh = swapped ? iw0 : ih0;
-
-      const cover = Math.max(rectW / rw, rectH / rh);
-      const scale = cover * tile.zoom;
-
-      // Center point of required rect + user offsets
-      const cx = rectX + rectW/2 + (tile.offsetX * scaleFactor);
-      const cy = rectY + rectH/2 + (tile.offsetY * scaleFactor);
-
-      ctx.translate(cx, cy);
-      ctx.rotate(rot * Math.PI/180);
-
-      // grayscale
-      if(tile.bw){
-        try { ctx.filter = "grayscale(1)"; } catch(e){}
-      } else {
-        ctx.filter = "none";
-      }
-
-      // draw original image (not swapped); rotation handles orientation
-      const drawW = iw0 * scale;
-      const drawH = ih0 * scale;
-      ctx.drawImage(tile.img, -drawW/2, -drawH/2, drawW, drawH);
-
-      ctx.filter = "none";
-      ctx.restore(); // remove clip
-      ctx.restore();
-
-      // Text overlay (anchored to safe area)
-      if(tile.text && tile.text.trim()){
-        const t = tile.text.trim();
-        const safeX = MAG.bleed * scaleFactor;
-        const safeY = MAG.bleed * scaleFactor;
-        const safe = MAG.safe * scaleFactor;
-
-        const sizePx = (tile.textSize || 28) * scaleFactor;
-        const yPct = clamp(tile.textY ?? 82, 55, 95);
-
-        const x = safeX + safe/2;
-        const y = safeY + (safe * (yPct/100));
-
-        ctx.save();
-        ctx.font = `900 ${Math.round(sizePx)}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        // Always black shadow
-        ctx.shadowColor = "rgba(0,0,0,0.85)";
-        ctx.shadowBlur = Math.max(2, 8 * scaleFactor);
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = Math.max(1, 3 * scaleFactor);
-
-        ctx.fillStyle = tile.textColor || "#FFFFFF";
-        ctx.fillText(t, x, y);
-
-        ctx.restore();
-      }
-
-      if(withGuides) drawGuides(ctx, W);
+      tctx.putImageData(data,0,0);
+      ctx.drawImage(tmp, dx, dy, dw, dh);
     }
 
     function drawGuides(ctx, W){
@@ -976,26 +851,106 @@
       const safe = MAG.safe * s;
 
       ctx.save();
-      // outer border
-      ctx.strokeStyle = "rgba(110,168,255,0.35)";
+      ctx.strokeStyle = "rgba(251,191,36,0.35)";
       ctx.lineWidth = Math.max(1, 2*s);
       roundRect(ctx, 0.5, 0.5, W-1, W-1, 18*s);
       ctx.stroke();
 
-      // safe border dashed
       ctx.strokeStyle = "rgba(0,0,0,0.25)";
       ctx.setLineDash([6*s, 6*s]);
       roundRect(ctx, bleed, bleed, safe, safe, 14*s);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // labels
       ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.font = `${Math.round(12*s)}px ui-sans-serif, system-ui`;
       ctx.textAlign = "left";
       ctx.fillText("bleed", 8*s, 16*s);
 
       ctx.restore();
+    }
+
+    function renderTileToContext(tile, ctx, size, withGuides){
+      const W = size, H = size;
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0,0,W,H);
+
+      if(!tile || !tile.img){
+        if(withGuides) drawGuides(ctx, W);
+        return;
+      }
+
+      const sf = W / MAG.full;
+
+      // Determine clip: if whiteBleed -> clip to SAFE. else -> allow drawing full but only enforce safe coverage
+      const safe = safeRect();
+      const clipX = tile.whiteBleed ? safe.x*sf : 0;
+      const clipY = tile.whiteBleed ? safe.y*sf : 0;
+      const clipW = tile.whiteBleed ? safe.w*sf : W;
+      const clipH = tile.whiteBleed ? safe.h*sf : H;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(clipX, clipY, clipW, clipH);
+      ctx.clip();
+
+      // Compute transform centered on SAFE area (so offsets behave consistently)
+      const cover = coverSafeScale(tile) * sf;
+      const scale = cover * tile.zoom;
+
+      const cx = (safe.x + safe.w/2) * sf + (tile.offsetX * sf);
+      const cy = (safe.y + safe.h/2) * sf + (tile.offsetY * sf);
+
+      const rot = ((tile.rot % 360) + 360) % 360;
+
+      ctx.translate(cx, cy);
+      ctx.rotate(rot * Math.PI/180);
+
+      const iw = tile.img.naturalWidth;
+      const ih = tile.img.naturalHeight;
+
+      const drawW = iw * scale;
+      const drawH = ih * scale;
+
+      // draw with or without grayscale
+      if(tile.bw){
+        // grayscale in a temp buffer
+        drawImageGrayscale(ctx, tile.img, -drawW/2, -drawH/2, drawW, drawH);
+      } else {
+        ctx.drawImage(tile.img, -drawW/2, -drawH/2, drawW, drawH);
+      }
+
+      ctx.restore();
+
+      // text (draggable) anchored within SAFE area (not affected by photo rotation)
+      if(tile.text && tile.text.trim()){
+        const t = tile.text.trim();
+        const safeX = safe.x*sf;
+        const safeY = safe.y*sf;
+        const safeS = safe.w*sf;
+
+        const sizePx = (tile.textSize || 28) * sf;
+        const x = safeX + safeS * (clamp(tile.textX ?? 50, 0, 100) / 100);
+        const y = safeY + safeS * (clamp(tile.textY ?? 82, 0, 100) / 100);
+
+        ctx.save();
+        ctx.font = `900 ${Math.round(sizePx)}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Always black shadow
+        ctx.shadowColor = "rgba(0,0,0,0.85)";
+        ctx.shadowBlur = Math.max(2, 8 * sf);
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = Math.max(1, 3 * sf);
+
+        ctx.fillStyle = tile.textColor || "#FFFFFF";
+        ctx.fillText(t, x, y);
+        ctx.restore();
+      }
+
+      if(withGuides) drawGuides(ctx, W);
     }
 
     // ---------------------------
@@ -1029,8 +984,7 @@
     function updatePaletteSelection(){
       const tile = getSlotTile(selectedIndex);
       const selectedColor = tile?.textColor || TEXT_COLORS[0].value;
-      const children = [...paletteEl.children];
-      children.forEach((el, i)=>{
+      [...paletteEl.children].forEach((el, i)=>{
         el.setAttribute("aria-selected", TEXT_COLORS[i].value === selectedColor ? "true" : "false");
       });
     }
@@ -1042,7 +996,6 @@
       for(let s=0; s<sets; s++){
         const start = s*SET_SIZE;
         const end = start + SET_SIZE;
-
         const filled = tiles.slice(start, end).filter(Boolean).length;
         const readyN = tiles.slice(start, end).filter(t => t && t.ready).length;
 
@@ -1056,13 +1009,12 @@
         tab.appendChild(label);
 
         const meta = document.createElement('span');
-        meta.className = "mini " + ((filled>0 && readyN===filled) ? "ok" : (filled>0 ? "warn" : "warn"));
+        meta.className = "mini " + ((filled>0 && readyN===filled) ? "ok" : "warn");
         meta.textContent = filled===0 ? "0/6" : `${readyN}/${filled}`;
         tab.appendChild(meta);
 
         tab.addEventListener('click', ()=>{
           activeSet = s;
-          // Keep selection within that set
           const base = activeSet*SET_SIZE;
           selectedIndex = clamp(selectedIndex, base, base+SET_SIZE-1);
           renderAll();
@@ -1106,16 +1058,11 @@
           selectedIndex = globalIndex;
           setActiveSetBySelected();
           renderAll();
-
-          // Fast add if empty slot: open replace input
-          if(!getSlotTile(selectedIndex)){
-            replaceInput.click();
-          }
+          if(!getSlotTile(selectedIndex)) replaceInput.click();
         });
 
         gridEl.appendChild(btn);
 
-        // render thumb (no guides)
         const ctx = canvas.getContext('2d');
         renderTileToContext(tile, ctx, canvas.width, false);
 
@@ -1131,34 +1078,13 @@
       }
     }
 
-    function updateCounts(){
-      photoCountEl.textContent = String(tiles.length);
-      tileCountEl.textContent = String(shownCount);
-      readyCountEl.textContent = String(photosReadyCount());
-
-      const canProceed = allPhotosReady() && ack.checked;
-      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
-      orderStatus.className = canProceed ? "ok" : "warn";
-
-      if(tiles.length === 0){
-        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
-      } else if(!allPhotosReady()){
-        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
-      } else if(!ack.checked){
-        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
-      } else {
-        orderDetail.textContent = "All tiles are ready and acknowledged.";
-      }
-    }
-
     function refreshControls(){
       const tile = getSlotTile(selectedIndex);
       const has = !!tile;
 
       selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
 
-      // enable/disable controls based on tile existence
-      replaceBtn.disabled = (shownCount === 0);
+      replaceBtn.disabled = false;
 
       deleteBtn.disabled = !has;
       rot90Btn.disabled = !has;
@@ -1170,7 +1096,6 @@
 
       overlayText.disabled = !has;
       textSize.disabled = !has;
-      textY.disabled = !has;
 
       if(!has){
         zoom.value = "1";
@@ -1181,19 +1106,20 @@
         textLen.textContent = "0";
         textSize.value = "28";
         textSizeVal.textContent = "28px";
-        textY.value = "82";
-        textYVal.textContent = "82%";
         colorNameEl.textContent = "White";
         updatePaletteSelection();
         return;
       }
 
-      // clamp & enforce min zoom
-      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
-      clampOffsetsToCover(tile);
+      // Enforce min zoom = 1 (cover SAFE)
+      tile.zoom = clamp(tile.zoom || 1, 1, 3);
+      clampOffsetsToKeepSafeCovered(tile);
 
-      zoom.value = String(tile.zoom || 1);
-      zoomVal.textContent = `${Math.round((tile.zoom||1)*100)}%`;
+      // slider reflects tile.zoom
+      zoom.min = "1";
+      zoom.max = "3";
+      zoom.value = String(tile.zoom);
+      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
 
       bw.checked = !!tile.bw;
       whiteBleed.checked = !!tile.whiteBleed;
@@ -1204,9 +1130,6 @@
       textSize.value = String(tile.textSize ?? 28);
       textSizeVal.textContent = `${tile.textSize ?? 28}px`;
 
-      textY.value = String(tile.textY ?? 82);
-      textYVal.textContent = `${tile.textY ?? 82}%`;
-
       colorNameEl.textContent = tile.textColorName || "White";
       updatePaletteSelection();
     }
@@ -1216,13 +1139,37 @@
       renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
     }
 
-    function renderAll(){
-      // keep shownCount synced
-      shownCount = computeShownCount(tiles.length);
-      // keep active tab valid
-      activeSet = clamp(activeSet, 0, totalSets()-1);
+    function updateCounts(){
+      photoCountEl.textContent = String(tiles.length);
+      tileCountEl.textContent = String(shownCount);
+      readyCountEl.textContent = String(photosReadyCount());
 
-      // keep selection in range and within active set
+      // Ack enabled only when full sets (multiple of 6) AND no partial set exists.
+      // In this UX, partial set means tiles.length % 6 != 0.
+      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
+      ack.disabled = !fullSets;
+      if(!fullSets) ack.checked = false;
+
+      const canProceed = allPhotosReady() && ack.checked && fullSets;
+      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
+      orderStatus.className = canProceed ? "ok" : "warn";
+
+      if(tiles.length === 0){
+        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
+      } else if(!fullSets){
+        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
+      } else if(!allPhotosReady()){
+        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
+      } else if(!ack.checked){
+        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
+      } else {
+        orderDetail.textContent = "All tiles are ready and acknowledged.";
+      }
+    }
+
+    function renderAll(){
+      shownCount = computeShownCount(tiles.length);
+      activeSet = clamp(activeSet, 0, totalSets()-1);
       selectedIndex = clamp(selectedIndex, 0, shownCount-1);
       setActiveSetBySelected();
 
@@ -1231,14 +1178,6 @@
       refreshControls();
       renderPreview();
       updateCounts();
-    }
-
-    // ---------------------------
-    // Review logic
-    // ---------------------------
-    function markReady(tile){
-      if(!tile) return;
-      tile.ready = true;
     }
 
     // ---------------------------
@@ -1257,7 +1196,10 @@
         const t = newTile();
         t.img = img;
         t.src = url;
-        t.ready = false;       // user must edit at least once
+        t.ready = false;
+        // initial clamp
+        t.zoom = 1;
+        clampOffsetsToKeepSafeCovered(t);
         tiles.push(t);
       }
 
@@ -1267,13 +1209,8 @@
         showToast(`Added <strong>${willAdd}</strong> photo(s).`);
       }
 
-      // Expand sets automatically
       shownCount = computeShownCount(tiles.length);
 
-      // If we were on an empty later tab, pull back to where content is (optional)
-      if(activeSet > totalSets()-1) activeSet = totalSets()-1;
-
-      // Auto-select first newly added tile (nice on mobile)
       if(willAdd > 0){
         selectedIndex = tiles.length - 1;
         setActiveSetBySelected();
@@ -1285,20 +1222,20 @@
     async function replaceSelectedWithFile(file){
       if(!file || !file.type || !file.type.startsWith("image/")) return;
 
-      // If selected index beyond current photos, it means user tapped an empty slot.
-      // In that case, we insert at that position by appending then shifting? Requirement: keep dense order.
-      // Easiest: if selectedIndex == tiles.length (the first empty), then append.
-      // If selectedIndex > tiles.length, it’s deeper empty — we treat as append too.
-      const target = selectedIndex <= tiles.length ? selectedIndex : tiles.length;
-
-      if(tiles.length >= MAX_TILES){
+      if(tiles.length >= MAX_TILES && selectedIndex >= tiles.length){
         showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
         return;
       }
 
       const {img, url} = await loadImageFromFile(file);
 
+      const target = selectedIndex <= tiles.length ? selectedIndex : tiles.length;
+
       if(target === tiles.length){
+        if(tiles.length >= MAX_TILES){
+          showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
+          return;
+        }
         const t = newTile();
         t.img = img;
         t.src = url;
@@ -1306,12 +1243,12 @@
         tiles.push(t);
         selectedIndex = tiles.length - 1;
       } else {
-        // Replace existing tile at target
         const t = tiles[target];
         revokeURL(t);
         t.img = img;
         t.src = url;
-        // Reset transform; keep text options? safest to reset everything user-facing
+
+        // reset edits
         t.zoom = 1;
         t.rot = 0;
         t.offsetX = 0;
@@ -1322,8 +1259,11 @@
         t.textColor = TEXT_COLORS[0].value;
         t.textColorName = TEXT_COLORS[0].name;
         t.textSize = 28;
+        t.textX = 50;
         t.textY = 82;
         t.ready = false;
+
+        clampOffsetsToKeepSafeCovered(t);
         selectedIndex = target;
       }
 
@@ -1337,13 +1277,9 @@
 
       const t = tiles[selectedIndex];
       revokeURL(t);
+      tiles.splice(selectedIndex, 1);
 
-      tiles.splice(selectedIndex, 1); // shifts left automatically (requirement)
-
-      // shrink sets automatically
       shownCount = computeShownCount(tiles.length);
-
-      // keep selection valid
       selectedIndex = clamp(selectedIndex, 0, shownCount-1);
       setActiveSetBySelected();
 
@@ -1362,11 +1298,43 @@
     }
 
     // ---------------------------
-    // Pinch + Drag handling (Pointer Events)
+    // Text hit test & dragging
     // ---------------------------
-    const pointers = new Map(); // pointerId -> {x,y}
+    function getTextMetrics(tile){
+      if(!tile?.text || !tile.text.trim()) return null;
+      const sf = preview.width / MAG.full;
+      const safe = safeRect();
+      const safeX = safe.x*sf;
+      const safeY = safe.y*sf;
+      const safeS = safe.w*sf;
+
+      const sizePx = (tile.textSize || 28) * sf;
+      const x = safeX + safeS * (clamp(tile.textX ?? 50, 0, 100)/100);
+      const y = safeY + safeS * (clamp(tile.textY ?? 82, 0, 100)/100);
+
+      // measure
+      pctx.save();
+      pctx.font = `900 ${Math.round(sizePx)}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+      const w = pctx.measureText(tile.text.trim()).width;
+      pctx.restore();
+
+      const pad = Math.max(10, sizePx*0.35);
+      return { x, y, w: w + pad*2, h: sizePx + pad*1.2 };
+    }
+
+    function pointInRect(px, py, r){
+      return (px >= r.x - r.w/2 && px <= r.x + r.w/2 && py >= r.y - r.h/2 && py <= r.y + r.h/2);
+    }
+
+    // ---------------------------
+    // Pinch + Drag (photo) + Drag (text)
+    // ---------------------------
+    const pointers = new Map();
     let pinchStartDist = 0;
     let pinchStartZoom = 1;
+
+    let draggingText = false;
+    let textDragStart = null;
 
     function canvasPointFromEvent(e, canvas){
       const r = canvas.getBoundingClientRect();
@@ -1377,8 +1345,8 @@
     }
 
     function distance(a,b){
-      const dx = a.x - b.x, dy = a.y - b.y;
-      return Math.hypot(dx, dy);
+      const dx=a.x-b.x, dy=a.y-b.y;
+      return Math.hypot(dx,dy);
     }
 
     preview.addEventListener('pointerdown', (e)=>{
@@ -1386,9 +1354,24 @@
       if(!tile) return;
 
       preview.setPointerCapture(e.pointerId);
-      pointers.set(e.pointerId, canvasPointFromEvent(e, preview));
+      const pt = canvasPointFromEvent(e, preview);
+      pointers.set(e.pointerId, pt);
+
+      // If single pointer and user touched the text box, drag text instead of photo
+      if(pointers.size === 1){
+        const m = getTextMetrics(tile);
+        if(m && pointInRect(pt.x, pt.y, m)){
+          draggingText = true;
+          textDragStart = { pt, tileTextX: tile.textX ?? 50, tileTextY: tile.textY ?? 82 };
+        } else {
+          draggingText = false;
+          textDragStart = null;
+        }
+      }
 
       if(pointers.size === 2){
+        draggingText = false;
+        textDragStart = null;
         const pts = [...pointers.values()];
         pinchStartDist = distance(pts[0], pts[1]);
         pinchStartZoom = tile.zoom || 1;
@@ -1405,15 +1388,38 @@
       pointers.set(e.pointerId, now);
 
       if(pointers.size === 1){
-        // drag
-        const dx = (now.x - prev.x);
-        const dy = (now.y - prev.y);
+        const sf = preview.width / MAG.full;
+        const safe = safeRect();
+        const safeX = safe.x*sf;
+        const safeY = safe.y*sf;
+        const safeS = safe.w*sf;
 
-        tile.offsetX += dx;
-        tile.offsetY += dy;
-        clampOffsetsToCover(tile);
+        const dx = now.x - prev.x;
+        const dy = now.y - prev.y;
 
-        markReady(tile); // any action marks ready (per spec)
+        if(draggingText && tile.text && tile.text.trim()){
+          // move text within safe area
+          const xPx = (safeX + safeS * ((tile.textX ?? 50)/100)) + dx;
+          const yPx = (safeY + safeS * ((tile.textY ?? 82)/100)) + dy;
+
+          const xPct = ((xPx - safeX) / safeS) * 100;
+          const yPct = ((yPx - safeY) / safeS) * 100;
+
+          // clamp with small padding
+          tile.textX = clamp(xPct, 5, 95);
+          tile.textY = clamp(yPct, 5, 95);
+
+          markReady(tile);
+          renderAll();
+          return;
+        }
+
+        // drag photo
+        tile.offsetX += (dx / sf);
+        tile.offsetY += (dy / sf);
+        clampOffsetsToKeepSafeCovered(tile);
+
+        markReady(tile);
         renderAll();
         return;
       }
@@ -1423,11 +1429,8 @@
         const d = distance(pts[0], pts[1]);
         if(pinchStartDist > 0){
           const raw = pinchStartZoom * (d / pinchStartDist);
-          tile.zoom = clamp(raw, 1, 3);
-          // enforce coverage and clamp offsets after zoom
-          tile.zoom = Math.max(tile.zoom, minZoomToCover(tile));
-          clampOffsetsToCover(tile);
-
+          tile.zoom = clamp(raw, 1, 3); // allow zooming out to cover safe (min 1)
+          clampOffsetsToKeepSafeCovered(tile);
           markReady(tile);
           renderAll();
         }
@@ -1436,8 +1439,10 @@
 
     function endPointer(e){
       if(pointers.has(e.pointerId)) pointers.delete(e.pointerId);
-      if(pointers.size < 2){
-        pinchStartDist = 0;
+      if(pointers.size < 2) pinchStartDist = 0;
+      if(pointers.size === 0){
+        draggingText = false;
+        textDragStart = null;
       }
     }
     preview.addEventListener('pointerup', endPointer);
@@ -1445,7 +1450,7 @@
     preview.addEventListener('lostpointercapture', endPointer);
 
     // ---------------------------
-    // Events: UI controls
+    // Events
     // ---------------------------
     bulkBtn.addEventListener('click', ()=> bulkInput.click());
     bulkInput.addEventListener('change', async ()=>{
@@ -1462,20 +1467,14 @@
 
     clearAllBtn.addEventListener('click', clearAll);
 
-    showGuides.addEventListener('change', ()=>{
-      // thumbs remain guideless by design; only affects preview
-      renderPreview();
-    });
+    showGuides.addEventListener('change', ()=> renderPreview());
 
     zoom.addEventListener('input', ()=>{
       const tile = getSlotTile(selectedIndex);
       if(!tile) return;
       tile.zoom = clamp(parseFloat(zoom.value), 1, 3);
-      tile.zoom = Math.max(tile.zoom, minZoomToCover(tile));
-      clampOffsetsToCover(tile);
-
+      clampOffsetsToKeepSafeCovered(tile);
       zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
-
       markReady(tile);
       renderAll();
     });
@@ -1492,11 +1491,7 @@
       const tile = getSlotTile(selectedIndex);
       if(!tile) return;
       tile.whiteBleed = whiteBleed.checked;
-
-      // Ensure zoom/offset still covers safe area
-      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
-      clampOffsetsToCover(tile);
-
+      clampOffsetsToKeepSafeCovered(tile);
       markReady(tile);
       renderAll();
     });
@@ -1519,15 +1514,6 @@
       renderAll();
     });
 
-    textY.addEventListener('input', ()=>{
-      const tile = getSlotTile(selectedIndex);
-      if(!tile) return;
-      tile.textY = parseInt(textY.value,10);
-      textYVal.textContent = `${tile.textY}%`;
-      markReady(tile);
-      renderAll();
-    });
-
     ack.addEventListener('change', updateCounts);
 
     deleteBtn.addEventListener('click', deleteSelected);
@@ -1542,11 +1528,7 @@
       const tile = getSlotTile(selectedIndex);
       if(!tile) return;
       tile.rot = ((tile.rot || 0) + 90) % 360;
-
-      // After rotation, ensure coverage and clamp offsets
-      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
-      clampOffsetsToCover(tile);
-
+      clampOffsetsToKeepSafeCovered(tile);
       markReady(tile);
       renderAll();
     });
@@ -1556,23 +1538,238 @@
       if(!tile) return;
       tile.offsetX = 0;
       tile.offsetY = 0;
-
-      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
-      clampOffsetsToCover(tile);
-
+      clampOffsetsToKeepSafeCovered(tile);
       markReady(tile);
       renderAll();
     });
 
-    // Cleanup URLs on unload
     window.addEventListener('beforeunload', ()=>{
       for(const t of tiles) revokeURL(t);
     });
 
     // ---------------------------
-    // Init
+    // Render helpers
     // ---------------------------
-    buildPalette();
+    function buildPaletteUI(){
+      paletteEl.innerHTML = "";
+      TEXT_COLORS.forEach((c) => {
+        const b = document.createElement('button');
+        b.type = "button";
+        b.className = "swatch";
+        b.style.setProperty("--c", c.value);
+        b.title = c.name;
+        b.setAttribute("aria-label", c.name);
+        b.setAttribute("aria-selected", "false");
+        b.addEventListener('click', ()=>{
+          const tile = getSlotTile(selectedIndex);
+          if(!tile) return;
+          tile.textColor = c.value;
+          tile.textColorName = c.name;
+          colorNameEl.textContent = c.name;
+          markReady(tile);
+          updatePaletteSelection();
+          renderAll();
+        });
+        paletteEl.appendChild(b);
+      });
+      updatePaletteSelection();
+    }
+
+    function updatePaletteSelection(){
+      const tile = getSlotTile(selectedIndex);
+      const selectedColor = tile?.textColor || TEXT_COLORS[0].value;
+      [...paletteEl.children].forEach((el, i)=>{
+        el.setAttribute("aria-selected", TEXT_COLORS[i].value === selectedColor ? "true" : "false");
+      });
+    }
+
+    function buildTabs(){
+      tabsEl.innerHTML = "";
+      const sets = totalSets();
+
+      for(let s=0; s<sets; s++){
+        const start = s*SET_SIZE;
+        const end = start + SET_SIZE;
+        const filled = tiles.slice(start, end).filter(Boolean).length;
+        const readyN = tiles.slice(start, end).filter(t => t && t.ready).length;
+
+        const tab = document.createElement('button');
+        tab.type = "button";
+        tab.className = "tab";
+        tab.setAttribute("aria-selected", s===activeSet ? "true":"false");
+
+        const label = document.createElement('span');
+        label.textContent = `Set ${s+1}`;
+        tab.appendChild(label);
+
+        const meta = document.createElement('span');
+        meta.className = "mini " + ((filled>0 && readyN===filled) ? "ok" : "warn");
+        meta.textContent = filled===0 ? "0/6" : `${readyN}/${filled}`;
+        tab.appendChild(meta);
+
+        tab.addEventListener('click', ()=>{
+          activeSet = s;
+          const base = activeSet*SET_SIZE;
+          selectedIndex = clamp(selectedIndex, base, base+SET_SIZE-1);
+          renderAll();
+        });
+
+        tabsEl.appendChild(tab);
+      }
+    }
+
+    function buildGrid(){
+      gridEl.innerHTML = "";
+      const base = activeSet * SET_SIZE;
+
+      for(let i=0;i<SET_SIZE;i++){
+        const globalIndex = base + i;
+        const tile = getSlotTile(globalIndex);
+
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.className = "slot";
+        btn.dataset.index = String(globalIndex);
+        btn.setAttribute("aria-selected", globalIndex===selectedIndex ? "true":"false");
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 220;
+        canvas.height = 220;
+
+        const empty = document.createElement('div');
+        empty.className = "empty";
+        empty.innerHTML = `<div class="plus">+</div><div>Add photo</div>`;
+
+        const badge = document.createElement('div');
+        badge.className = "badge";
+        badge.innerHTML = `<span class="dot"></span><span>Review</span>`;
+
+        btn.appendChild(canvas);
+        btn.appendChild(empty);
+        btn.appendChild(badge);
+
+        btn.addEventListener('click', ()=>{
+          selectedIndex = globalIndex;
+          setActiveSetBySelected();
+          renderAll();
+          if(!getSlotTile(selectedIndex)) replaceInput.click();
+        });
+
+        gridEl.appendChild(btn);
+
+        const ctx = canvas.getContext('2d');
+        renderTileToContext(tile, ctx, canvas.width, false);
+
+        if(tile && tile.img){
+          empty.style.display = "none";
+          badge.style.display = "flex";
+          badge.classList.toggle("ready", !!tile.ready);
+          badge.querySelector('span:last-child').textContent = tile.ready ? "Ready" : "Review";
+        } else {
+          empty.style.display = "flex";
+          badge.style.display = "none";
+        }
+      }
+    }
+
+    function refreshControls(){
+      const tile = getSlotTile(selectedIndex);
+      const has = !!tile;
+
+      selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
+
+      deleteBtn.disabled = !has;
+      rot90Btn.disabled = !has;
+      centerBtn.disabled = !has;
+
+      zoom.disabled = !has;
+      bw.disabled = !has;
+      whiteBleed.disabled = !has;
+
+      overlayText.disabled = !has;
+      textSize.disabled = !has;
+
+      if(!has){
+        zoom.value = "1";
+        zoomVal.textContent = "100%";
+        bw.checked = false;
+        whiteBleed.checked = false;
+        overlayText.value = "";
+        textLen.textContent = "0";
+        textSize.value = "28";
+        textSizeVal.textContent = "28px";
+        colorNameEl.textContent = "White";
+        updatePaletteSelection();
+        return;
+      }
+
+      tile.zoom = clamp(tile.zoom || 1, 1, 3);
+      clampOffsetsToKeepSafeCovered(tile);
+
+      zoom.min = "1";
+      zoom.max = "3";
+      zoom.value = String(tile.zoom);
+      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
+
+      bw.checked = !!tile.bw;
+      whiteBleed.checked = !!tile.whiteBleed;
+
+      overlayText.value = tile.text || "";
+      textLen.textContent = String((tile.text || "").length);
+
+      textSize.value = String(tile.textSize ?? 28);
+      textSizeVal.textContent = `${tile.textSize ?? 28}px`;
+
+      colorNameEl.textContent = tile.textColorName || "White";
+      updatePaletteSelection();
+    }
+
+    function renderPreview(){
+      const tile = getSlotTile(selectedIndex);
+      renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
+    }
+
+    function updateCounts(){
+      photoCountEl.textContent = String(tiles.length);
+      tileCountEl.textContent = String(shownCount);
+      readyCountEl.textContent = String(photosReadyCount());
+
+      const fullSets = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
+      ack.disabled = !fullSets;
+      if(!fullSets) ack.checked = false;
+
+      const canProceed = fullSets && allPhotosReady() && ack.checked;
+      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
+      orderStatus.className = canProceed ? "ok" : "warn";
+
+      if(tiles.length === 0){
+        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
+      } else if(!fullSets){
+        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
+      } else if(!allPhotosReady()){
+        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
+      } else if(!ack.checked){
+        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
+      } else {
+        orderDetail.textContent = "All tiles are ready and acknowledged.";
+      }
+    }
+
+    function renderAll(){
+      shownCount = computeShownCount(tiles.length);
+      activeSet = clamp(activeSet, 0, totalSets()-1);
+      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
+      setActiveSetBySelected();
+
+      buildTabs();
+      buildGrid();
+      refreshControls();
+      renderPreview();
+      updateCounts();
+    }
+
+    // Init UI
+    buildPaletteUI();
     renderAll();
   </script>
 </body>
