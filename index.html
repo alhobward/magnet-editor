@@ -6,1270 +6,1574 @@
   <title>Magnet Editor</title>
   <style>
     :root{
-      --bg:#0b0c10;
-      --text:#e9eef5;
-      --muted:rgba(233,238,245,.75);
-      --blue:#2a5cff;
-      --yellow:#ffd43b;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --shadow2: 0 18px 55px rgba(0,0,0,.45);
-      --radius:16px;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color: var(--text);
+      --bg:#0b0d12;
+      --panel:#121625;
+      --panel2:#0f1320;
+      --text:#e9ecf3;
+      --muted:#aab2c5;
+      --line:#232a43;
+      --accent:#6ea8ff;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+
+      /* Drawing space (px) */
+      --full: 600;    /* includes bleed */
+      --safe: 500;    /* 5cm print area */
+      --bleed: 50;    /* 5mm each side */
     }
+
     *{ box-sizing:border-box; }
     body{
-      margin:0; min-height:100vh;
-      background:
-        radial-gradient(1200px 600px at 20% -10%, rgba(42,92,255,.15), transparent 55%),
-        radial-gradient(900px 500px at 90% 10%, rgba(255,212,59,.10), transparent 60%),
-        var(--bg);
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: linear-gradient(180deg, #070911, var(--bg));
       color:var(--text);
     }
 
     header{
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      display:flex; align-items:center; justify-content:space-between;
-      backdrop-filter: blur(8px);
-      background: rgba(11,12,16,.55);
-      position: sticky; top: 0; z-index: 5;
-      gap: 10px;
-      flex-wrap: wrap;
+      position:sticky;
+      top:0;
+      z-index:10;
+      background: rgba(11,13,18,0.86);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
     }
-    header h1{ margin:0; font-size: 13px; font-weight:900; opacity:.95; }
-
-    .pill{
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 14px 18px;
+    }
+    .topbar{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    h1{
+      font-size:16px;
+      margin:0;
+      letter-spacing:0.2px;
+    }
+    .sub{
+      margin-top:2px;
       font-size:12px;
-      background: rgba(15,17,32,.55);
-      box-shadow: 0 10px 25px rgba(0,0,0,.18);
-      white-space: nowrap;
-    }
-    .hdrRight{ display:flex; flex-direction:column; gap:8px; min-width: 320px; }
-    .hdrTop{ display:flex; gap:8px; align-items:center; justify-content:flex-end; flex-wrap:wrap; }
-    .progressWrap{
-      width: 320px; max-width: 92vw; height: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(15,17,32,.55);
-      overflow:hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,.18) inset;
-    }
-    .progressBar{
-      height:100%; width:0%;
-      background: linear-gradient(90deg, rgba(255,212,59,1), rgba(42,92,255,.95));
-      transition: width .22s ease;
+      color:var(--muted);
     }
 
-    main{
+    .pillrow{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(18,22,37,0.7);
+      color:var(--text);
+      font-size:12px;
+      line-height:1;
+    }
+    button, input, select{ font: inherit; }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(18,22,37,0.7);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(110,168,255,0.35);
+      background: linear-gradient(180deg, rgba(110,168,255,0.28), rgba(18,22,37,0.7));
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+    .btn:disabled{
+      opacity:0.45;
+      cursor:not-allowed;
+    }
+
+    main .wrap{ padding-top: 12px; }
+
+    /* GRID + TABS */
+    .gridCard{
+      border:1px solid var(--line);
+      border-radius: 18px;
+      background: radial-gradient(1200px 500px at 10% 0%, rgba(110,168,255,0.12), transparent 60%),
+                  linear-gradient(180deg, rgba(18,22,37,0.88), rgba(15,19,32,0.88));
+      overflow:hidden;
+    }
+    .gridHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 12px 10px;
+      border-bottom:1px solid var(--line);
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .count{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .count b{ color:var(--text); font-weight:800; }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      padding: 10px 12px;
+      border-bottom:1px solid var(--line);
+      background: rgba(7,9,17,0.18);
+    }
+    .tab{
+      border:1px solid var(--line);
+      background: rgba(18,22,37,0.60);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:12px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tab[aria-selected="true"]{
+      border-color: rgba(110,168,255,0.9);
+      box-shadow: 0 0 0 3px rgba(110,168,255,0.12) inset;
+    }
+    .tab .mini{
+      font-weight:900;
+      color: rgba(233,236,243,0.92);
+    }
+    .tab .mini.ok{ color: rgba(52,211,153,0.95); }
+    .tab .mini.warn{ color: rgba(251,191,36,0.95); }
+
+    .thumbGrid{
       display:grid;
-      grid-template-columns: 360px 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
       padding: 12px;
+    }
+
+    .slot{
+      position:relative;
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(7,9,17,0.55);
+      overflow:hidden;
+      cursor:pointer;
+      aspect-ratio: 1 / 1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      padding:0;
+    }
+    .slot[aria-selected="true"]{
+      outline: 2px solid rgba(110,168,255,0.9);
+      outline-offset: 2px;
+    }
+    .slot canvas{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+    .slot .empty{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:10px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      pointer-events:none;
+    }
+    .slot .empty .plus{
+      width:36px; height:36px;
+      border-radius: 12px;
+      border:1px dashed rgba(170,178,197,0.45);
+      display:grid; place-items:center;
+      font-size:20px;
+      color: rgba(170,178,197,0.75);
+    }
+    .badge{
+      position:absolute;
+      left:8px; top:8px;
+      font-size:11px;
+      padding:6px 8px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(15,19,32,0.72);
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      gap:6px;
+      pointer-events:none;
+    }
+    .badge .dot{
+      width:8px; height:8px;
+      border-radius:99px;
+      background: var(--warn);
+      box-shadow: 0 0 0 3px rgba(251,191,36,0.15);
+    }
+    .badge.ready .dot{
+      background: var(--good);
+      box-shadow: 0 0 0 3px rgba(52,211,153,0.15);
+    }
+
+    /* BULK UPLOAD UNDER GRID */
+    .bulkRow{
+      padding: 12px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:space-between;
+    }
+    .bulkRow .left{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .bulkRow input[type="file"]{ display:none; }
+    .note{
+      color: var(--muted);
+      font-size:12px;
+      max-width: 520px;
+    }
+    .toast{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px dashed rgba(170,178,197,0.25);
+      background: rgba(7,9,17,0.28);
+      color: var(--muted);
+      font-size:12px;
+    }
+    .toast strong{ color: var(--text); }
+
+    /* CONTROLS BELOW GRID */
+    .controls{
+      margin-top: 12px;
+      display:grid;
+      gap:12px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width:820px){
+      .controls{ grid-template-columns: 1.05fr 0.95fr; }
     }
 
     .panel{
-      background: linear-gradient(180deg, rgba(18,20,32,.95), rgba(18,20,32,.85));
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      padding: 12px;
-      box-shadow: var(--shadow);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18,22,37,0.88), rgba(15,19,32,0.88));
+      overflow:hidden;
     }
-
-    .right{
-      background: linear-gradient(180deg, rgba(18,20,32,.93), rgba(18,20,32,.84));
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
+    .panel h2{
+      margin:0;
+      padding:12px 12px 10px;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+      letter-spacing:0.2px;
+    }
+    .panel .body{
       padding:12px;
-      box-shadow: var(--shadow);
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-height: 520px;
+      display:grid;
+      gap:12px;
     }
 
-    h2{ margin:0 0 10px; font-size:12px; font-weight:950; opacity:.9; }
-    .muted{ font-size:12px; color: var(--muted); line-height:1.35; }
-    .k{ font-size:12px; opacity:.82; }
-
-    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .row + .row{ margin-top:10px; }
-    .twoCol{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
-    button, .btnLike{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(15,17,32,.9);
-      color: var(--text);
-      padding:10px 12px;
-      border-radius: 12px;
-      cursor:pointer;
-      font-weight:950;
+    .previewWrap{
+      border:1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(7,9,17,0.55);
+      overflow:hidden;
+      position:relative;
+    }
+    #preview{
+      width:100%;
+      height:auto;
+      display:block;
+      touch-action:none; /* required for pinch/drag */
+    }
+    .previewHelp{
+      position:absolute;
+      left:10px; right:10px; bottom:10px;
       font-size:12px;
-      transition: transform .12s ease, filter .12s ease, border-color .12s ease, box-shadow .12s ease;
-      display:inline-flex;
+      color: rgba(170,178,197,0.92);
+      background: rgba(15,19,32,0.65);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 10px;
+      border-radius: 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
       align-items:center;
-      justify-content:center;
+    }
+    .previewHelp span{ color: rgba(233,236,243,0.92); }
+
+    .row{
+      display:grid;
       gap:8px;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
     }
-    button:hover, .btnLike:hover{ border-color: rgba(255,255,255,.22); filter: brightness(1.03); transform: translateY(-1px); }
-    button:active, .btnLike:active{ transform: translateY(0); filter: brightness(.98); }
-    button:disabled{ opacity:.45; cursor:not-allowed; transform:none; filter:none; box-shadow:none; }
+    .row label{
+      font-size:12px;
+      color: var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .row label b{
+      color: var(--text);
+      font-weight:800;
+      font-size:12px;
+    }
+    .range{ width:100%; }
 
-    button.primary{
-      background: linear-gradient(180deg, rgba(42,92,255,1), rgba(42,92,255,.82));
-      border-color: rgba(42,92,255,.85);
-      box-shadow: 0 10px 25px rgba(42,92,255,.25);
+    .toggleRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
     }
-    .upload{
-      background: linear-gradient(180deg, rgba(255,212,59,1), rgba(255,212,59,.88));
-      border-color: rgba(255,212,59,.95);
-      color:#0b0c10;
-      box-shadow: 0 10px 25px rgba(255,212,59,.16);
-    }
-    button.danger{
-      background: linear-gradient(180deg, rgba(64,18,34,.9), rgba(42,20,32,.9));
-      border-color: rgba(255,80,120,.35);
-    }
-    button.ghost{ background: transparent; }
-
-    hr{ border:0; border-top:1px solid rgba(255,255,255,.08); margin:12px 0; }
-
-    input[type="text"]{
-      width: 100%;
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
       padding:10px 12px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(15,17,32,.9);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(7,9,17,0.35);
+      min-width: 220px;
+    }
+    .toggle input{ transform: scale(1.2); }
+    .toggle .tmeta{
+      display:grid;
+      gap:2px;
+    }
+    .toggle .tmeta .t1{ font-size:12px; font-weight:900; }
+    .toggle .tmeta .t2{ font-size:12px; color:var(--muted); }
+
+    .textInput{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(7,9,17,0.35);
       color: var(--text);
       outline:none;
     }
-    input[type="range"]{ width: 100%; }
 
-    .seg{ display:flex; gap:8px; flex-wrap:wrap; }
-    .seg button{ padding:8px 10px; border-radius:999px; }
-    .seg button.active{
-      background: rgba(26,34,58,.9);
-      border-color: rgba(255,255,255,.24);
-    }
-
-    .nav{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .tile{
-      background: linear-gradient(180deg, rgba(15,17,32,.95), rgba(12,14,24,.95));
-      border: 1.5px solid rgba(255,212,59,.78);
-      border-radius: 16px;
-      padding:10px;
-      cursor:pointer;
+    .palette{
       display:flex;
-      flex-direction:column;
-      gap:10px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.22);
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
     }
-    .tile:hover{ transform: translateY(-2px); border-color: rgba(255,212,59,.98); box-shadow: 0 18px 38px rgba(0,0,0,.35); }
-    .tile.active{ border-color: rgba(255,212,59,1); box-shadow: 0 18px 42px rgba(0,0,0,.38); }
-
-    .thumb{
-      width:100%;
-      aspect-ratio: 1/1;
-      border-radius:14px;
-      background: rgba(11,12,16,1);
-      border: 1px solid rgba(255,212,59,.50);
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden;
+    .swatch{
+      width:34px; height:34px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,0.16);
+      cursor:pointer;
+      position:relative;
+      background: var(--c);
     }
-    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-    .meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .badge{
-      font-size: 11px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(15,17,32,.65);
-      font-weight: 950;
-      white-space: nowrap;
+    .swatch[aria-selected="true"]{
+      outline: 2px solid rgba(110,168,255,0.95);
+      outline-offset: 2px;
     }
-    .badge.empty{ opacity:.82; }
-    .badge.review{ border-color: rgba(255,210,138,.55); color: #ffd28a; }
-    .badge.ready{ border-color: rgba(120,255,190,.35); color: #a9ffd4; }
-
-    .canvasWrap{
-      background: linear-gradient(180deg, rgba(11,12,16,1), rgba(6,7,10,1));
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      padding: 12px;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow: var(--shadow2);
-    }
-    canvas{
-      width: min(560px, 100%);
-      height: auto;
-      border-radius: 14px;
-      background: #05060a;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 35px rgba(0,0,0,.38);
-      touch-action: none;
-    }
-
-    .checkrow{ display:flex; gap:10px; align-items:flex-start; }
-    .checkrow input{ transform: translateY(2px); }
-    .hint{ font-size:12px; opacity:.78; margin-top:6px; }
-    .warn{ font-size:12px; color:#ffd28a; opacity:.95; }
-    .ok{ font-size:12px; color:#a9ffd4; opacity:.95; }
-
-    /* ✅ Hide file inputs WITHOUT display:none (better on mobile) */
-    .fileHidden{
+    .swatch::after{
+      content:"";
       position:absolute;
-      left:-9999px;
-      width:1px;
-      height:1px;
-      opacity:0;
+      inset:0;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.25);
       pointer-events:none;
     }
 
-    @media (max-width: 980px){
-      main{ grid-template-columns: 1fr; }
-      .hdrRight{ min-width: unset; width: 100%; }
-      .progressWrap{ width: 100%; max-width: 100%; }
-      .hdrTop{ justify-content:space-between; }
+    .statusLine{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      border:1px dashed rgba(170,178,197,0.25);
+      border-radius: 14px;
+      background: rgba(7,9,17,0.28);
+      color: var(--muted);
+      font-size:12px;
     }
+    .statusLine strong{ color:var(--text); }
+    .ok{ color: rgba(52,211,153,0.95); font-weight:900; }
+    .warn{ color: rgba(251,191,36,0.95); font-weight:900; }
+    .bad{ color: rgba(251,113,133,0.95); font-weight:900; }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      padding-top:2px;
+    }
+
+    footer{
+      padding: 18px 14px 26px;
+      color: var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    code{ color: rgba(233,236,243,0.92); }
   </style>
 </head>
 <body>
-<header>
-  <h1>Magnet Editor (50×50mm required • bleed may be blank)</h1>
-
-  <div class="hdrRight">
-    <div class="hdrTop">
-      <span class="pill" id="qtyPill">Order Quantity: 6</span>
-      <span class="pill" id="progressPill">0/6 complete</span>
-      <button class="primary" id="toGridBtn" type="button">Grid</button>
-    </div>
-    <div class="progressWrap">
-      <div class="progressBar" id="progressBar"></div>
-    </div>
-  </div>
-</header>
-
-<main>
-  <section class="panel">
-    <h2>Order</h2>
-    <div class="row">
-      <div class="k">Quantity (multiples of 6, max 72)</div>
-      <div class="seg" id="qtyButtons"></div>
-    </div>
-
-    <div class="row">
-      <!-- ✅ Label triggers bulk input directly (most reliable on mobile) -->
-      <label for="bulkFileInput" class="btnLike upload">Upload photos (bulk)</label>
-
-      <input id="bulkFileInput" class="fileHidden" type="file" accept="image/*" multiple />
-      <input id="tileFileInput" class="fileHidden" type="file" accept="image/*" />
-    </div>
-    <div class="muted">Tip: on mobile, you can upload single photos by tapping an empty square.</div>
-
-    <hr>
-
-    <h2>Review & print readiness</h2>
-    <div class="row twoCol">
-      <button id="reviewNextBtn" type="button">Review next needed</button>
-      <button id="reviewSummaryBtn" type="button">Show summary</button>
-    </div>
-
-    <div class="checkrow">
-      <input id="finalConfirm" type="checkbox" />
-      <div>
-        <label for="finalConfirm" class="k">I’ve reviewed all magnets and they’re ready to print</label>
-        <div class="hint" id="confirmHint">Uploads must be complete (no empty magnets) to enable A4/A3.</div>
-        <div class="hint" id="confirmStatus"></div>
-      </div>
-    </div>
-
-    <hr>
-
-    <h2>Downloads</h2>
-    <div class="row">
-      <button id="dlMagnetBtn" type="button">Download current magnet (1200×1200 PNG)</button>
-    </div>
-    <div class="row twoCol">
-      <button id="dlA4Btn" type="button">Download A4 sheet (6-up)</button>
-      <button id="dlA3Btn" type="button">Download A3 sheet (12-up)</button>
-    </div>
-    <div class="muted">A4/A3 downloads require: (1) no empty magnets, (2) the confirmation box ticked.</div>
-
-    <hr>
-
-    <div id="editorControls" style="display:none">
-      <h2>Editor</h2>
-
-      <div class="row">
-        <input type="file" id="fileInput" accept="image/*" />
-      </div>
-
-      <div class="row twoCol">
-        <button id="clearPhotoBtn" class="danger" type="button">Clear photo</button>
-        <button id="guidesBtn" type="button">Guides: On</button>
-      </div>
-
-      <div class="row twoCol">
-        <button id="prevBtn" type="button">◀ Prev</button>
-        <button id="nextBtn" type="button">Next ▶</button>
-      </div>
-
-      <div class="row">
-        <label class="k">Zoom (pinch on mobile also works)</label>
-        <input type="range" id="zoom" min="1" max="3" value="1" step="0.01" />
-      </div>
-
-      <div class="row twoCol">
-        <button id="bwBtn" type="button">B&W: Off</button>
-        <button id="textColorBtn" type="button">Text: Black</button>
-      </div>
-
-      <div class="row">
-        <label class="k">Text (optional, max 25 chars)</label>
-        <input type="text" id="textInput" maxlength="25" placeholder="e.g., Seoul 2026" />
-        <div class="row" style="width:100%; justify-content:space-between;">
-          <span class="k" id="charCount">0/25</span>
-          <span class="k">Drag text on canvas</span>
+  <header>
+    <div class="wrap">
+      <div class="topbar">
+        <div>
+          <h1>Magnet Editor</h1>
+          <div class="sub">5cm × 5cm • 5mm bleed (can be blank/white) • orders in sets of 6 (max 72)</div>
+        </div>
+        <div class="pillrow">
+          <button class="btn ghost" id="clearAll">Clear all</button>
         </div>
       </div>
-
-      <div class="row">
-        <button class="danger" id="deleteTextBtn" type="button" disabled>Delete text</button>
-      </div>
-
-      <div class="row">
-        <button id="backToGridBtn" class="ghost" type="button">← Back to grid</button>
-      </div>
-
-      <div class="muted">
-        Mobile gestures: <b>one-finger drag</b> to move photo, <b>two-finger pinch</b> to zoom.
-      </div>
     </div>
-  </section>
+  </header>
 
-  <section class="right">
-    <div class="nav">
-      <div class="seg" id="setButtons"></div>
-      <span class="k" id="viewLabel">Grid</span>
+  <main>
+    <div class="wrap">
+
+      <!-- GRID TOP -->
+      <section class="gridCard" aria-label="Magnet grid">
+        <div class="gridHeader">
+          <div class="count">
+            <span>Photos: <b id="photoCount">0</b></span>
+            <span>Tiles shown: <b id="tileCount">6</b></span>
+            <span>Ready: <b id="readyCount">0</b></span>
+          </div>
+          <div class="hint">Tap a tile to edit. Pinch to zoom. Drag to position.</div>
+        </div>
+
+        <div class="tabs" id="tabs" aria-label="Sets (6 per tab)"></div>
+
+        <div class="thumbGrid" id="thumbGrid"></div>
+
+        <!-- BULK UPLOAD directly under grid -->
+        <div class="bulkRow">
+          <div class="left">
+            <input id="bulkInput" type="file" accept="image/*" multiple />
+            <button class="btn primary" id="bulkBtn">Bulk upload photos</button>
+
+            <button class="btn" id="replaceBtn" disabled>Replace selected</button>
+            <input id="replaceInput" type="file" accept="image/*" />
+          </div>
+          <div class="note">
+            Uploads expand sets automatically (up to 72). If more than 72 are uploaded, extras are skipped.
+          </div>
+
+          <div class="toast" id="toast" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- CONTROLS BELOW GRID -->
+      <section class="controls" aria-label="Editing controls">
+
+        <div class="panel">
+          <h2>Preview & crop</h2>
+          <div class="body">
+            <div class="previewWrap">
+              <canvas id="preview" width="600" height="600" aria-label="Magnet preview"></canvas>
+              <div class="previewHelp">
+                <div>Selected: <span id="selectedLabel">Tile 1</span></div>
+                <div style="opacity:0.9">Pinch = zoom • Drag = move • Rotate 90° if needed</div>
+              </div>
+            </div>
+
+            <div class="toggleRow">
+              <button class="btn" id="rot90" disabled>Rotate 90°</button>
+              <button class="btn ghost" id="centerImg" disabled>Center</button>
+            </div>
+
+            <div class="row">
+              <label>
+                <span>Zoom</span>
+                <b id="zoomVal">100%</b>
+              </label>
+              <input class="range" id="zoom" type="range" min="1" max="3" step="0.01" value="1" disabled />
+            </div>
+
+            <div class="toggleRow">
+              <div class="toggle">
+                <input id="bw" type="checkbox" disabled />
+                <div class="tmeta">
+                  <div class="t1">Black &amp; White</div>
+                  <div class="t2">Applies to tile + thumbnail</div>
+                </div>
+              </div>
+
+              <div class="toggle">
+                <input id="whiteBleed" type="checkbox" disabled />
+                <div class="tmeta">
+                  <div class="t1">White/blank bleed</div>
+                  <div class="t2">Image only in 5×5 area</div>
+                </div>
+              </div>
+
+              <div class="toggle">
+                <input id="showGuides" type="checkbox" checked />
+                <div class="tmeta">
+                  <div class="t1">Show guides</div>
+                  <div class="t2">Safe area + bleed</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Text & review</h2>
+          <div class="body">
+            <div class="row">
+              <label>
+                <span>Overlay text (optional)</span>
+                <b id="textLen">0</b>
+              </label>
+              <input id="overlayText" class="textInput" type="text" placeholder="Optional text" maxlength="40" disabled />
+            </div>
+
+            <div class="row">
+              <label>
+                <span>Text color</span>
+                <b id="colorName">White</b>
+              </label>
+              <div class="palette" id="palette" aria-label="Text color palette"></div>
+              <div style="font-size:12px;color:var(--muted);">All colors use a black shadow for readability.</div>
+            </div>
+
+            <div class="row">
+              <label>
+                <span>Text size</span>
+                <b id="textSizeVal">28px</b>
+              </label>
+              <input class="range" id="textSize" type="range" min="16" max="56" step="1" value="28" disabled />
+            </div>
+
+            <div class="row">
+              <label>
+                <span>Text vertical position</span>
+                <b id="textYVal">82%</b>
+              </label>
+              <input class="range" id="textY" type="range" min="55" max="95" step="1" value="82" disabled />
+            </div>
+
+            <div class="statusLine" id="statusLine">
+              <div>
+                <strong>Order status:</strong>
+                <span id="orderStatus" class="warn">Not ready</span>
+              </div>
+              <div>
+                <span id="orderDetail">Upload photos and edit each one. Then tick the acknowledgement.</span>
+              </div>
+            </div>
+
+            <div class="toggleRow">
+              <div class="toggle" style="min-width:100%;">
+                <input id="ack" type="checkbox" />
+                <div class="tmeta">
+                  <div class="t1">I acknowledge I have reviewed and edited all magnets</div>
+                  <div class="t2">Required before order can proceed</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn" id="deleteTile" disabled>Delete selected</button>
+              <button class="btn ghost" id="nextTile">Next</button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <footer>
+        This editor is customer-facing only. No download/print buttons are shown.
+      </footer>
     </div>
+  </main>
 
-    <div id="gridView">
-      <div class="grid" id="grid"></div>
-      <div class="row" style="margin-top:12px;">
-        <span class="warn" id="lowResWarn" style="display:none;">One or more photos may be low resolution for printing.</span>
-      </div>
-    </div>
+  <script>
+    // ---------------------------
+    // Config
+    // ---------------------------
+    const MAX_TILES = 72;
+    const SET_SIZE = 6;
 
-    <div id="editorView" style="display:none">
-      <div class="canvasWrap">
-        <canvas id="canvas" width="800" height="800"></canvas>
-      </div>
-    </div>
-  </section>
-</main>
-
-<script>
-(() => {
-  // Geometry
-  const CANVAS_SIZE = 800;
-  const VISIBLE_MM = 50;
-  const BLEED_MM = 5;
-  const TOTAL_MM = VISIBLE_MM + BLEED_MM*2; // 60
-  const VISIBLE_RATIO = VISIBLE_MM / TOTAL_MM; // 50/60
-  const VISIBLE_MARGIN_RATIO = (1 - VISIBLE_RATIO) / 2;
-
-  const VISIBLE_RECT = {
-    x: CANVAS_SIZE * VISIBLE_MARGIN_RATIO,
-    y: CANVAS_SIZE * VISIBLE_MARGIN_RATIO,
-    w: CANVAS_SIZE * VISIBLE_RATIO,
-    h: CANVAS_SIZE * VISIBLE_RATIO
-  };
-
-  const MAGNET_PRINT_PX = 1200;
-  const MAX_QTY = 72;
-
-  const A4 = { w: 2480, h: 3508 };
-  const A3 = { w: 3508, h: 4961 };
-  const MAGNET_ON_SHEET_PX = 709;
-
-  // DOM
-  const qtyButtons = document.getElementById('qtyButtons');
-  const setButtons = document.getElementById('setButtons');
-  const grid = document.getElementById('grid');
-  const gridView = document.getElementById('gridView');
-  const editorView = document.getElementById('editorView');
-  const editorControls = document.getElementById('editorControls');
-  const viewLabel = document.getElementById('viewLabel');
-
-  const qtyPill = document.getElementById('qtyPill');
-  const progressPill = document.getElementById('progressPill');
-  const progressBar = document.getElementById('progressBar');
-  const lowResWarn = document.getElementById('lowResWarn');
-
-  const bulkFileInput = document.getElementById('bulkFileInput');
-  const tileFileInput = document.getElementById('tileFileInput');
-  const fileInput = document.getElementById('fileInput');
-
-  const finalConfirm = document.getElementById('finalConfirm');
-  const confirmHint = document.getElementById('confirmHint');
-  const confirmStatus = document.getElementById('confirmStatus');
-  const reviewNextBtn = document.getElementById('reviewNextBtn');
-  const reviewSummaryBtn = document.getElementById('reviewSummaryBtn');
-
-  const dlMagnetBtn = document.getElementById('dlMagnetBtn');
-  const dlA4Btn = document.getElementById('dlA4Btn');
-  const dlA3Btn = document.getElementById('dlA3Btn');
-
-  const guidesBtn = document.getElementById('guidesBtn');
-  const clearPhotoBtn = document.getElementById('clearPhotoBtn');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const backToGridBtn = document.getElementById('backToGridBtn');
-  const toGridBtn = document.getElementById('toGridBtn');
-
-  const zoomEl = document.getElementById('zoom');
-  const bwBtn = document.getElementById('bwBtn');
-
-  const textInput = document.getElementById('textInput');
-  const charCount = document.getElementById('charCount');
-  const textColorBtn = document.getElementById('textColorBtn');
-  const deleteTextBtn = document.getElementById('deleteTextBtn');
-
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-
-  // State
-  let quantity = 6;
-  let setIndex = 0;
-  let activeIndex = 0;
-  let showGuides = true;
-  let mode = 'grid';
-  let items = [];
-  let tileUploadTargetIndex = null;
-
-  // Helpers
-  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
-  const ceilToMultiple = (n,m)=>Math.ceil(n/m)*m;
-
-  function newItem(){
-    return {
-      img:null,
-      grayCanvas:null,
-      src:null, w:0, h:0,
-      x:0, y:0, scale:1,
-      bw:false,
-      reviewed:false,
-      lowRes:false,
-      hasText:false,
-      text:"",
-      textX: CANVAS_SIZE/2,
-      textY: CANVAS_SIZE*0.84,
-      textColor: "black"
+    const MAG = {
+      full: 600,
+      safe: 500,
+      bleed: 50
     };
-  }
 
-  function initItems(qty){ items = Array.from({length:qty}, ()=>newItem()); }
+    // Text palette (fixed presets)
+    const TEXT_COLORS = [
+      { name: "White",  value: "#FFFFFF" },
+      { name: "Black",  value: "#111827" },
+      { name: "Red",    value: "#EF4444" },
+      { name: "Orange", value: "#F97316" },
+      { name: "Yellow", value: "#FBBF24" },
+      { name: "Green",  value: "#22C55E" },
+      { name: "Blue",   value: "#3B82F6" },
+      { name: "Purple", value: "#A855F7" },
+      { name: "Pink",   value: "#EC4899" },
+      { name: "Teal",   value: "#14B8A6" },
+    ];
 
-  function countComplete(){ return items.filter(it=>!!it.src).length; }
-  function countEmpty(){ return items.filter(it=>!it.src).length; }
-  function countNeedsReview(){ return items.filter(it=>!!it.src && !it.reviewed).length; }
-
-  function updateQtyUI(){ qtyPill.textContent = `Order Quantity: ${quantity}`; }
-
-  function updateProgress(){
-    const complete = countComplete();
-    progressPill.textContent = `${complete}/${quantity} complete`;
-    const pct = quantity ? Math.round((complete/quantity)*100) : 0;
-    progressBar.style.width = pct + "%";
-  }
-
-  function updateGatingUI(){
-    const confirmed = !!finalConfirm.checked;
-    const empties = countEmpty();
-    const needsReview = countNeedsReview();
-    const canPrintSheets = confirmed && empties === 0;
-
-    dlA4Btn.disabled = !canPrintSheets;
-    dlA3Btn.disabled = !canPrintSheets;
-
-    if (!confirmed) {
-      confirmHint.textContent = "Ticking this enables A4/A3 downloads (once all magnets have photos).";
-      confirmStatus.textContent = "";
-      confirmStatus.className = "hint";
-      return;
-    }
-    if (empties > 0) {
-      confirmHint.textContent = "Please fill all magnets before downloading A4/A3.";
-      confirmStatus.textContent = `Still empty: ${empties} magnet(s).`;
-      confirmStatus.className = "hint warn";
-      return;
-    }
-    if (needsReview > 0) {
-      confirmHint.textContent = "Downloads enabled. We recommend reviewing all magnets first.";
-      confirmStatus.textContent = `Not reviewed yet: ${needsReview} magnet(s).`;
-      confirmStatus.className = "hint warn";
-    } else {
-      confirmHint.textContent = "Downloads enabled. Everything looks ready.";
-      confirmStatus.textContent = "All magnets reviewed ✅";
-      confirmStatus.className = "hint ok";
-    }
-  }
-
-  function baseScaleForVisible(it){
-    if (!it.img) return 1;
-    return Math.max(VISIBLE_RECT.w/it.w, VISIBLE_RECT.h/it.h);
-  }
-
-  function clampToVisibleCoverage(it){
-    if (!it.img) return;
-    const base = baseScaleForVisible(it);
-    if (it.scale < base) it.scale = base;
-
-    const imgW = it.w * it.scale;
-    const imgH = it.h * it.scale;
-
-    const minX = VISIBLE_RECT.x + VISIBLE_RECT.w - imgW;
-    const maxX = VISIBLE_RECT.x;
-    const minY = VISIBLE_RECT.y + VISIBLE_RECT.h - imgH;
-    const maxY = VISIBLE_RECT.y;
-
-    it.x = clamp(it.x, minX, maxX);
-    it.y = clamp(it.y, minY, maxY);
-  }
-
-  function buildQtyButtons(){
-    qtyButtons.innerHTML = '';
-    for (let q=6; q<=MAX_QTY; q+=6){
-      const b=document.createElement('button');
-      b.type='button'; b.textContent=q;
-      if (q===quantity) b.classList.add('active');
-      b.onclick=()=>setQuantity(q,true);
-      qtyButtons.appendChild(b);
-    }
-  }
-
-  function buildSetButtons(){
-    setButtons.innerHTML='';
-    const setCount = Math.ceil(quantity/6);
-    for (let s=0; s<setCount; s++){
-      const b=document.createElement('button');
-      b.type='button'; b.textContent=`Set ${s+1}`;
-      if (s===setIndex) b.classList.add('active');
-      b.onclick=()=>{
-        setIndex=s;
-        buildSetButtons();
-        renderGrid();
-        if (mode==='edit'){
-          const start=setIndex*6;
-          openEditor(start);
-        }
+    // ---------------------------
+    // State
+    // ---------------------------
+    // We store tiles densely: no holes in the middle. Deleting shifts everything left.
+    // "Tiles shown" expands/shrinks to smallest multiple of 6 needed, min 6, max 72.
+    function newTile(){
+      return {
+        id: (crypto.randomUUID?.() || String(Math.random()).slice(2)),
+        img: null,
+        src: null,          // object URL
+        // transform
+        zoom: 1,
+        rot: 0,             // 0,90,180,270
+        offsetX: 0,         // px in MAG.full coordinate space
+        offsetY: 0,
+        // options
+        bw: false,
+        whiteBleed: false,
+        // text
+        text: "",
+        textColor: TEXT_COLORS[0].value,
+        textColorName: TEXT_COLORS[0].name,
+        textSize: 28,
+        textY: 82,
+        // review
+        ready: false
       };
-      setButtons.appendChild(b);
     }
-  }
 
-  function setMode(next){
-    mode=next;
-    if (mode==='grid'){
-      gridView.style.display='';
-      editorView.style.display='none';
-      editorControls.style.display='none';
-      viewLabel.textContent='Grid';
-    } else {
-      gridView.style.display='none';
-      editorView.style.display='';
-      editorControls.style.display='';
-      viewLabel.textContent=`Editing #${activeIndex+1}`;
-      syncControls();
-      draw();
+    let tiles = [];         // dense list of tiles with photos (and their edits)
+    let shownCount = 6;     // total tile slots currently displayed (multiple of 6)
+    let activeSet = 0;      // tab index (0-based)
+    let selectedIndex = 0;  // global index in the displayed slots [0..shownCount-1]
+
+    // ---------------------------
+    // DOM
+    // ---------------------------
+    const tabsEl = document.getElementById('tabs');
+    const gridEl = document.getElementById('thumbGrid');
+
+    const photoCountEl = document.getElementById('photoCount');
+    const tileCountEl = document.getElementById('tileCount');
+    const readyCountEl = document.getElementById('readyCount');
+
+    const bulkBtn = document.getElementById('bulkBtn');
+    const bulkInput = document.getElementById('bulkInput');
+    const replaceBtn = document.getElementById('replaceBtn');
+    const replaceInput = document.getElementById('replaceInput');
+    const clearAllBtn = document.getElementById('clearAll');
+
+    const toast = document.getElementById('toast');
+
+    const preview = document.getElementById('preview');
+    const pctx = preview.getContext('2d');
+
+    const selectedLabel = document.getElementById('selectedLabel');
+    const zoom = document.getElementById('zoom');
+    const zoomVal = document.getElementById('zoomVal');
+
+    const rot90Btn = document.getElementById('rot90');
+    const centerBtn = document.getElementById('centerImg');
+
+    const bw = document.getElementById('bw');
+    const whiteBleed = document.getElementById('whiteBleed');
+    const showGuides = document.getElementById('showGuides');
+
+    const overlayText = document.getElementById('overlayText');
+    const textLen = document.getElementById('textLen');
+    const textSize = document.getElementById('textSize');
+    const textSizeVal = document.getElementById('textSizeVal');
+    const textY = document.getElementById('textY');
+    const textYVal = document.getElementById('textYVal');
+
+    const paletteEl = document.getElementById('palette');
+    const colorNameEl = document.getElementById('colorName');
+
+    const ack = document.getElementById('ack');
+    const orderStatus = document.getElementById('orderStatus');
+    const orderDetail = document.getElementById('orderDetail');
+
+    const deleteBtn = document.getElementById('deleteTile');
+    const nextBtn = document.getElementById('nextTile');
+
+    // ---------------------------
+    // Utilities
+    // ---------------------------
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+    function revokeURL(tile){
+      if(tile?.src){
+        try{ URL.revokeObjectURL(tile.src); }catch(e){}
+      }
     }
-  }
 
-  function setQuantity(newQty, preserveExisting=true){
-    newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(newQty,6)));
-    if (newQty === quantity) return;
+    function loadImageFromFile(file){
+      return new Promise((resolve,reject)=>{
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = ()=> resolve({img, url});
+        img.onerror = (e)=> reject(e);
+        img.src = url;
+      });
+    }
 
-    const old = items;
-    quantity = newQty;
-    items = Array.from({length:quantity}, (_,i)=> (preserveExisting && i<old.length) ? old[i] : newItem());
+    function roundRect(ctx, x, y, w, h, r){
+      r = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.arcTo(x+w, y, x+w, y+h, r);
+      ctx.arcTo(x+w, y+h, x, y+h, r);
+      ctx.arcTo(x, y+h, x, y, r);
+      ctx.arcTo(x, y, x+w, y, r);
+      ctx.closePath();
+    }
 
-    if (activeIndex >= quantity) activeIndex = quantity-1;
-    const setCount = Math.ceil(quantity/6);
-    if (setIndex >= setCount) setIndex = setCount-1;
+    function computeShownCount(photoCount){
+      if(photoCount <= 0) return SET_SIZE;
+      const needed = Math.ceil(photoCount / SET_SIZE) * SET_SIZE;
+      return clamp(needed, SET_SIZE, MAX_TILES);
+    }
 
-    buildQtyButtons();
-    buildSetButtons();
-    renderGrid();
-    updateQtyUI();
-    updateProgress();
-    updateGatingUI();
-  }
+    function getSlotTile(globalIndex){
+      // If this slot has a photo (tile exists), return it; else return null (empty slot)
+      return tiles[globalIndex] || null;
+    }
 
-  function getBadgeInfo(it){
-    if (!it.src) return {text:"Empty", cls:"empty"};
-    if (!it.reviewed) return {text:"Review", cls:"review"};
-    return {text:"Ready", cls:"ready"};
-  }
+    function setActiveSetBySelected(){
+      activeSet = Math.floor(selectedIndex / SET_SIZE);
+    }
 
-  function renderPreviewDataURL(index, size=320){
-    const it = items[index];
-    if (!it.img) return '';
-    const off=document.createElement('canvas');
-    off.width=size; off.height=size;
-    const o=off.getContext('2d');
-    o.imageSmoothingEnabled=true;
-    o.imageSmoothingQuality="high";
-    o.fillStyle='#05060a';
-    o.fillRect(0,0,size,size);
+    function totalSets(){
+      return shownCount / SET_SIZE;
+    }
 
-    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
+    function photosReadyCount(){
+      return tiles.reduce((n,t)=> n + (t.ready ? 1 : 0), 0);
+    }
 
-    const sx = it.x / CANVAS_SIZE * size;
-    const sy = it.y / CANVAS_SIZE * size;
-    const sw = (it.w*it.scale)/CANVAS_SIZE * size;
-    const sh = (it.h*it.scale)/CANVAS_SIZE * size;
+    function allPhotosReady(){
+      if(tiles.length === 0) return false;
+      return tiles.every(t => t.ready);
+    }
 
-    if (srcCanvas) o.drawImage(srcCanvas, sx, sy, sw, sh);
-    else o.drawImage(it.img, sx, sy, sw, sh);
+    function showToast(msg){
+      toast.style.display = "block";
+      toast.innerHTML = msg;
+      window.clearTimeout(showToast._t);
+      showToast._t = window.setTimeout(()=>{
+        toast.style.display = "none";
+        toast.textContent = "";
+      }, 4500);
+    }
 
-    return off.toDataURL('image/png');
-  }
+    // ---------------------------
+    // Rendering (canvas)
+    // ---------------------------
+    function requiredRectFor(tile){
+      // If whiteBleed: safe area must be covered; bleed may be blank
+      // Else: full area must be covered
+      if(tile?.whiteBleed){
+        return { x: MAG.bleed, y: MAG.bleed, w: MAG.safe, h: MAG.safe };
+      }
+      return { x: 0, y: 0, w: MAG.full, h: MAG.full };
+    }
 
-  function renderGrid(){
-    grid.innerHTML='';
-    const start=setIndex*6;
-    const end=Math.min(start+6, quantity);
-    let anyLowRes=false;
+    function minZoomToCover(tile){
+      if(!tile?.img) return 1;
 
-    for (let i=start; i<end; i++){
-      const it=items[i];
-      const tile=document.createElement('div');
-      tile.className='tile' + ((mode==='edit' && i===activeIndex) ? ' active' : '');
-      tile.onclick=()=>{
-        if (!it.src){
-          tileUploadTargetIndex=i;
-          tileFileInput.value='';
-          tileFileInput.click(); // works because input is not display:none
-        } else openEditor(i);
-      };
+      const rect = requiredRectFor(tile);
+      const iw = tile.img.naturalWidth;
+      const ih = tile.img.naturalHeight;
 
-      const thumb=document.createElement('div');
-      thumb.className='thumb';
+      // Rotation is only multiples of 90 -> swap dims if 90/270
+      const r = ((tile.rot % 360) + 360) % 360;
+      const swapped = (r === 90 || r === 270);
+      const rw = swapped ? ih : iw;
+      const rh = swapped ? iw : ih;
 
-      if (it.src){
-        const imgEl=document.createElement('img');
-        imgEl.src=renderPreviewDataURL(i, 320);
-        thumb.appendChild(imgEl);
-      } else {
-        const ph=document.createElement('div');
-        ph.className='muted';
-        ph.style.textAlign='center';
-        ph.innerHTML='Tap to upload<br>(+ add photo)';
-        thumb.appendChild(ph);
+      // Need cover (cover scale)
+      const cover = Math.max(rect.w / rw, rect.h / rh);
+      // Our renderer draws using cover * zoom, where zoom>=1 means "extra beyond cover"
+      return 1; // base zoom of 1 already equals cover. But we clamp zoom >=1 always.
+    }
+
+    function clampOffsetsToCover(tile){
+      if(!tile?.img) return;
+
+      const rect = requiredRectFor(tile);
+      const iw0 = tile.img.naturalWidth;
+      const ih0 = tile.img.naturalHeight;
+
+      const r = ((tile.rot % 360) + 360) % 360;
+      const swapped = (r === 90 || r === 270);
+      const iw = swapped ? ih0 : iw0;
+      const ih = swapped ? iw0 : ih0;
+
+      const cover = Math.max(rect.w / iw, rect.h / ih);
+      const scale = cover * tile.zoom;
+
+      const halfW = (iw * scale) / 2;
+      const halfH = (ih * scale) / 2;
+
+      const reqHalfW = rect.w / 2;
+      const reqHalfH = rect.h / 2;
+
+      // Ensure scale covers required rect (should, because cover computed)
+      // Clamp offsets so required rect stays within image bounds
+      const maxX = Math.max(0, halfW - reqHalfW);
+      const maxY = Math.max(0, halfH - reqHalfH);
+
+      tile.offsetX = clamp(tile.offsetX, -maxX, maxX);
+      tile.offsetY = clamp(tile.offsetY, -maxY, maxY);
+    }
+
+    function renderTileToContext(tile, ctx, size, withGuides){
+      const W = size, H = size;
+      ctx.clearRect(0,0,W,H);
+
+      // white background always (bleed can be blank/white)
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0,0,W,H);
+
+      if(!tile || !tile.img){
+        if(withGuides) drawGuides(ctx, W);
+        return;
       }
 
-      const meta=document.createElement('div');
-      meta.className='meta';
+      const scaleFactor = W / MAG.full;
+      const rect = requiredRectFor(tile);
 
-      const left=document.createElement('div');
-      left.className='k';
-      left.textContent=`#${i+1}`;
+      const rectX = rect.x * scaleFactor;
+      const rectY = rect.y * scaleFactor;
+      const rectW = rect.w * scaleFactor;
+      const rectH = rect.h * scaleFactor;
 
-      const badge=document.createElement('div');
-      const b=getBadgeInfo(it);
-      badge.className=`badge ${b.cls}`;
-      badge.textContent=b.text;
-
-      meta.appendChild(left);
-      meta.appendChild(badge);
-
-      if (it.lowRes) anyLowRes=true;
-
-      tile.appendChild(thumb);
-      tile.appendChild(meta);
-      grid.appendChild(tile);
-    }
-
-    lowResWarn.style.display = anyLowRes ? 'block' : 'none';
-  }
-
-  function fileToDataURL(file){
-    return new Promise((resolve,reject)=>{
-      const r=new FileReader();
-      r.onload=()=>resolve(r.result);
-      r.onerror=reject;
-      r.readAsDataURL(file);
-    });
-  }
-
-  function loadImageFromURL(url){
-    return new Promise((resolve,reject)=>{
-      const img=new Image();
-      img.onload=()=>resolve(img);
-      img.onerror=reject;
-      img.src=url;
-    });
-  }
-
-  function buildGrayscaleCanvas(img){
-    const c = document.createElement('canvas');
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    c.width = w; c.height = h;
-    const g = c.getContext('2d', { willReadFrequently: true });
-    g.drawImage(img, 0, 0, w, h);
-    const data = g.getImageData(0, 0, w, h);
-    const d = data.data;
-    for (let i=0; i<d.length; i+=4){
-      const r=d[i], gg=d[i+1], b=d[i+2];
-      const y = (0.2126*r + 0.7152*gg + 0.0722*b) | 0;
-      d[i]=d[i+1]=d[i+2]=y;
-    }
-    g.putImageData(data, 0, 0);
-    return c;
-  }
-
-  function setImageForIndex(i, img, src){
-    const it=items[i];
-    it.img=img; it.src=src;
-    it.grayCanvas = buildGrayscaleCanvas(img);
-    it.w=img.naturalWidth; it.h=img.naturalHeight;
-
-    const base=baseScaleForVisible(it);
-    it.scale=base;
-
-    const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
-    const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
-    it.x = cx - (it.w*it.scale)/2;
-    it.y = cy - (it.h*it.scale)/2;
-
-    it.reviewed=false;
-    it.lowRes = (Math.min(it.w, it.h) < 1200);
-
-    clampToVisibleCoverage(it);
-
-    updateProgress();
-    updateGatingUI();
-    renderGrid();
-    if (mode==='edit' && activeIndex===i){
-      syncControls();
-      draw();
-    }
-  }
-
-  function syncControls(){
-    const it=items[activeIndex];
-    guidesBtn.textContent = `Guides: ${showGuides ? 'On' : 'Off'}`;
-    bwBtn.textContent = `B&W: ${it.bw ? 'On' : 'Off'}`;
-
-    if (it.img){
-      const base=baseScaleForVisible(it);
-      const ratio=it.scale/base;
-      zoomEl.value=String(clamp(ratio,1,3));
-    } else zoomEl.value='1';
-
-    textInput.value = it.hasText ? it.text : '';
-    charCount.textContent = `${(textInput.value||'').length}/25`;
-    textColorBtn.textContent = (it.textColor === 'black') ? 'Text: Black' : 'Text: White + Shadow';
-    deleteTextBtn.disabled = !it.hasText;
-
-    fileInput.value='';
-  }
-
-  function draw(){
-    const it=items[activeIndex];
-    ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
-
-    ctx.fillStyle='#05060a';
-    ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
-
-    if (!it.img){
-      ctx.fillStyle='rgba(233,238,245,.85)';
-      ctx.font='900 16px system-ui';
-      ctx.textAlign='center';
-      ctx.fillText('Upload a photo to begin', CANVAS_SIZE/2, CANVAS_SIZE/2);
-      return;
-    }
-
-    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
-    if (srcCanvas) ctx.drawImage(srcCanvas, it.x, it.y, it.w*it.scale, it.h*it.scale);
-    else ctx.drawImage(it.img, it.x, it.y, it.w*it.scale, it.h*it.scale);
-
-    if (it.hasText && it.text){
+      // Clip: either required rect (if whiteBleed) or full
       ctx.save();
-      ctx.font = '900 42px system-ui';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.beginPath();
+      ctx.rect(rectX, rectY, rectW, rectH);
+      ctx.clip();
 
-      if (it.textColor === 'whiteShadow'){
-        ctx.fillStyle = 'rgba(0,0,0,.55)';
-        ctx.fillText(it.text, it.textX+2, it.textY+2);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(it.text, it.textX, it.textY);
+      // Compute cover scale (rotation multiples of 90)
+      const iw0 = tile.img.naturalWidth;
+      const ih0 = tile.img.naturalHeight;
+      const rot = ((tile.rot % 360) + 360) % 360;
+      const swapped = (rot === 90 || rot === 270);
+      const rw = swapped ? ih0 : iw0;
+      const rh = swapped ? iw0 : ih0;
+
+      const cover = Math.max(rectW / rw, rectH / rh);
+      const scale = cover * tile.zoom;
+
+      // Center point of required rect + user offsets
+      const cx = rectX + rectW/2 + (tile.offsetX * scaleFactor);
+      const cy = rectY + rectH/2 + (tile.offsetY * scaleFactor);
+
+      ctx.translate(cx, cy);
+      ctx.rotate(rot * Math.PI/180);
+
+      // grayscale
+      if(tile.bw){
+        try { ctx.filter = "grayscale(1)"; } catch(e){}
       } else {
-        ctx.fillStyle = '#000000';
-        ctx.fillText(it.text, it.textX, it.textY);
+        ctx.filter = "none";
       }
+
+      // draw original image (not swapped); rotation handles orientation
+      const drawW = iw0 * scale;
+      const drawH = ih0 * scale;
+      ctx.drawImage(tile.img, -drawW/2, -drawH/2, drawW, drawH);
+
+      ctx.filter = "none";
+      ctx.restore(); // remove clip
+      ctx.restore();
+
+      // Text overlay (anchored to safe area)
+      if(tile.text && tile.text.trim()){
+        const t = tile.text.trim();
+        const safeX = MAG.bleed * scaleFactor;
+        const safeY = MAG.bleed * scaleFactor;
+        const safe = MAG.safe * scaleFactor;
+
+        const sizePx = (tile.textSize || 28) * scaleFactor;
+        const yPct = clamp(tile.textY ?? 82, 55, 95);
+
+        const x = safeX + safe/2;
+        const y = safeY + (safe * (yPct/100));
+
+        ctx.save();
+        ctx.font = `900 ${Math.round(sizePx)}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Always black shadow
+        ctx.shadowColor = "rgba(0,0,0,0.85)";
+        ctx.shadowBlur = Math.max(2, 8 * scaleFactor);
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = Math.max(1, 3 * scaleFactor);
+
+        ctx.fillStyle = tile.textColor || "#FFFFFF";
+        ctx.fillText(t, x, y);
+
+        ctx.restore();
+      }
+
+      if(withGuides) drawGuides(ctx, W);
+    }
+
+    function drawGuides(ctx, W){
+      const s = W / MAG.full;
+      const bleed = MAG.bleed * s;
+      const safe = MAG.safe * s;
+
+      ctx.save();
+      // outer border
+      ctx.strokeStyle = "rgba(110,168,255,0.35)";
+      ctx.lineWidth = Math.max(1, 2*s);
+      roundRect(ctx, 0.5, 0.5, W-1, W-1, 18*s);
+      ctx.stroke();
+
+      // safe border dashed
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.setLineDash([6*s, 6*s]);
+      roundRect(ctx, bleed, bleed, safe, safe, 14*s);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // labels
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.font = `${Math.round(12*s)}px ui-sans-serif, system-ui`;
+      ctx.textAlign = "left";
+      ctx.fillText("bleed", 8*s, 16*s);
+
       ctx.restore();
     }
 
-    if (showGuides){
-      ctx.strokeStyle='rgba(255,255,255,.35)';
-      ctx.lineWidth=2;
-      ctx.strokeRect(2,2,CANVAS_SIZE-4,CANVAS_SIZE-4);
-
-      ctx.strokeStyle='rgba(255,210,138,.9)';
-      ctx.lineWidth=2;
-      ctx.setLineDash([8,6]);
-      ctx.strokeRect(VISIBLE_RECT.x, VISIBLE_RECT.y, VISIBLE_RECT.w, VISIBLE_RECT.h);
-      ctx.setLineDash([]);
-    }
-  }
-
-  function findNextNeededIndex(){
-    const start=setIndex*6;
-    const end=Math.min(start+6, quantity);
-    for (let i=start;i<end;i++) if (!items[i].src) return i;
-    for (let i=start;i<end;i++) if (items[i].src && !items[i].reviewed) return i;
-    for (let i=0;i<quantity;i++) if (!items[i].src) return i;
-    for (let i=0;i<quantity;i++) if (items[i].src && !items[i].reviewed) return i;
-    return null;
-  }
-
-  function openEditor(i){
-    activeIndex=i;
-    setIndex=Math.floor(activeIndex/6);
-    buildSetButtons();
-
-    if (items[activeIndex].src && !items[activeIndex].reviewed){
-      items[activeIndex].reviewed=true;
+    // ---------------------------
+    // UI building
+    // ---------------------------
+    function buildPalette(){
+      paletteEl.innerHTML = "";
+      TEXT_COLORS.forEach((c) => {
+        const b = document.createElement('button');
+        b.type = "button";
+        b.className = "swatch";
+        b.style.setProperty("--c", c.value);
+        b.title = c.name;
+        b.setAttribute("aria-label", c.name);
+        b.setAttribute("aria-selected", "false");
+        b.addEventListener('click', ()=>{
+          const tile = getSlotTile(selectedIndex);
+          if(!tile) return;
+          tile.textColor = c.value;
+          tile.textColorName = c.name;
+          markReady(tile);
+          colorNameEl.textContent = c.name;
+          updatePaletteSelection();
+          renderAll();
+        });
+        paletteEl.appendChild(b);
+      });
+      updatePaletteSelection();
     }
 
-    setMode('edit');
-    renderGrid();
-    updateGatingUI();
-    syncControls();
-    draw();
-  }
-
-  // Auto-compact + auto-shrink sets
-  function compactAndResizeAfterRemoval(keepEditingIndex=null){
-    const filled = items.filter(it => !!it.src);
-    const filledCount = filled.length;
-    const newQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount, 6)));
-
-    const newItems = [];
-    for (let i=0; i<newQty; i++){
-      newItems.push(i < filledCount ? filled[i] : newItem());
-    }
-    items = newItems;
-    quantity = newQty;
-
-    if (keepEditingIndex !== null) activeIndex = clamp(keepEditingIndex, 0, quantity-1);
-    else activeIndex = clamp(activeIndex, 0, quantity-1);
-
-    setIndex = Math.floor(activeIndex / 6);
-
-    buildQtyButtons();
-    buildSetButtons();
-    renderGrid();
-    updateQtyUI();
-    updateProgress();
-    updateGatingUI();
-
-    if (mode === 'edit') openEditor(activeIndex);
-  }
-
-  // Touch/pointer gestures
-  const pointers = new Map();
-  let dragMode = null;
-  let lastSingle = null;
-  let pinchStart = null;
-
-  function canvasToLocal(e){
-    const rect=canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top)  * (canvas.height / rect.height);
-    return {x,y};
-  }
-
-  function hitTestText(it, x, y){
-    if (!it.hasText || !it.text) return false;
-    const w = Math.max(120, it.text.length * 22);
-    const h = 60;
-    return (x >= it.textX - w/2 && x <= it.textX + w/2 && y >= it.textY - h/2 && y <= it.textY + h/2);
-  }
-
-  function applyScaleAroundPoint(it, newScale, anchorX, anchorY){
-    const oldScale = it.scale;
-    const ix = (anchorX - it.x) / oldScale;
-    const iy = (anchorY - it.y) / oldScale;
-
-    it.scale = newScale;
-    it.x = anchorX - ix * it.scale;
-    it.y = anchorY - iy * it.scale;
-
-    clampToVisibleCoverage(it);
-  }
-
-  canvas.addEventListener('pointerdown', (e)=>{
-    if (mode !== 'edit') return;
-    canvas.setPointerCapture(e.pointerId);
-    const p=canvasToLocal(e);
-    pointers.set(e.pointerId, p);
-
-    const it=items[activeIndex];
-    if (pointers.size === 1){
-      dragMode = hitTestText(it, p.x, p.y) ? 'text' : 'photo';
-      lastSingle = {x:p.x, y:p.y};
-    }
-    if (pointers.size === 2){
-      const pts=[...pointers.values()];
-      const dx=pts[0].x-pts[1].x, dy=pts[0].y-pts[1].y;
-      const dist=Math.hypot(dx,dy);
-      pinchStart = { dist, scale: it.scale };
-      dragMode = null;
-      lastSingle = null;
-    }
-  });
-
-  canvas.addEventListener('pointermove', (e)=>{
-    if (mode !== 'edit') return;
-    if (!pointers.has(e.pointerId)) return;
-    const it=items[activeIndex];
-    if (!it.img) return;
-
-    const p=canvasToLocal(e);
-    pointers.set(e.pointerId, p);
-
-    if (pointers.size === 1 && lastSingle){
-      const dx = p.x - lastSingle.x;
-      const dy = p.y - lastSingle.y;
-
-      if (dragMode === 'text'){ it.textX += dx; it.textY += dy; }
-      else { it.x += dx; it.y += dy; clampToVisibleCoverage(it); }
-
-      lastSingle = {x:p.x, y:p.y};
-      draw();
-      return;
+    function updatePaletteSelection(){
+      const tile = getSlotTile(selectedIndex);
+      const selectedColor = tile?.textColor || TEXT_COLORS[0].value;
+      const children = [...paletteEl.children];
+      children.forEach((el, i)=>{
+        el.setAttribute("aria-selected", TEXT_COLORS[i].value === selectedColor ? "true" : "false");
+      });
     }
 
-    if (pointers.size === 2 && pinchStart){
-      const pts=[...pointers.values()];
-      const dx=pts[0].x-pts[1].x, dy=pts[0].y-pts[1].y;
-      const dist=Math.hypot(dx,dy);
-      const cx=(pts[0].x+pts[1].x)/2;
-      const cy=(pts[0].y+pts[1].y)/2;
+    function buildTabs(){
+      tabsEl.innerHTML = "";
+      const sets = totalSets();
 
-      const base = baseScaleForVisible(it);
-      const minScale = base;
-      const maxScale = base * 3;
+      for(let s=0; s<sets; s++){
+        const start = s*SET_SIZE;
+        const end = start + SET_SIZE;
 
-      const scaleFactor = dist / pinchStart.dist;
-      const newScale = clamp(pinchStart.scale * scaleFactor, minScale, maxScale);
+        const filled = tiles.slice(start, end).filter(Boolean).length;
+        const readyN = tiles.slice(start, end).filter(t => t && t.ready).length;
 
-      applyScaleAroundPoint(it, newScale, cx, cy);
+        const tab = document.createElement('button');
+        tab.type = "button";
+        tab.className = "tab";
+        tab.setAttribute("aria-selected", s===activeSet ? "true":"false");
 
-      const ratio = it.scale / base;
-      zoomEl.value = String(clamp(ratio, 1, 3));
-      draw();
+        const label = document.createElement('span');
+        label.textContent = `Set ${s+1}`;
+        tab.appendChild(label);
+
+        const meta = document.createElement('span');
+        meta.className = "mini " + ((filled>0 && readyN===filled) ? "ok" : (filled>0 ? "warn" : "warn"));
+        meta.textContent = filled===0 ? "0/6" : `${readyN}/${filled}`;
+        tab.appendChild(meta);
+
+        tab.addEventListener('click', ()=>{
+          activeSet = s;
+          // Keep selection within that set
+          const base = activeSet*SET_SIZE;
+          selectedIndex = clamp(selectedIndex, base, base+SET_SIZE-1);
+          renderAll();
+        });
+
+        tabsEl.appendChild(tab);
+      }
     }
-  });
 
-  canvas.addEventListener('pointerup', (e)=>{
-    pointers.delete(e.pointerId);
-    if (pointers.size < 2) pinchStart = null;
-    if (pointers.size === 0){ dragMode = null; lastSingle = null; }
-    else if (pointers.size === 1){
-      const only=[...pointers.values()][0];
-      lastSingle = {x:only.x, y:only.y};
-      dragMode = 'photo';
+    function buildGrid(){
+      gridEl.innerHTML = "";
+      const base = activeSet * SET_SIZE;
+
+      for(let i=0;i<SET_SIZE;i++){
+        const globalIndex = base + i;
+        const tile = getSlotTile(globalIndex);
+
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.className = "slot";
+        btn.dataset.index = String(globalIndex);
+        btn.setAttribute("aria-selected", globalIndex===selectedIndex ? "true":"false");
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 220;
+        canvas.height = 220;
+
+        const empty = document.createElement('div');
+        empty.className = "empty";
+        empty.innerHTML = `<div class="plus">+</div><div>Add photo</div>`;
+
+        const badge = document.createElement('div');
+        badge.className = "badge";
+        badge.innerHTML = `<span class="dot"></span><span>Review</span>`;
+
+        btn.appendChild(canvas);
+        btn.appendChild(empty);
+        btn.appendChild(badge);
+
+        btn.addEventListener('click', ()=>{
+          selectedIndex = globalIndex;
+          setActiveSetBySelected();
+          renderAll();
+
+          // Fast add if empty slot: open replace input
+          if(!getSlotTile(selectedIndex)){
+            replaceInput.click();
+          }
+        });
+
+        gridEl.appendChild(btn);
+
+        // render thumb (no guides)
+        const ctx = canvas.getContext('2d');
+        renderTileToContext(tile, ctx, canvas.width, false);
+
+        if(tile && tile.img){
+          empty.style.display = "none";
+          badge.style.display = "flex";
+          badge.classList.toggle("ready", !!tile.ready);
+          badge.querySelector('span:last-child').textContent = tile.ready ? "Ready" : "Review";
+        } else {
+          empty.style.display = "flex";
+          badge.style.display = "none";
+        }
+      }
     }
-  });
 
-  canvas.addEventListener('pointercancel', (e)=>{
-    pointers.delete(e.pointerId);
-    if (pointers.size < 2) pinchStart = null;
-    if (pointers.size === 0){ dragMode=null; lastSingle=null; }
-  });
+    function updateCounts(){
+      photoCountEl.textContent = String(tiles.length);
+      tileCountEl.textContent = String(shownCount);
+      readyCountEl.textContent = String(photosReadyCount());
 
-  // Bulk upload (multiple files)
-  bulkFileInput.addEventListener('change', async (e)=>{
-    const files = Array.from(e.target.files || []).filter(f=>f.type.startsWith('image/'));
-    if (!files.length) return;
+      const canProceed = allPhotosReady() && ack.checked;
+      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
+      orderStatus.className = canProceed ? "ok" : "warn";
 
-    const filledCount = items.filter(it=>!!it.src).length;
-    const neededQty = Math.max(6, Math.min(MAX_QTY, ceilToMultiple(filledCount + files.length, 6)));
-    if (neededQty !== quantity) setQuantity(neededQty, true);
-
-    let i=0;
-    for (const f of files){
-      while (i < items.length && items[i].src) i++;
-      if (i >= items.length) break;
-      const src = await fileToDataURL(f);
-      const img = await loadImageFromURL(src);
-      setImageForIndex(i, img, src);
-      i++;
-    }
-    bulkFileInput.value='';
-    updateProgress(); updateQtyUI(); updateGatingUI();
-  });
-
-  // Single upload by tapping an empty tile
-  tileFileInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    const target = tileUploadTargetIndex;
-    tileUploadTargetIndex = null;
-    if (!f || target == null) return;
-    const src = await fileToDataURL(f);
-    const img = await loadImageFromURL(src);
-    setImageForIndex(target, img, src);
-    openEditor(target);
-  });
-
-  // Single upload inside editor
-  fileInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-    const src = await fileToDataURL(f);
-    const img = await loadImageFromURL(src);
-    setImageForIndex(activeIndex, img, src);
-  });
-
-  // Buttons
-  guidesBtn.addEventListener('click', ()=>{
-    showGuides = !showGuides;
-    guidesBtn.textContent = `Guides: ${showGuides?'On':'Off'}`;
-    draw();
-  });
-
-  bwBtn.addEventListener('click', ()=>{
-    const it=items[activeIndex];
-    it.bw = !it.bw;
-    bwBtn.textContent = `B&W: ${it.bw?'On':'Off'}`;
-    draw();
-    renderGrid();
-  });
-
-  zoomEl.addEventListener('input', ()=>{
-    const it=items[activeIndex];
-    if (!it.img) return;
-    const base = baseScaleForVisible(it);
-    const ratio = parseFloat(zoomEl.value || '1');
-    const newScale = base * ratio;
-    const cx = VISIBLE_RECT.x + VISIBLE_RECT.w/2;
-    const cy = VISIBLE_RECT.y + VISIBLE_RECT.h/2;
-    applyScaleAroundPoint(it, newScale, cx, cy);
-    draw();
-  });
-
-  clearPhotoBtn.addEventListener('click', ()=>{
-    if (!items[activeIndex].src) return;
-    items[activeIndex] = newItem();
-    compactAndResizeAfterRemoval(activeIndex);
-  });
-
-  prevBtn.addEventListener('click', ()=>{
-    const start=setIndex*6;
-    const end=Math.min(start+6, quantity)-1;
-    const next = (activeIndex-1 < start) ? end : activeIndex-1;
-    openEditor(next);
-  });
-
-  nextBtn.addEventListener('click', ()=>{
-    const start=setIndex*6;
-    const end=Math.min(start+6, quantity)-1;
-    const next = (activeIndex+1 > end) ? start : activeIndex+1;
-    openEditor(next);
-  });
-
-  backToGridBtn.addEventListener('click', ()=> setMode('grid'));
-  toGridBtn.addEventListener('click', ()=> setMode('grid'));
-
-  finalConfirm.addEventListener('change', updateGatingUI);
-
-  reviewNextBtn.addEventListener('click', ()=>{
-    const idx=findNextNeededIndex();
-    if (idx===null) return alert("Everything looks good — no empty or unreviewed magnets found.");
-    openEditor(idx);
-  });
-
-  reviewSummaryBtn.addEventListener('click', ()=>{
-    alert(`Summary:\n\nEmpty magnets: ${countEmpty()}\nNot reviewed: ${countNeedsReview()}\nComplete: ${countComplete()}/${quantity}`);
-  });
-
-  textInput.addEventListener('input', ()=>{
-    const it=items[activeIndex];
-    const v=(textInput.value||'').slice(0,25);
-    textInput.value=v;
-    charCount.textContent=`${v.length}/25`;
-    if (v.trim().length){
-      it.hasText=true;
-      it.text=v.trim();
-      deleteTextBtn.disabled=false;
-    } else {
-      it.hasText=false;
-      it.text="";
-      deleteTextBtn.disabled=true;
-    }
-    draw();
-    renderGrid();
-  });
-
-  textColorBtn.addEventListener('click', ()=>{
-    const it=items[activeIndex];
-    it.textColor = (it.textColor === 'black') ? 'whiteShadow' : 'black';
-    textColorBtn.textContent = (it.textColor === 'black') ? 'Text: Black' : 'Text: White + Shadow';
-    draw();
-  });
-
-  deleteTextBtn.addEventListener('click', ()=>{
-    const it=items[activeIndex];
-    it.hasText=false;
-    it.text="";
-    textInput.value="";
-    charCount.textContent="0/25";
-    deleteTextBtn.disabled=true;
-    draw();
-    renderGrid();
-  });
-
-  // Downloads (unchanged from your working version)
-  function renderMagnetToCanvas(index, outSize=1200){
-    const it=items[index];
-    const off=document.createElement('canvas');
-    off.width=outSize; off.height=outSize;
-    const o=off.getContext('2d', { willReadFrequently: false });
-    o.imageSmoothingEnabled=true; o.imageSmoothingQuality="high";
-    o.fillStyle='#ffffff';
-    o.fillRect(0,0,outSize,outSize);
-    if (!it.img) return off;
-
-    const srcCanvas = (it.bw && it.grayCanvas) ? it.grayCanvas : null;
-
-    const sx = it.x / CANVAS_SIZE * outSize;
-    const sy = it.y / CANVAS_SIZE * outSize;
-    const sw = (it.w*it.scale)/CANVAS_SIZE * outSize;
-    const sh = (it.h*it.scale)/CANVAS_SIZE * outSize;
-
-    if (srcCanvas) o.drawImage(srcCanvas, sx, sy, sw, sh);
-    else o.drawImage(it.img, sx, sy, sw, sh);
-
-    if (it.hasText && it.text){
-      o.save();
-      o.font='900 64px system-ui';
-      o.textAlign='center';
-      o.textBaseline='middle';
-      const tx = it.textX / CANVAS_SIZE * outSize;
-      const ty = it.textY / CANVAS_SIZE * outSize;
-      if (it.textColor === 'whiteShadow'){
-        o.fillStyle='rgba(0,0,0,.55)';
-        o.fillText(it.text, tx+3, ty+3);
-        o.fillStyle='#ffffff';
-        o.fillText(it.text, tx, ty);
+      if(tiles.length === 0){
+        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
+      } else if(!allPhotosReady()){
+        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
+      } else if(!ack.checked){
+        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
       } else {
-        o.fillStyle='#000000';
-        o.fillText(it.text, tx, ty);
-      }
-      o.restore();
-    }
-
-    return off;
-  }
-
-  function downloadCanvasPNG(c, filename){
-    const a=document.createElement('a');
-    a.href=c.toDataURL('image/png');
-    a.download=filename;
-    a.click();
-  }
-
-  function makeSheet(page, indices, perPage){
-    const sheet=document.createElement('canvas');
-    sheet.width=page.w; sheet.height=page.h;
-    const sctx=sheet.getContext('2d');
-    sctx.imageSmoothingEnabled=true; sctx.imageSmoothingQuality="high";
-    sctx.fillStyle='#ffffff';
-    sctx.fillRect(0,0,sheet.width,sheet.height);
-
-    const cols = perPage===6 ? 3 : 4;
-    const rows = perPage===6 ? 2 : 3;
-    const margin = Math.floor(page.w * 0.07);
-    const gap = Math.floor(page.w * 0.03);
-
-    const cellW = Math.floor((page.w - margin*2 - gap*(cols-1)) / cols);
-    const cellH = Math.floor((page.h - margin*2 - gap*(rows-1)) / rows);
-    const drawSize = Math.min(MAGNET_ON_SHEET_PX, cellW, cellH);
-
-    let idx=0;
-    for (let r=0;r<rows;r++){
-      for (let c=0;c<cols;c++){
-        if (idx>=indices.length) break;
-        const magnetIndex=indices[idx++];
-        const magnetCanvas=renderMagnetToCanvas(magnetIndex, MAGNET_PRINT_PX);
-
-        const xCell = margin + c*(cellW+gap);
-        const yCell = margin + r*(cellH+gap);
-        const x = xCell + Math.floor((cellW - drawSize)/2);
-        const y = yCell + Math.floor((cellH - drawSize)/2);
-
-        sctx.drawImage(magnetCanvas, 0,0,MAGNET_PRINT_PX,MAGNET_PRINT_PX, x,y, drawSize,drawSize);
-        sctx.strokeStyle='rgba(0,0,0,.10)';
-        sctx.lineWidth=2;
-        sctx.strokeRect(x,y,drawSize,drawSize);
+        orderDetail.textContent = "All tiles are ready and acknowledged.";
       }
     }
-    return sheet;
-  }
 
-  dlMagnetBtn.addEventListener('click', ()=>{
-    if (!items[activeIndex].img) return alert('Open a magnet with a photo first.');
-    downloadCanvasPNG(renderMagnetToCanvas(activeIndex, MAGNET_PRINT_PX), `magnet_${activeIndex+1}_1200.png`);
-  });
+    function refreshControls(){
+      const tile = getSlotTile(selectedIndex);
+      const has = !!tile;
 
-  dlA4Btn.addEventListener('click', ()=>{
-    if (dlA4Btn.disabled) return;
-    const start=setIndex*6;
-    const end=Math.min(start+6, quantity);
-    const indices=Array.from({length:end-start}, (_,k)=>start+k);
-    downloadCanvasPNG(makeSheet(A4, indices, 6), `print_sheet_set${setIndex+1}_A4_6up.png`);
-  });
+      selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
 
-  dlA3Btn.addEventListener('click', ()=>{
-    if (dlA3Btn.disabled) return;
-    const start=setIndex*6;
-    const end=Math.min(start+12, quantity);
-    if (end-start<12) return alert('Need 12 magnets available for A3 (two full sets).');
-    const indices=Array.from({length:12}, (_,k)=>start+k);
-    downloadCanvasPNG(makeSheet(A3, indices, 12), `print_sheet_set${setIndex+1}_A3_12up.png`);
-  });
+      // enable/disable controls based on tile existence
+      replaceBtn.disabled = (shownCount === 0);
 
-  // Init
-  initItems(quantity);
-  buildQtyButtons();
-  buildSetButtons();
-  renderGrid();
-  updateQtyUI();
-  updateProgress();
-  updateGatingUI();
-  setMode('grid');
-})();
-</script>
+      deleteBtn.disabled = !has;
+      rot90Btn.disabled = !has;
+      centerBtn.disabled = !has;
+
+      zoom.disabled = !has;
+      bw.disabled = !has;
+      whiteBleed.disabled = !has;
+
+      overlayText.disabled = !has;
+      textSize.disabled = !has;
+      textY.disabled = !has;
+
+      if(!has){
+        zoom.value = "1";
+        zoomVal.textContent = "100%";
+        bw.checked = false;
+        whiteBleed.checked = false;
+        overlayText.value = "";
+        textLen.textContent = "0";
+        textSize.value = "28";
+        textSizeVal.textContent = "28px";
+        textY.value = "82";
+        textYVal.textContent = "82%";
+        colorNameEl.textContent = "White";
+        updatePaletteSelection();
+        return;
+      }
+
+      // clamp & enforce min zoom
+      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
+      clampOffsetsToCover(tile);
+
+      zoom.value = String(tile.zoom || 1);
+      zoomVal.textContent = `${Math.round((tile.zoom||1)*100)}%`;
+
+      bw.checked = !!tile.bw;
+      whiteBleed.checked = !!tile.whiteBleed;
+
+      overlayText.value = tile.text || "";
+      textLen.textContent = String((tile.text || "").length);
+
+      textSize.value = String(tile.textSize ?? 28);
+      textSizeVal.textContent = `${tile.textSize ?? 28}px`;
+
+      textY.value = String(tile.textY ?? 82);
+      textYVal.textContent = `${tile.textY ?? 82}%`;
+
+      colorNameEl.textContent = tile.textColorName || "White";
+      updatePaletteSelection();
+    }
+
+    function renderPreview(){
+      const tile = getSlotTile(selectedIndex);
+      renderTileToContext(tile, pctx, MAG.full, showGuides.checked);
+    }
+
+    function renderAll(){
+      // keep shownCount synced
+      shownCount = computeShownCount(tiles.length);
+      // keep active tab valid
+      activeSet = clamp(activeSet, 0, totalSets()-1);
+
+      // keep selection in range and within active set
+      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
+      setActiveSetBySelected();
+
+      buildTabs();
+      buildGrid();
+      refreshControls();
+      renderPreview();
+      updateCounts();
+    }
+
+    // ---------------------------
+    // Review logic
+    // ---------------------------
+    function markReady(tile){
+      if(!tile) return;
+      tile.ready = true;
+    }
+
+    // ---------------------------
+    // Upload / Replace / Delete
+    // ---------------------------
+    async function addFiles(fileList){
+      const files = Array.from(fileList || []).filter(f => f && f.type && f.type.startsWith("image/"));
+      if(!files.length) return;
+
+      const available = MAX_TILES - tiles.length;
+      const willAdd = Math.min(available, files.length);
+      const skipped = files.length - willAdd;
+
+      for(let i=0;i<willAdd;i++){
+        const {img, url} = await loadImageFromFile(files[i]);
+        const t = newTile();
+        t.img = img;
+        t.src = url;
+        t.ready = false;       // user must edit at least once
+        tiles.push(t);
+      }
+
+      if(skipped > 0){
+        showToast(`<strong>${skipped}</strong> photo(s) were not added (max <strong>${MAX_TILES}</strong>). Create a second order for more magnets.`);
+      } else {
+        showToast(`Added <strong>${willAdd}</strong> photo(s).`);
+      }
+
+      // Expand sets automatically
+      shownCount = computeShownCount(tiles.length);
+
+      // If we were on an empty later tab, pull back to where content is (optional)
+      if(activeSet > totalSets()-1) activeSet = totalSets()-1;
+
+      // Auto-select first newly added tile (nice on mobile)
+      if(willAdd > 0){
+        selectedIndex = tiles.length - 1;
+        setActiveSetBySelected();
+      }
+
+      renderAll();
+    }
+
+    async function replaceSelectedWithFile(file){
+      if(!file || !file.type || !file.type.startsWith("image/")) return;
+
+      // If selected index beyond current photos, it means user tapped an empty slot.
+      // In that case, we insert at that position by appending then shifting? Requirement: keep dense order.
+      // Easiest: if selectedIndex == tiles.length (the first empty), then append.
+      // If selectedIndex > tiles.length, it’s deeper empty — we treat as append too.
+      const target = selectedIndex <= tiles.length ? selectedIndex : tiles.length;
+
+      if(tiles.length >= MAX_TILES){
+        showToast(`Max <strong>${MAX_TILES}</strong> reached. Create a second order for more magnets.`);
+        return;
+      }
+
+      const {img, url} = await loadImageFromFile(file);
+
+      if(target === tiles.length){
+        const t = newTile();
+        t.img = img;
+        t.src = url;
+        t.ready = false;
+        tiles.push(t);
+        selectedIndex = tiles.length - 1;
+      } else {
+        // Replace existing tile at target
+        const t = tiles[target];
+        revokeURL(t);
+        t.img = img;
+        t.src = url;
+        // Reset transform; keep text options? safest to reset everything user-facing
+        t.zoom = 1;
+        t.rot = 0;
+        t.offsetX = 0;
+        t.offsetY = 0;
+        t.bw = false;
+        t.whiteBleed = false;
+        t.text = "";
+        t.textColor = TEXT_COLORS[0].value;
+        t.textColorName = TEXT_COLORS[0].name;
+        t.textSize = 28;
+        t.textY = 82;
+        t.ready = false;
+        selectedIndex = target;
+      }
+
+      shownCount = computeShownCount(tiles.length);
+      setActiveSetBySelected();
+      renderAll();
+    }
+
+    function deleteSelected(){
+      if(selectedIndex < 0 || selectedIndex >= tiles.length) return;
+
+      const t = tiles[selectedIndex];
+      revokeURL(t);
+
+      tiles.splice(selectedIndex, 1); // shifts left automatically (requirement)
+
+      // shrink sets automatically
+      shownCount = computeShownCount(tiles.length);
+
+      // keep selection valid
+      selectedIndex = clamp(selectedIndex, 0, shownCount-1);
+      setActiveSetBySelected();
+
+      renderAll();
+    }
+
+    function clearAll(){
+      for(const t of tiles) revokeURL(t);
+      tiles = [];
+      shownCount = SET_SIZE;
+      activeSet = 0;
+      selectedIndex = 0;
+      ack.checked = false;
+      toast.style.display = "none";
+      renderAll();
+    }
+
+    // ---------------------------
+    // Pinch + Drag handling (Pointer Events)
+    // ---------------------------
+    const pointers = new Map(); // pointerId -> {x,y}
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1;
+
+    function canvasPointFromEvent(e, canvas){
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * (canvas.width / r.width),
+        y: (e.clientY - r.top) * (canvas.height / r.height)
+      };
+    }
+
+    function distance(a,b){
+      const dx = a.x - b.x, dy = a.y - b.y;
+      return Math.hypot(dx, dy);
+    }
+
+    preview.addEventListener('pointerdown', (e)=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+
+      preview.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, canvasPointFromEvent(e, preview));
+
+      if(pointers.size === 2){
+        const pts = [...pointers.values()];
+        pinchStartDist = distance(pts[0], pts[1]);
+        pinchStartZoom = tile.zoom || 1;
+      }
+    });
+
+    preview.addEventListener('pointermove', (e)=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      if(!pointers.has(e.pointerId)) return;
+
+      const prev = pointers.get(e.pointerId);
+      const now = canvasPointFromEvent(e, preview);
+      pointers.set(e.pointerId, now);
+
+      if(pointers.size === 1){
+        // drag
+        const dx = (now.x - prev.x);
+        const dy = (now.y - prev.y);
+
+        tile.offsetX += dx;
+        tile.offsetY += dy;
+        clampOffsetsToCover(tile);
+
+        markReady(tile); // any action marks ready (per spec)
+        renderAll();
+        return;
+      }
+
+      if(pointers.size === 2){
+        const pts = [...pointers.values()];
+        const d = distance(pts[0], pts[1]);
+        if(pinchStartDist > 0){
+          const raw = pinchStartZoom * (d / pinchStartDist);
+          tile.zoom = clamp(raw, 1, 3);
+          // enforce coverage and clamp offsets after zoom
+          tile.zoom = Math.max(tile.zoom, minZoomToCover(tile));
+          clampOffsetsToCover(tile);
+
+          markReady(tile);
+          renderAll();
+        }
+      }
+    });
+
+    function endPointer(e){
+      if(pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+      if(pointers.size < 2){
+        pinchStartDist = 0;
+      }
+    }
+    preview.addEventListener('pointerup', endPointer);
+    preview.addEventListener('pointercancel', endPointer);
+    preview.addEventListener('lostpointercapture', endPointer);
+
+    // ---------------------------
+    // Events: UI controls
+    // ---------------------------
+    bulkBtn.addEventListener('click', ()=> bulkInput.click());
+    bulkInput.addEventListener('change', async ()=>{
+      await addFiles(bulkInput.files);
+      bulkInput.value = "";
+    });
+
+    replaceBtn.addEventListener('click', ()=> replaceInput.click());
+    replaceInput.addEventListener('change', async ()=>{
+      const file = replaceInput.files && replaceInput.files[0];
+      if(file) await replaceSelectedWithFile(file);
+      replaceInput.value = "";
+    });
+
+    clearAllBtn.addEventListener('click', clearAll);
+
+    showGuides.addEventListener('change', ()=>{
+      // thumbs remain guideless by design; only affects preview
+      renderPreview();
+    });
+
+    zoom.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.zoom = clamp(parseFloat(zoom.value), 1, 3);
+      tile.zoom = Math.max(tile.zoom, minZoomToCover(tile));
+      clampOffsetsToCover(tile);
+
+      zoomVal.textContent = `${Math.round(tile.zoom*100)}%`;
+
+      markReady(tile);
+      renderAll();
+    });
+
+    bw.addEventListener('change', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.bw = bw.checked;
+      markReady(tile);
+      renderAll();
+    });
+
+    whiteBleed.addEventListener('change', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.whiteBleed = whiteBleed.checked;
+
+      // Ensure zoom/offset still covers safe area
+      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
+      clampOffsetsToCover(tile);
+
+      markReady(tile);
+      renderAll();
+    });
+
+    overlayText.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.text = overlayText.value;
+      textLen.textContent = String(overlayText.value.length);
+      markReady(tile);
+      renderAll();
+    });
+
+    textSize.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.textSize = parseInt(textSize.value,10);
+      textSizeVal.textContent = `${tile.textSize}px`;
+      markReady(tile);
+      renderAll();
+    });
+
+    textY.addEventListener('input', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.textY = parseInt(textY.value,10);
+      textYVal.textContent = `${tile.textY}%`;
+      markReady(tile);
+      renderAll();
+    });
+
+    ack.addEventListener('change', updateCounts);
+
+    deleteBtn.addEventListener('click', deleteSelected);
+
+    nextBtn.addEventListener('click', ()=>{
+      selectedIndex = (selectedIndex + 1) % shownCount;
+      setActiveSetBySelected();
+      renderAll();
+    });
+
+    rot90Btn.addEventListener('click', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.rot = ((tile.rot || 0) + 90) % 360;
+
+      // After rotation, ensure coverage and clamp offsets
+      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
+      clampOffsetsToCover(tile);
+
+      markReady(tile);
+      renderAll();
+    });
+
+    centerBtn.addEventListener('click', ()=>{
+      const tile = getSlotTile(selectedIndex);
+      if(!tile) return;
+      tile.offsetX = 0;
+      tile.offsetY = 0;
+
+      tile.zoom = Math.max(tile.zoom || 1, minZoomToCover(tile));
+      clampOffsetsToCover(tile);
+
+      markReady(tile);
+      renderAll();
+    });
+
+    // Cleanup URLs on unload
+    window.addEventListener('beforeunload', ()=>{
+      for(const t of tiles) revokeURL(t);
+    });
+
+    // ---------------------------
+    // Init
+    // ---------------------------
+    buildPalette();
+    renderAll();
+  </script>
 </body>
 </html>
