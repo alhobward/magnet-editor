@@ -13,10 +13,17 @@
       --muted:#aab2c5;
       --line:#232a43;
 
-      --yellow:#fbbf24;
-      --yellow2:#f59e0b;
+      /* NEW BRAND PALETTE (from bottom logo) */
+      --navy:#003070;              /* rgb(0,48,112) */
+      --navy-rgb: 0, 48, 112;
+
+      --pink:#F090A0;              /* rgb(240,144,160) */
+      --pink-rgb: 240, 144, 160;
+      --pink2:#E87490;             /* slightly deeper pink for gradients */
+      --pink2-rgb: 232, 116, 144;
+
       --good:#34d399;
-      --warn:#fbbf24;
+      --warn: var(--pink);
       --bad:#fb7185;
 
       --full: 600;
@@ -72,15 +79,15 @@
     .btn:disabled{ opacity:0.45; cursor:not-allowed; }
 
     .btn.primary{
-      border-color: rgba(251,191,36,0.65);
+      border-color: rgba(var(--pink-rgb), 0.75);
       color: #0b0d12;
-      background: linear-gradient(180deg, rgba(251,191,36,1), rgba(245,158,11,1));
-      box-shadow: 0 10px 30px rgba(251,191,36,0.18);
+      background: linear-gradient(180deg, rgba(var(--pink-rgb),1), rgba(var(--pink2-rgb),1));
+      box-shadow: 0 10px 30px rgba(var(--pink-rgb),0.18);
     }
 
     .btn.yellow{
-      border-color: rgba(251,191,36,0.95);
-      box-shadow: 0 0 0 1px rgba(251,191,36,0.12) inset, 0 0 18px rgba(251,191,36,0.12);
+      border-color: rgba(var(--pink-rgb), 0.95);
+      box-shadow: 0 0 0 1px rgba(var(--pink-rgb),0.12) inset, 0 0 18px rgba(var(--pink-rgb),0.12);
     }
 
     main .wrap{ padding-top: 12px; }
@@ -88,7 +95,7 @@
     .gridCard{
       border:1px solid var(--line);
       border-radius: 18px;
-      background: radial-gradient(1200px 500px at 10% 0%, rgba(251,191,36,0.10), transparent 60%),
+      background: radial-gradient(1200px 500px at 10% 0%, rgba(var(--pink-rgb),0.10), transparent 60%),
                   linear-gradient(180deg, rgba(18,22,37,0.88), rgba(15,19,32,0.88));
       overflow:hidden;
     }
@@ -134,12 +141,12 @@
       gap:8px;
     }
     .tab[aria-selected="true"]{
-      border-color: rgba(251,191,36,0.9);
-      box-shadow: 0 0 0 3px rgba(251,191,36,0.12) inset;
+      border-color: rgba(var(--pink-rgb),0.9);
+      box-shadow: 0 0 0 3px rgba(var(--pink-rgb),0.12) inset;
     }
     .tab .mini{ font-weight:900; color: rgba(233,236,243,0.92); }
     .tab .mini.ok{ color: rgba(52,211,153,0.95); }
-    .tab .mini.warn{ color: rgba(251,191,36,0.95); }
+    .tab .mini.warn{ color: rgba(var(--pink-rgb),0.95); }
 
     .thumbGrid{
       display:grid;
@@ -150,7 +157,7 @@
 
     .slot{
       position:relative;
-      border:1px solid rgba(251,191,36,0.75);
+      border:1px solid rgba(var(--pink-rgb),0.78);
       border-radius: 16px;
       background: rgba(7,9,17,0.55);
       overflow:hidden;
@@ -162,15 +169,15 @@
       user-select:none;
       padding:0;
       box-shadow:
-        0 0 0 1px rgba(251,191,36,0.15) inset,
-        0 0 18px rgba(251,191,36,0.18);
+        0 0 0 1px rgba(var(--pink-rgb),0.15) inset,
+        0 0 18px rgba(var(--pink-rgb),0.18);
     }
     .slot[aria-selected="true"]{
-      outline: 2px solid rgba(251,191,36,0.95);
+      outline: 2px solid rgba(var(--pink-rgb),0.95);
       outline-offset: 2px;
       box-shadow:
-        0 0 0 1px rgba(251,191,36,0.22) inset,
-        0 0 24px rgba(251,191,36,0.28);
+        0 0 0 1px rgba(var(--pink-rgb),0.22) inset,
+        0 0 24px rgba(var(--pink-rgb),0.28);
     }
     .slot canvas{ width:100%; height:100%; display:block; }
 
@@ -191,11 +198,11 @@
     .slot .empty .plus{
       width:36px; height:36px;
       border-radius: 12px;
-      border:1px dashed rgba(251,191,36,0.65);
+      border:1px dashed rgba(var(--pink-rgb),0.65);
       display:grid; place-items:center;
       font-size:20px;
-      color: rgba(251,191,36,0.95);
-      box-shadow: 0 0 18px rgba(251,191,36,0.18);
+      color: rgba(var(--pink-rgb),0.95);
+      box-shadow: 0 0 18px rgba(var(--pink-rgb),0.18);
     }
 
     .badge{
@@ -216,7 +223,7 @@
       width:8px; height:8px;
       border-radius:99px;
       background: var(--warn);
-      box-shadow: 0 0 0 3px rgba(251,191,36,0.15);
+      box-shadow: 0 0 0 3px rgba(var(--pink-rgb),0.15);
     }
     .badge.ready .dot{
       background: var(--good);
@@ -369,7 +376,7 @@
       background: var(--c);
     }
     .swatch[aria-selected="true"]{
-      outline: 2px solid rgba(251,191,36,0.95);
+      outline: 2px solid rgba(var(--pink-rgb),0.95);
       outline-offset: 2px;
     }
     .swatch::after{
@@ -396,7 +403,7 @@
     }
     .statusLine strong{ color:var(--text); }
     .ok{ color: rgba(52,211,153,0.95); font-weight:900; }
-    .warn{ color: rgba(251,191,36,0.95); font-weight:900; }
+    .warn{ color: rgba(var(--pink-rgb),0.95); font-weight:900; }
 
     .actions{
       display:flex;
@@ -585,11 +592,11 @@
       { name: "Black",  value: "#111827" },
       { name: "Red",    value: "#EF4444" },
       { name: "Orange", value: "#F97316" },
-      { name: "Yellow", value: "#FBBF24" },
+      { name: "Pink",   value: "#F090A0" },   // matches brand pink
+      { name: "Navy",   value: "#003070" },   // matches brand navy
       { name: "Green",  value: "#22C55E" },
       { name: "Blue",   value: "#3B82F6" },
       { name: "Purple", value: "#A855F7" },
-      { name: "Pink",   value: "#EC4899" },
       { name: "Teal",   value: "#14B8A6" },
     ];
 
@@ -793,7 +800,7 @@
       ctx.drawImage(tmp, dx, dy, dw, dh);
     }
 
-    // Guides are always on now, and black.
+    // Guides are always on now, and NAVY (brand) instead of black.
     function drawGuides(ctx, W){
       const s = W / MAG.full;
       const bleed = MAG.bleed * s;
@@ -801,18 +808,18 @@
 
       ctx.save();
 
-      ctx.strokeStyle = "rgba(0,0,0,0.78)";
+      ctx.strokeStyle = "rgba(0,48,112,0.78)";
       ctx.lineWidth = Math.max(1, 2*s);
       roundRect(ctx, 0.5, 0.5, W-1, W-1, 18*s);
       ctx.stroke();
 
-      ctx.strokeStyle = "rgba(0,0,0,0.65)";
+      ctx.strokeStyle = "rgba(0,48,112,0.65)";
       ctx.setLineDash([6*s, 6*s]);
       roundRect(ctx, bleed, bleed, safe, safe, 14*s);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = "rgba(0,0,0,0.45)";
+      ctx.fillStyle = "rgba(0,48,112,0.55)";
       ctx.font = `${Math.round(12*s)}px ui-sans-serif, system-ui`;
       ctx.textAlign = "left";
       ctx.fillText("bleed", 8*s, 16*s);
@@ -1070,10 +1077,8 @@
       tileCountEl.textContent = String(shownCount);
       readyCountEl.textContent = String(photosReadyCount());
 
-      // Full order must be multiple of 6
       const fullOrder = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
 
-      // Ack can only be checked when the order is full
       ack.disabled = !fullOrder;
       if(!fullOrder) ack.checked = false;
 
@@ -1154,7 +1159,7 @@
 
     function renderPreview(){
       const tile = getSlotTile(selectedIndex);
-      renderTileToContext(tile, pctx, MAG.full, true); // guides always on
+      renderTileToContext(tile, pctx, MAG.full, true);
     }
 
     function renderAll(){
@@ -1439,7 +1444,6 @@
       renderAll();
     });
 
-    // If customer acknowledges (only enabled when multiple of 6), mark ALL uploaded magnets as ready.
     ack.addEventListener('change', ()=>{
       if(ack.checked){
         for(const t of tiles){
@@ -1468,7 +1472,6 @@
       renderAll();
     });
 
-    // Next tile + tiny polish scroll
     nextBtn.addEventListener('click', ()=>{
       selectedIndex = (selectedIndex + 1) % shownCount;
       setActiveSetBySelected();
