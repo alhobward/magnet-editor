@@ -1,9 +1,10 @@
 <!doctype html>
+<!-- Magnetic Moments Editor v1.0 Soft Launch | Max 24 magnets | Updated 2026-06-30 -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Magnet Editor</title>
+  <title>Magnetic Moments Editor</title>
   <style>
     :root{
       --bg:#0b0d12;
@@ -414,6 +415,72 @@
       padding-top:2px;
     }
 
+
+    .welcomeOverlay{
+      position:fixed;
+      inset:0;
+      z-index:50;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background: rgba(7,9,17,0.78);
+      backdrop-filter: blur(10px);
+    }
+    .welcomeOverlay.hidden{ display:none; }
+    .welcomeCard{
+      width:min(760px, 100%);
+      border:1px solid rgba(var(--pink-rgb),0.55);
+      border-radius:24px;
+      background:
+        radial-gradient(900px 400px at 20% 0%, rgba(var(--pink-rgb),0.14), transparent 60%),
+        linear-gradient(180deg, rgba(18,22,37,0.98), rgba(15,19,32,0.98));
+      box-shadow: 0 30px 100px rgba(0,0,0,0.38);
+      padding:22px;
+    }
+    .welcomeCard h2{
+      margin:0 0 10px;
+      font-size:24px;
+      letter-spacing:-0.3px;
+    }
+    .welcomeCard p{
+      color:var(--muted);
+      line-height:1.5;
+      margin:0 0 14px;
+    }
+    .guidelinesBox{
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:18px;
+      padding:16px;
+      background:rgba(7,9,17,0.35);
+      margin-top:14px;
+    }
+    .guidelinesBox h3{
+      margin:0 0 10px;
+      font-size:15px;
+    }
+    .guidelinesBox ul{
+      margin:10px 0 14px 18px;
+      padding:0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+    .privacyNote{
+      border-left:3px solid var(--pink);
+      background:rgba(var(--pink-rgb),0.09);
+      padding:12px 14px;
+      border-radius:14px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+    .welcomeActions{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:16px;
+    }
+
     footer{
       padding: 18px 14px 26px;
       color: var(--muted);
@@ -423,12 +490,37 @@
   </style>
 </head>
 <body>
+
+  <div class="welcomeOverlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="welcomeCard">
+      <h2 id="welcomeTitle">Welcome to Magnetic Moments</h2>
+      <p>Create beautiful custom photo magnets from your favourite memories. For our soft launch, orders are available in sets of 6, up to 24 magnets.</p>
+
+      <div class="guidelinesBox">
+        <h3>Before you upload</h3>
+        <p>Please make sure your photos comply with the Magnetic Moments Content Guidelines.</p>
+        <ul>
+          <li>You have permission to use the photos you upload.</li>
+          <li>Photos must not contain nudity or sexually explicit content.</li>
+          <li>Photos must not contain violence or graphic content.</li>
+          <li>Photos must not contain hate speech, discriminatory material, illegal activity, copyrighted material you do not have permission to use, or anything offensive or inappropriate.</li>
+        </ul>
+        <p>Magnetic Moments reserves the right to refuse and refund any order that does not comply with these guidelines.</p>
+        <div class="privacyNote"><strong>Your privacy matters.</strong> Your photos are used only to produce your order and are never shared with third parties.</div>
+      </div>
+
+      <div class="welcomeActions">
+        <button class="btn primary" id="startCreatingBtn">Start creating</button>
+      </div>
+    </div>
+  </div>
+
   <header>
     <div class="wrap">
       <div class="topbar">
         <div>
-          <h1>Magnet Editor</h1>
-          <div class="sub">5cm × 5cm • 5mm bleed (can be blank/white) • orders in sets of 6 (max 72)</div>
+          <h1>Magnetic Moments</h1>
+          <div class="sub">Create beautiful custom photo magnets • 5cm × 5cm • sets of 6 • max 24 photos</div>
         </div>
         <div></div>
       </div>
@@ -441,11 +533,11 @@
       <section class="gridCard" aria-label="Magnet grid">
         <div class="gridHeader">
           <div class="count">
-            <span>Photos: <b id="photoCount">0</b></span>
-            <span>Tiles shown: <b id="tileCount">6</b></span>
+            <span>Photos uploaded: <b id="photoCount">0</b></span>
+            <span>Magnets shown: <b id="tileCount">6</b></span>
             <span>Ready: <b id="readyCount">0</b></span>
           </div>
-          <div class="hint">Tap a tile to edit. Pinch to zoom. Drag photo or drag text.</div>
+          <div class="hint">Tap a magnet to edit • Pinch to zoom • Drag photo or text</div>
         </div>
 
         <div class="tabs" id="tabs" aria-label="Sets (6 per tab)"></div>
@@ -464,7 +556,7 @@
             <input id="replaceInput" type="file" accept="image/*" />
           </div>
           <div class="note">
-            Uploads expand sets automatically (up to 72). If more than 72 are uploaded, extras are skipped.
+            Upload your photos to create up to 24 custom magnets. Sets grow automatically in groups of 6.
           </div>
 
           <div class="toast" id="toast" style="display:none;"></div>
@@ -474,19 +566,19 @@
       <section class="controls" aria-label="Editing controls">
 
         <div class="panel">
-          <h2>Preview & crop</h2>
+          <h2>Edit your magnet</h2>
           <div class="body">
             <div class="previewWrap">
               <canvas id="preview" width="600" height="600" aria-label="Magnet preview"></canvas>
               <div class="previewHelp">
-                <div>Selected: <span id="selectedLabel">Tile 1</span></div>
-                <div style="opacity:0.9">Pinch = zoom • Drag = move • Drag text when visible</div>
+                <div>Selected: <span id="selectedLabel">Magnet 1</span></div>
+                <div style="opacity:0.9">Pinch to zoom • Drag to move • Drag text to reposition</div>
               </div>
             </div>
 
             <div class="actions" style="justify-content:space-between;">
-              <div style="font-size:12px;color:var(--muted);">Switch tiles while preview stays visible.</div>
-              <button class="btn" id="nextTile">Next tile</button>
+              <div style="font-size:12px;color:var(--muted);">Switch magnets while preview stays visible.</div>
+              <button class="btn" id="nextTile">Next magnet</button>
             </div>
 
             <div class="toggleRow">
@@ -496,7 +588,7 @@
 
             <div class="row">
               <label>
-                <span>Zoom</span>
+                <span>Photo zoom</span>
                 <b id="zoomVal">100%</b>
               </label>
               <input class="range" id="zoom" type="range" min="1" max="3" step="0.01" value="1" disabled />
@@ -524,11 +616,11 @@
         </div>
 
         <div class="panel">
-          <h2>Text & review</h2>
+          <h2>Add text & review</h2>
           <div class="body">
             <div class="row">
               <label>
-                <span>Overlay text (optional)</span>
+                <span>Add text (optional)</span>
                 <b id="textLen">0</b>
               </label>
               <input id="overlayText" class="textInput" type="text" placeholder="Optional text" maxlength="40" disabled />
@@ -557,7 +649,7 @@
                 <span id="orderStatus" class="warn">Not ready</span>
               </div>
               <div>
-                <span id="orderDetail">Upload photos and edit each one. Then tick the acknowledgement.</span>
+                <span id="orderDetail">Upload photos, edit each magnet, then confirm your order is ready.</span>
               </div>
             </div>
 
@@ -565,8 +657,8 @@
               <div class="toggle" style="min-width:100%;">
                 <input id="ack" type="checkbox" disabled />
                 <div class="tmeta">
-                  <div class="t1">I acknowledge I have reviewed and edited all magnets</div>
-                  <div class="t2">Enabled only when your order is a full set of 6 (or 12/18/...)</div>
+                  <div class="t1">I confirm that I have reviewed all magnets and that my photos comply with the Magnetic Moments Content Guidelines</div>
+                  <div class="t2">Required before checkout. Orders must be in complete sets of 6.</div>
                 </div>
               </div>
             </div>
@@ -577,13 +669,13 @@
       </section>
 
       <footer>
-        Customer-facing editor only. Shopify checkout navigation will be wired separately later.
+        Thank you for creating your Magnetic Moments. Review carefully before checkout.
       </footer>
     </div>
   </main>
 
   <script>
-    const MAX_TILES = 72;
+    const MAX_TILES = 24;
     const SET_SIZE = 6;
     const MAG = { full: 600, safe: 500, bleed: 50 };
 
@@ -669,6 +761,8 @@
     const orderDetail = document.getElementById('orderDetail');
 
     const nextBtn = document.getElementById('nextTile');
+    const welcomeOverlay = document.getElementById('welcomeOverlay');
+    const startCreatingBtn = document.getElementById('startCreatingBtn');
 
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
@@ -1042,7 +1136,7 @@
 
         const badge = document.createElement('div');
         badge.className = "badge";
-        badge.innerHTML = `<span class="dot"></span><span>Review</span>`;
+        badge.innerHTML = `<span class="dot"></span><span>Needs Review</span>`;
 
         btn.appendChild(canvas);
         btn.appendChild(empty);
@@ -1064,7 +1158,7 @@
           empty.style.display = "none";
           badge.style.display = "flex";
           badge.classList.toggle("ready", !!tile.ready);
-          badge.querySelector('span:last-child').textContent = tile.ready ? "Ready" : "Review";
+          badge.querySelector('span:last-child').textContent = tile.ready ? "Ready ✓" : "Needs Review";
         } else {
           empty.style.display = "flex";
           badge.style.display = "none";
@@ -1083,7 +1177,7 @@
       if(!fullOrder) ack.checked = false;
 
       const canProceed = fullOrder && allPhotosReady() && ack.checked;
-      orderStatus.textContent = canProceed ? "Ready" : "Not ready";
+      orderStatus.textContent = canProceed ? "Ready for checkout" : "Not ready";
       orderStatus.className = canProceed ? "ok" : "warn";
 
       const has = !!getSlotTile(selectedIndex);
@@ -1092,15 +1186,15 @@
       deleteAllBtn.disabled = tiles.length === 0;
 
       if(tiles.length === 0){
-        orderDetail.textContent = "Upload photos, edit each one, then tick the acknowledgement.";
+        orderDetail.textContent = "Upload photos, edit each magnet, then confirm your order is ready.";
       } else if(!fullOrder){
-        orderDetail.textContent = "Add photos until you reach a full set of 6 (or 12/18/...).";
+        orderDetail.textContent = "Add photos until you have a complete set of 6, 12, 18, or 24 magnets.";
       } else if(!allPhotosReady()){
-        orderDetail.textContent = "Edit each photo at least once so every tile becomes Ready.";
+        orderDetail.textContent = "Review or edit each magnet so every one is marked Ready ✓.";
       } else if(!ack.checked){
-        orderDetail.textContent = "Tick the acknowledgement checkbox to proceed.";
+        orderDetail.textContent = "Confirm that you have reviewed your magnets and agree to the Content Guidelines.";
       } else {
-        orderDetail.textContent = "All tiles are ready and acknowledged.";
+        orderDetail.textContent = "Your Magnetic Moments are ready for checkout.";
       }
     }
 
@@ -1108,7 +1202,7 @@
       const tile = getSlotTile(selectedIndex);
       const has = !!tile;
 
-      selectedLabel.textContent = `Tile ${selectedIndex + 1}`;
+      selectedLabel.textContent = `Magnet ${selectedIndex + 1}`;
 
       replaceBtn.disabled = false;
 
@@ -1482,6 +1576,18 @@
     window.addEventListener('beforeunload', ()=>{
       for(const t of tiles) revokeURL(t);
     });
+
+
+    startCreatingBtn.addEventListener('click', ()=>{
+      welcomeOverlay.classList.add('hidden');
+      try{ sessionStorage.setItem('mmWelcomeSeen', 'true'); }catch(e){}
+    });
+
+    try{
+      if(sessionStorage.getItem('mmWelcomeSeen') === 'true'){
+        welcomeOverlay.classList.add('hidden');
+      }
+    }catch(e){}
 
     // Init
     buildPaletteUI();
