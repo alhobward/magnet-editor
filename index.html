@@ -556,7 +556,7 @@
             <input id="replaceInput" type="file" accept="image/*" />
           </div>
           <div class="note">
-            Upload your photos to create up to 24 custom magnets. Sets grow automatically in groups of 6.
+            Upload the required number of photos for your selected magnet set.
           </div>
 
           <div class="toast" id="toast" style="display:none;"></div>
@@ -675,7 +675,7 @@
   </main>
 
   <script>
-    const MAX_TILES = 24;
+    const MAX_TILES = parseInt(new URLSearchParams(window.location.search).get('qty') || '6', 10);
     const SET_SIZE = 6;
     const MAG = { full: 600, safe: 500, bleed: 50 };
 
