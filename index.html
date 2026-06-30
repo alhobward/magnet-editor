@@ -714,7 +714,8 @@
     }
 
     let tiles = [];
-    let shownCount = 6;
+   let shownCount = new URLSearchParams(window.location.search).get('qty') || 6;
+shownCount = parseInt(shownCount, 10);
     let activeSet = 0;
     let selectedIndex = 0;
 
