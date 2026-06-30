@@ -795,7 +795,9 @@ shownCount = parseInt(shownCount, 10);
     }
 
 function computeShownCount(photoCount){
-  return MAX_TILES;
+  if(photoCount <= 0) return SET_SIZE;
+  const needed = Math.ceil(photoCount / SET_SIZE) * SET_SIZE;
+  return clamp(needed, SET_SIZE, MAX_TILES);
 }
     }
 
