@@ -788,7 +788,27 @@ shownCount = parseInt(shownCount, 10);
         img.src = url;
       });
     }
+    async function uploadImageToCloudflare(file) {
+  const formData = new FormData();
+  formData.append("file", file);
 
+  const response = await fetch(WORKER_UPLOAD_URL, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload failed (${response.status})`);
+  }
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || "Upload failed");
+  }
+
+  return result;
+}
     function roundRect(ctx, x, y, w, h, r){
       r = Math.min(r, w/2, h/2);
       ctx.beginPath();
