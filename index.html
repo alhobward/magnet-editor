@@ -1172,7 +1172,7 @@ shownCount = parseInt(shownCount, 10);
       tileCountEl.textContent = String(shownCount);
       readyCountEl.textContent = String(photosReadyCount());
 
-      const fullOrder = (tiles.length > 0) && (tiles.length % SET_SIZE === 0);
+      const fullOrder = tiles.length === MAX_TILES;
 
       ack.disabled = !fullOrder;
       if(!fullOrder) ack.checked = false;
