@@ -1688,6 +1688,31 @@ async function uploadAllMagnetsToCloudflare() {
     // Init
     buildPaletteUI();
     renderAll();
+    window.addEventListener("message", async (event) => {
+  if (event.data?.type !== "MM_UPLOAD_REQUEST") {
+    return;
+  }
+
+  try {
+    const uploadedMagnets = await uploadAllMagnetsToCloudflare();
+
+    window.parent.postMessage(
+      {
+        type: "MM_UPLOAD_SUCCESS",
+        uploadedMagnets,
+      },
+      "*"
+    );
+  } catch (error) {
+    window.parent.postMessage(
+      {
+        type: "MM_UPLOAD_ERROR",
+        message: error.message,
+      },
+      "*"
+    );
+  }
+});
   </script>
 </body>
 </html>
