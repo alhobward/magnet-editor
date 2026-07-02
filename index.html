@@ -1375,7 +1375,7 @@ async function uploadAllMagnetsToCloudflare() {
         const t = newTile();
         t.img = img;
         t.src = url;
-        t.file = file;
+        t.file = files[i];
         t.ready = false;
         t.zoom = 1;
         clampOffsetsToKeepSafeCovered(t);
