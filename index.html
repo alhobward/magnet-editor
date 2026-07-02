@@ -1689,6 +1689,7 @@ async function uploadAllMagnetsToCloudflare() {
     buildPaletteUI();
     renderAll();
     window.addEventListener("message", async (event) => {
+    console.log("Received message:", event.data);  
   if (event.data?.type !== "MM_UPLOAD_REQUEST") {
     return;
   }
