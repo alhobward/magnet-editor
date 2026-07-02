@@ -788,9 +788,9 @@ shownCount = parseInt(shownCount, 10);
         img.src = url;
       });
     }
-    async function uploadImageToCloudflare(file) {
+    async function uploadImageToCloudflare(file, filename = "magnet.jpg") {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", file, filename);
 
   const response = await fetch(WORKER_UPLOAD_URL, {
     method: "POST",
@@ -808,6 +808,72 @@ shownCount = parseInt(shownCount, 10);
   }
 
   return result;
+}
+
+function tileToBlob(tile) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = MAG.full;
+    canvas.height = MAG.full;
+
+    const ctx = canvas.getContext("2d");
+    renderTileToContext(tile, ctx, MAG.full, false);
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Could not prepare magnet image"));
+        return;
+      }
+
+      resolve(blob);
+    }, "image/jpeg", 0.95);
+  });
+}
+
+async function uploadAllMagnetsToCloudflare() {
+  if (tiles.length !== MAX_TILES) {
+    throw new Error(`Please upload exactly ${MAX_TILES} photos before adding to cart.`);
+  }
+
+  if (!allPhotosReady() || !ack.checked) {
+    throw new Error("Please review all magnets and confirm the order before adding to cart.");
+  }
+
+  const uploadedMagnets = [];
+
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tiles[i];
+
+    tile.uploading = true;
+    tile.uploadError = null;
+    renderAll();
+
+    try {
+      const blob = await tileToBlob(tile);
+      const filename = `magnet-${i + 1}.jpg`;
+      const result = await uploadImageToCloudflare(blob, filename);
+
+      tile.uploadKey = result.key;
+      tile.uploadUrl = result.url;
+      tile.uploaded = true;
+      tile.uploading = false;
+
+      uploadedMagnets.push({
+        magnet: i + 1,
+        key: result.key,
+        url: result.url,
+      });
+    } catch (error) {
+      tile.uploading = false;
+      tile.uploadError = error.message;
+      renderAll();
+      throw error;
+    }
+
+    renderAll();
+  }
+
+  return uploadedMagnets;
 }
     function roundRect(ctx, x, y, w, h, r){
       r = Math.min(r, w/2, h/2);
