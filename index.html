@@ -417,16 +417,27 @@
 
 
     .welcomeOverlay{
-      position:fixed;
-      inset:0;
-      z-index:50;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background: rgba(7,9,17,0.78);
-      backdrop-filter: blur(10px);
-    }
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:18px;
+  background:rgba(7,9,17,0.78);
+  backdrop-filter:blur(10px);
+
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
+
+html.welcome-open,
+body.welcome-open{
+  overflow:hidden;
+  height:100%;
+}
     .welcomeOverlay.hidden{ display:none; }
     .welcomeCard{
       width:min(760px, 100%);
@@ -768,8 +779,11 @@ shownCount = parseInt(shownCount, 10);
     const orderDetail = document.getElementById('orderDetail');
 
     const nextBtn = document.getElementById('nextTile');
-    const welcomeOverlay = document.getElementById('welcomeOverlay');
-    const startCreatingBtn = document.getElementById('startCreatingBtn');
+  const welcomeOverlay = document.getElementById('welcomeOverlay');
+const startCreatingBtn = document.getElementById('startCreatingBtn');
+
+document.documentElement.classList.add('welcome-open');
+document.body.classList.add('welcome-open');
 
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
@@ -1675,15 +1689,24 @@ async function uploadAllMagnetsToCloudflare() {
 
 
     startCreatingBtn.addEventListener('click', ()=>{
-      welcomeOverlay.classList.add('hidden');
-      try{ sessionStorage.setItem('mmWelcomeSeen', 'true'); }catch(e){}
-    });
+  welcomeOverlay.classList.add('hidden');
+
+  document.documentElement.classList.remove('welcome-open');
+  document.body.classList.remove('welcome-open');
+
+  try{
+    sessionStorage.setItem('mmWelcomeSeen', 'true');
+  }catch(e){}
+});
 
     try{
-      if(sessionStorage.getItem('mmWelcomeSeen') === 'true'){
-        welcomeOverlay.classList.add('hidden');
-      }
-    }catch(e){}
+  if(sessionStorage.getItem('mmWelcomeSeen') === 'true'){
+    welcomeOverlay.classList.add('hidden');
+
+    document.documentElement.classList.remove('welcome-open');
+    document.body.classList.remove('welcome-open');
+  }
+}catch(e){}
 
     // Init
     buildPaletteUI();
