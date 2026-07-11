@@ -1737,6 +1737,54 @@ async function uploadAllMagnetsToCloudflare() {
     );
   }
 });
+
+    // Report the editor's full height to the Shopify parent page.
+(function () {
+  let lastReportedHeight = 0;
+  let resizeFrame = null;
+
+  function reportEditorHeight() {
+    if (resizeFrame) {
+      cancelAnimationFrame(resizeFrame);
+    }
+
+    resizeFrame = requestAnimationFrame(() => {
+      const height = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+
+      if (Math.abs(height - lastReportedHeight) < 2) {
+        return;
+      }
+
+      lastReportedHeight = height;
+
+      window.parent.postMessage(
+        {
+          type: 'MM_EDITOR_HEIGHT',
+          height: height
+        },
+        '*'
+      );
+    });
+  }
+
+  window.addEventListener('load', reportEditorHeight);
+  window.addEventListener('resize', reportEditorHeight);
+
+  const resizeObserver = new ResizeObserver(reportEditorHeight);
+  resizeObserver.observe(document.body);
+
+  const mutationObserver = new MutationObserver(reportEditorHeight);
+  mutationObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true
+  });
+
+  reportEditorHeight();
+})();
   </script>
 </body>
 </html>
